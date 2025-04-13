@@ -1,17 +1,14 @@
-# 🔍 Pull Request Summary
+## 🔍 Pull Request Summary
 
 <!-- Provide a short and clear summary of the changes introduced in this PR -->
->
+> 
 
 ---
 
 ## 📂 Related Branch
 
-- [ ] My branch follows the format: `<group>-<FirstName>-<SecondName>`
-
-> Example: `group-08-Jane-Foster`
-
-- [ ] Base branch of this PR: `group-XX`
+- [ ] My branch follows the format: `<group>-<firstName>-<secondName>`
+- Base branch of this PR: `group-XX`
 
 ---
 
@@ -41,7 +38,6 @@
 
 <!-- List directories, files or microservices impacted -->
 > Example:
->
 > - `client/src/app/components/...`
 > - `server/microservice_01/...`
 
