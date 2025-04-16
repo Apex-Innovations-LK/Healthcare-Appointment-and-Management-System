@@ -1,0 +1,316 @@
+<div class="min-h-screen bg-blue-100 flex items-center justify-center p-4">
+  <div
+    class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden"
+  >
+    <!-- Left Section -->
+    <div
+      class="bg-gradient-to-br from-green-400 to-blue-600 text-white w-full md:w-1/2 p-8 flex flex-col justify-center"
+    >
+      <h2 class="text-4xl font-bold mb-4">Welcome to HealthSync</h2>
+      <p class="text-lg mb-6">
+        Manage appointments, patient records, billing, and more -- all in one
+        place.
+      </p>
+      <p class="text-md">
+        {{ isLogin ? "Don’t have an account?" : "Already have an account?" }}
+        <a
+          class="underline cursor-pointer font-semibold"
+          (click)="toggleForm()"
+        >
+          {{ isLogin ? "Sign up" : "Login" }}
+        </a>
+      </p>
+    </div>
+
+    <!-- Right Section -->
+    <div class="w-full md:w-1/2 p-8 bg-gray-500">
+      <!-- Login Form -->
+      <form *ngIf="isLogin" #loginForm="ngForm" (ngSubmit)="login()" novalidate>
+        <h3 class="text-2xl font-semibold mb-6 text-center">Log in</h3>
+        <div class="space-y-4">
+          <div>
+            <label for="username">Username</label>
+            <input
+              pInputText
+              id="username"
+              name="username"
+              [(ngModel)]="user.username"
+              #username="ngModel"
+              required
+              type="text"
+              class="w-full"
+              placeholder="Enter username"
+            />
+            <div
+              *ngIf="username.invalid && username.touched"
+              class="text-red-500 text-sm"
+            >
+              Username is required.
+            </div>
+          </div>
+          <div>
+            <label for="password">Password</label>
+            <input
+              pPassword
+              id="password"
+              name="password"
+              [(ngModel)]="user.password"
+              #password="ngModel"
+              required
+              class="w-full"
+              placeholder="Enter password"
+              type="password"
+            />
+            <div
+              *ngIf="password.invalid && password.touched"
+              class="text-red-500 text-sm"
+            >
+              Password is required.
+            </div>
+          </div>
+          <button
+            pButton
+            type="submit"
+            [disabled]="loginForm.invalid"
+            class="w-full mt-4 cursor-pointer"
+            label="Login"
+          ></button>
+        </div>
+      </form>
+
+      <!-- Signup Form 1 -->
+      <form
+        *ngIf="!isLogin && isNext"
+        #signupForm="ngForm"
+        (ngSubmit)="isNext = false"
+        novalidate
+      >
+        <h3 class="text-2xl font-semibold mb-6 text-center ml-0">Create Account</h3>
+       
+        <div class="space-y-4">
+          <div>
+            <label for="signup-username">Username</label>
+            <input
+              pInputText
+              id="signup-username"
+              name="username"
+              [(ngModel)]="user.username"
+              #signupUsername="ngModel"
+              required
+              type="text"
+              class="w-full"
+              placeholder="Your username"
+            />
+            <div
+              *ngIf="signupUsername.invalid && signupUsername.touched"
+              class="text-red-500 text-sm"
+            >
+              Username is required.
+            </div>
+          </div>
+
+          <div>
+            <label for="signup-role">Role</label>
+            <select
+              id="signup-role"
+              name="role"
+              [(ngModel)]="user.role"
+              #role="ngModel"
+              required
+              class="w-full p-inputtext"
+            >
+              <option value="" disabled selected>Select your role</option>
+              <option value="PATIENT">Patient</option>
+              <option value="DOCTOR">Doctor</option>
+              <option value="STAFF">Staff</option>
+            </select>
+
+            <div
+              *ngIf="role.invalid && role.touched"
+              class="text-red-500 text-sm"
+            >
+              Role is required.
+            </div>
+          </div>
+
+          <div>
+            <label for="signup-password">Password</label>
+            <input
+              pPassword
+              id="signup-password"
+              name="password"
+              [(ngModel)]="user.password"
+              #signupPassword="ngModel"
+              required
+              class="w-full"
+              placeholder="Password"
+              type="password"
+            />
+            <div
+              *ngIf="signupPassword.invalid && signupPassword.touched"
+              class="text-red-500 text-sm"
+            >
+              Password is required.
+            </div>
+          </div>
+
+          <button
+            pButton
+            type="submit"
+            [disabled]="signupForm.invalid"
+            class="w-full mt-4 cursor-pointer"
+            label="Next"
+          ></button>
+        </div>
+      </form>
+
+      <!-- Signup Form 2 -->
+      <form
+        *ngIf="!isLogin && !isNext"
+        #signupForm="ngForm"
+        (ngSubmit)="registerUser()"
+        novalidate
+      >
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-2xl font-semibold mb-6 text-center">Create Account</h3>
+         <a
+          class="underline cursor-pointer font-semibold mb-4"
+          (click)="isNext = true"
+          >previous page</a>
+          </div>
+        <div class="space-y-4">
+          <div class="flex gap-4">
+            <div class="w-1/2">
+              <label for="firstName">First Name</label>
+              <input
+                pInputText
+                id="firstName"
+                name="first_name"
+                [(ngModel)]="user.first_name"
+                #firstName="ngModel"
+                required
+                type="text"
+                class="w-full"
+                placeholder="First name"
+              />
+              <div
+                *ngIf="firstName.invalid && firstName.touched"
+                class="text-red-500 text-sm"
+              >
+                First name is required.
+              </div>
+            </div>
+            <div class="w-1/2">
+              <label for="lastName">Last Name</label>
+              <input
+                pInputText
+                id="lastName"
+                name="last_name"
+                [(ngModel)]="user.last_name"
+                #lastName="ngModel"
+                required
+                type="text"
+                class="w-full"
+                placeholder="Last name"
+              />
+              <div
+                *ngIf="lastName.invalid && lastName.touched"
+                class="text-red-500 text-sm"
+              >
+                Last name is required.
+              </div>
+            </div>
+          </div>
+          <div>
+            <label for="email">Date of Birth</label>
+            <input
+              pInputText
+              id="bithday"
+              name="date of birth"
+              [(ngModel)]="user.date_of_birth"
+              #birthday="ngModel"
+              required
+              type="date"
+              class="w-full"
+              placeholder="Date of Birth"
+            />
+            <div
+              *ngIf="birthday.invalid && birthday.touched"
+              class="text-red-500 text-sm"
+            >
+              Date of Birth is required.
+            </div>
+          </div>
+
+          <div>
+            <label for="email">Gender</label>
+            <input
+              pInputText
+              id="gender"
+              name="gender"
+              [(ngModel)]="user.gender"
+              #gender="ngModel"
+              required
+              type="text"
+              class="w-full"
+              placeholder="Gender"
+            />
+            <div
+              *ngIf="gender.invalid && gender.touched"
+              class="text-red-500 text-sm"
+            >
+              Gender is required.
+            </div>
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input
+              pInputText
+              id="email"
+              name="email"
+              [(ngModel)]="user.email"
+              #email="ngModel"
+              required
+              type="email"
+              class="w-full"
+              placeholder="Email"
+            />
+            <div
+              *ngIf="email.invalid && email.touched"
+              class="text-red-500 text-sm"
+            >
+              A valid email is required.
+            </div>
+          </div>
+          <div>
+            <label for="phone">Phone</label>
+            <input
+              pInputText
+              id="phone"
+              name="phone_number"
+              [(ngModel)]="user.phone_number"
+              #phone="ngModel"
+              required
+              type="text"
+              class="w-full"
+              placeholder="Phone number"
+            />
+            <div
+              *ngIf="phone.invalid && phone.touched"
+              class="text-red-500 text-sm"
+            >
+              Phone number is required.
+            </div>
+          </div>
+          <button
+            pButton
+            type="submit"
+            [disabled]="signupForm.invalid"
+            class="w-full mt-4 cursor-pointer"
+            label="Sign Up"   
+          ></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
