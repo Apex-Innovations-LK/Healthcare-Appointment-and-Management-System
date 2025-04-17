@@ -55,7 +55,8 @@ export class AuthComponent implements OnInit {
           summary: 'Success',
           detail: 'Signup successful!',
         });
-        if (this.user.role === "Staff" || this.user.role === "Doctor") { 
+        sessionStorage.setItem('token', data.token);
+        if (this.user.role === "Staff" || this.user.role === "Doctor") {
           this.router.navigate(['/waiting-approval']);
         }
         this.router.navigate(['/home']);
