@@ -1,13 +1,13 @@
-package com.team7.patient_service;
+package com.madhushankha.ipfs_demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PatientServiceApplication {
+public class IpfsDemoApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PatientServiceApplication.class, args);
+		SpringApplication.run(IpfsDemoApplication.class, args);
 	}
 
 }
