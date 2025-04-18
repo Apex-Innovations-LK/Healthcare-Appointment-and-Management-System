@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.team8</groupId>
-    <artifactId>health-analytics</artifactId>
+    <artifactId>health-analytics-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>health-analytics</name>
     <description>health-analytics</description>
