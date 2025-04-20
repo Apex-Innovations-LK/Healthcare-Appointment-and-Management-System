@@ -10,7 +10,6 @@ import { User } from '../models/user';
 import { OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 
-
 @Component({
   selector: 'app-auth',
   standalone: true,
@@ -46,6 +45,30 @@ export class AuthComponent implements OnInit {
   ) {}
   ngOnInit(): void {}
 
+  private redirectUserBasedOnRole(
+    token: string,
+    username: string,
+    role: string,
+    status: string
+  ): void {
+    sessionStorage.setItem('token', token);
+    sessionStorage.setItem('username', username);
+    if (status === 'PENDING') {
+      this.router.navigate(['/waiting-approval']);
+    } else {
+      const routesByRole: Record<string, string> = {
+        PATIENT: '/home',
+        ADMIN: '/admin-dashboard',
+        DOCTOR: '/doctor-dashboard',
+        STAFF: '/staff-dashboard',
+      };
+
+      const route = routesByRole[role] || '/un-Authorized';
+      this.router.navigate([route]);
+
+    }
+  }
+
   registerUser() {
     this.authService.registerUser(this.user).subscribe(
       (data) => {
@@ -55,11 +78,12 @@ export class AuthComponent implements OnInit {
           summary: 'Success',
           detail: 'Signup successful!',
         });
-        sessionStorage.setItem('token', data.token);
-        if (this.user.role === "Staff" || this.user.role === "Doctor") {
-          this.router.navigate(['/waiting-approval']);
-        }
-        this.router.navigate(['/home']);
+        this.redirectUserBasedOnRole(
+          data.token,
+          data.username,
+          data.role,
+          data.status
+        );
       },
       (error) => {
         console.log('Error in creating user' + error.message);
@@ -81,8 +105,12 @@ export class AuthComponent implements OnInit {
           summary: 'Success',
           detail: 'Login successful!',
         });
-        sessionStorage.setItem('token', data.token);
-        this.router.navigate(['/home']);
+        this.redirectUserBasedOnRole(
+          data.token,
+          data.username,
+          data.role,
+          data.status
+        );
       },
       (error) => {
         console.log('Error in login' + error.message);

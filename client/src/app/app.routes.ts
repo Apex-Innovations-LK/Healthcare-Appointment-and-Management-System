@@ -5,8 +5,9 @@ import { WaitingApprovalComponent } from './waiting-approval/waiting-approval.co
 
 export const routes: Routes = [
   { path: 'auth', component: AuthComponent },
-   //{ path: '**', redirectTo: 'auth', pathMatch: 'full' },
+  // { path: '**', redirectTo: 'auth', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: '', redirectTo: 'auth', pathMatch: 'full' },
-  {path: 'waiting-approval', component: WaitingApprovalComponent}
+  { path: 'waiting-approval', component: WaitingApprovalComponent },
+
 ];

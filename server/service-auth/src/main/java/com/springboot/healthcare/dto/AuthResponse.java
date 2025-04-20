@@ -4,12 +4,16 @@ public class AuthResponse {
 
     private String token;
     private String username;
+    private String role;
+    private String status;
     private String message;
 
     // constructor
-    public AuthResponse(String token, String username, String message) {
+    public AuthResponse(String token, String username,String role, String status,  String message) {
         this.token = token;
         this.username = username;
+        this.role = role;
+        this.status = status;
         this.message = message;
     }
 
@@ -37,5 +41,23 @@ public class AuthResponse {
     public void setMessage(String message) {
         this.message = message;
     }
+
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 
 }

@@ -15,7 +15,7 @@ public class Users {
     private UUID id;
 
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, name ="username")
     private String username;
 
     private String first_name;

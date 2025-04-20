@@ -4,36 +4,23 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.function.Function;
 
 @Service
 public class JWTService {
 
-    private String secretKey = "";
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    public JWTService() {
-        try {
-            KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
-            SecretKey sKey = keyGenerator.generateKey();
-            secretKey = Base64.getEncoder().encodeToString(sKey.getEncoded());
-        } catch(NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-
-    public String generateToken(String username, UUID id, String role) {
+    public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
-        claims.put("id", id);
         return Jwts.builder()
                 .claims()
                 .add(claims)
@@ -56,10 +43,6 @@ public class JWTService {
 
     public String extractRole(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class));
-    }
-
-    public UUID extractId(String token) {
-        return extractClaim(token, claims -> claims.get("id", UUID.class));
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

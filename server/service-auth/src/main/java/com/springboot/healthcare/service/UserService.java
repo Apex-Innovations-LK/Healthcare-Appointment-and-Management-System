@@ -16,7 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -43,9 +43,12 @@ public class UserService {
 
     public AuthResponse register(Users user) {
         user.setPassword(encoder.encode(user.getPassword()));
-        user.setStatus("PENDING");
-        Users savedUser = userRepo.save(user);
-
+        if (user.getRole().equals("DOCTOR") || user.getRole().equals("STAFF")) {
+            user.setStatus("PENDING");
+        } else {
+            user.setStatus("APPROVED");
+        }
+        userRepo.save(user);
         switch(user.getRole().toUpperCase()) {
             case "DOCTOR":
                 Doctor doctor = new Doctor();
@@ -68,21 +71,34 @@ public class UserService {
             default:
                 throw new IllegalArgumentException("Invalid role specified.");
         }
-        user.setId(savedUser.getId());
-        String token = jwtService.generateToken(user.getUsername(), user.getId(), user.getRole());
-        return new AuthResponse(token, user.getUsername(), "Registration successful");
+        String token = jwtService.generateToken(user.getUsername(), user.getRole());
+        return new AuthResponse(token, user.getUsername(), user.getRole(), user.getStatus(),"Registration successful");
     }
 
      public AuthResponse verify(Users user) {
          Authentication authentication =
                  authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
          if(authentication.isAuthenticated()) {
-             Users loggedUser = userRepo.findByusername(user.getUsername());
-             user.setId(loggedUser.getId());
+             Users loggedUser = userRepo.findByUsername(user.getUsername()).orElse(null);
              user.setRole(loggedUser.getRole());
-             String loginToken =  jwtService.generateToken(user.getUsername(), user.getId(), user.getRole());
-             return new AuthResponse(loginToken, user.getUsername(), "Verification successful");
+             user.setStatus(loggedUser.getStatus());
+             String loginToken =  jwtService.generateToken(user.getUsername(), user.getRole());
+             return new AuthResponse(loginToken, user.getUsername(),  user.getRole(), user.getStatus(),"Verification successful");
          }
-         return new AuthResponse("", "", "Verification failed");
+         return new AuthResponse("", "","", "", "Verification failed");
      }
+
+//
+//    public Optional<Users> getUserById(UUID id) {
+//        return userRepo.findById(id);
+//    }
+
+    public Optional<Users> getUserByUsername(String username) {
+        return userRepo.findByUsername(username);
+    }
+
+
+
+
+
 }
