@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: chat-service
+
+logging:
+  level:
+    root: INFO
+
+huggingface:
+  api:
+    key: ${HUGGINGFACE_API_KEY}
