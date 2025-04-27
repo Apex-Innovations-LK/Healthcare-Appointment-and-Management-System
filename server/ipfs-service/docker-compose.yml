@@ -1,5 +1,4 @@
----
-version: '3'
+version: '1'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -12,8 +11,6 @@ services:
     image: confluentinc/cp-kafka:7.3.0
     container_name: broker
     ports:
-    # To learn about configuring Kafka for access across networks see
-    # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
       - "9092:9092"
     depends_on:
       - zookeeper
@@ -26,18 +23,17 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
-docker exec \ 
-kafka-topics --create \
-  --topic "health.record.created" \
-  --bootstrap-server localhost:9092 \
-  --partitions 3 \
-  --replication-factor 1
+  ipfs:
+    image: ipfs/go-ipfs:latest
+    container_name: ipfs-node
+    ports:
+      - "4001:4001"   # Swarm (p2p)
+      - "5001:5001"   # API
+      - "8080:8080"   # Gateway
+    volumes:
+      - ipfs_data:/data/ipfs
+      - ipfs_staging:/export
 
-docker exec broker \
-kafka-topics --list --bootstrap-server broker:9092
-
-docker exec broker \
-kafka-console-consumer --bootstrap-server broker:9092 \
-  --topic health.record.created \
-  --from-beginning
-
+volumes:
+  ipfs_data:
+  ipfs_staging:
