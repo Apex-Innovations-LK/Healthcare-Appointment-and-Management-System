@@ -27,12 +27,24 @@ services:
     image: ipfs/go-ipfs:latest
     container_name: ipfs-node
     ports:
-      - "4001:4001"   # Swarm (p2p)
-      - "5001:5001"   # API
-      - "8080:8080"   # Gateway
+      - "4001:4001"
+      - "5001:5001"
+      - "8080:8080"
     volumes:
       - ipfs_data:/data/ipfs
       - ipfs_staging:/export
+
+  springboot-app:
+    build: .
+    container_name: springboot-app
+    ports:
+      - "8086:8085"
+    depends_on:
+      - broker
+      - ipfs
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+    restart: on-failure
 
 volumes:
   ipfs_data:
