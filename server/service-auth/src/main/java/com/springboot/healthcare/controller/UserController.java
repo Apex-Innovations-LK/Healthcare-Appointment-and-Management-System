@@ -1,6 +1,8 @@
 package com.springboot.healthcare.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.springboot.healthcare.dto.AuthResponse;
+import com.springboot.healthcare.dto.RegisterRequest;
 import com.springboot.healthcare.model.Users;
 import com.springboot.healthcare.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,28 +20,12 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public AuthResponse register(@RequestBody Users user) {
-        return userService.register(user);
+    public AuthResponse register(@RequestBody RegisterRequest request) throws JsonProcessingException {
+        return userService.register(request);
     }
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody Users user) {
         return userService.verify(user);
     }
-
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> getUserById(@PathVariable UUID id) {
-//        Optional<Users> user = userService.getUserById(id);
-//        return user.map(ResponseEntity::ok)
-//                .orElseGet(() -> ResponseEntity.notFound().build());
-//    }
-
-    @GetMapping("/username/{username}")
-    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
-        Optional<Users> user = userService.getUserByUsername(username);
-        return user.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-
 }

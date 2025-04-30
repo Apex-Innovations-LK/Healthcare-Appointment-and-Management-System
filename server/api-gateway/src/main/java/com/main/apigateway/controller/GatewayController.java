@@ -36,6 +36,7 @@ public class GatewayController {
             HttpMethod httpMethod = HttpMethod.valueOf(request.getMethod());
 
             // Debug prints
+            System.out.println("----------------------------------------");
             System.out.println("---------- API GATEWAY DEBUG ----------");
             System.out.println("Service       : " + service);
             System.out.println("HTTP Method   : " + httpMethod);
@@ -70,8 +71,10 @@ public class GatewayController {
         return switch (service.toLowerCase()) {
             case "auth" -> "1";   // http://localhost:8081
             case "schedule" -> "2";   // http://localhost:8082
-            //case "staff" -> "3";  // http://localhost:8083
+            case "appointment" -> "3";  // http://localhost:8083
             default -> throw new IllegalArgumentException("Unknown service: " + service);
         };
     }
+
+
 }

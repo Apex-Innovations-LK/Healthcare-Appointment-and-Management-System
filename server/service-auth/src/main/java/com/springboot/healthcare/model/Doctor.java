@@ -18,6 +18,8 @@ public class Doctor {
 
     private String speciality;
 
+    private String license_number;
+
 
     // Getters and Setters
     public UUID getId() {
@@ -44,6 +46,13 @@ public class Doctor {
         this.speciality = speciality;
     }
 
+    public String getLicense_number() {
+        return license_number;
+    }
+
+    public void setLicense_number(String license_number) {
+        this.license_number = license_number;
+    }
 
 
     @Override
@@ -51,6 +60,7 @@ public class Doctor {
         return "Doctor{" +
                 "id=" + id +
                 ", speciality='" + speciality + '\'' +
+                ", license_number='" + license_number + '\'' +
                 '}';
     }
 }

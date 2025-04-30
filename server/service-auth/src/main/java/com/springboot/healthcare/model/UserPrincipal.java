@@ -23,11 +23,13 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getPassword() {
+        System.out.println("password" + user.getPassword());
         return user.getPassword();
     }
 
     @Override
     public String getUsername() {
+        System.out.println("username" + user.getUsername());
         return user.getUsername();
     }
 

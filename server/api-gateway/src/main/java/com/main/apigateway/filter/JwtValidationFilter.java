@@ -31,20 +31,24 @@ public class JwtValidationFilter implements Filter {
         }
 
 
+
         String authHeader = req.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("Missing or invalid Authorization header");
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Invalid or expired token. Please login again.\"}");
+            response.getWriter().flush();
             return;
         }
 
         String token = authHeader.substring(7);
-        System.out.println(token);
 
         if (!jwtService.isTokenValid(token)) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("Invalid or expired JWT token");
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Invalid or expired token. Please login again.\"}");
+            response.getWriter().flush();
             return;
         }
 
