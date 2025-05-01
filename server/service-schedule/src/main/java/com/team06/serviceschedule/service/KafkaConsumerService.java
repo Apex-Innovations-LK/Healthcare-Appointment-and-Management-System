@@ -1,145 +1,103 @@
-//package com.team06.serviceschedule.service;
-//
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.team06.serviceschedule.dto.DoctorKafkaEvent;
-//import com.team06.serviceschedule.dto.UserKafkaEvent;
-//import com.team06.serviceschedule.model.Availibility;
-//import com.team06.serviceschedule.model.Users;
-//import com.team06.serviceschedule.repo.AvailibilityRepo;
-//import com.team06.serviceschedule.repo.UserRepo;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.kafka.annotation.KafkaListener;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.List;
-////
-//@Service
-//public class KafkaConsumerService {
-//
-//    private final ObjectMapper objectMapper;
-//
-//    @Autowired
-//    private UserRepo userRepo;
-//
-//    @Autowired
-//    private AvailibilityRepo availabilityRepo;
-//
-//    public KafkaConsumerService(ObjectMapper objectMapper) {
-//        this.objectMapper = objectMapper;
-//    }
-//
-//    @KafkaListener(topics = "user_created", groupId = "group_id")
-//    public void consumeUserEvent(String message) {
-//        try {
-//            System.out.println(message);
-//            String actualJson = objectMapper.readValue(message, String.class);
-//            UserKafkaEvent event = objectMapper.readValue(actualJson, UserKafkaEvent.class);
-//
-//            if (event.getRole().equals("DOCTOR") || event.getRole().equals("STAFF")) {
-//                Users user = new Users();
-//                user.setEmail(event.getEmail());
-//                user.setId(event.getUserId());
-//                user.setRole(event.getRole());
-//                user.setUsername(event.getUsername());
-//
-//                userRepo.save(user);
-//                List<Users> users = userRepo.findAllByRole("STAFF");
-//                System.out.println("users" + users);
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    @KafkaListener(topics = "availability_settled", groupId = "group_id")
-//    public void consumeDoctorEvent(String message) {
-//        try{
-//            System.out.println(message);
-//            String actualJson = objectMapper.readValue(message, String.class);
-//            DoctorKafkaEvent event = objectMapper.readValue(actualJson, DoctorKafkaEvent.class);
-//
-//            Availibility availibility = new Availibility();
-//            availibility.setSession_id(event.getSession_id());
-//            availibility.setDoctor_id(event.getDoctor_id());
-//            availibility.setFrom(event.getFrom());
-//            availibility.setTo(event.getTo());
-//            availibility.setNumber_of_patients(event.getNumber_of_patients());
-//
-//            System.out.println("availability" + availibility);
-//            System.out.println("message" + message);
-//
-//            availabilityRepo.save(availibility);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}
-
 package com.team06.serviceschedule.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team06.serviceschedule.dto.DoctorKafkaEvent;
 import com.team06.serviceschedule.dto.UserKafkaEvent;
 import com.team06.serviceschedule.model.Availibility;
 import com.team06.serviceschedule.model.Users;
 import com.team06.serviceschedule.repo.AvailibilityRepo;
 import com.team06.serviceschedule.repo.UserRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class KafkaConsumerService {
-
-    private final UserRepo userRepo;
-    private final AvailibilityRepo availibilityRepo;
+    private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerService.class);
 
     @Autowired
-    public KafkaConsumerService(UserRepo userRepo, AvailibilityRepo availibilityRepo) {
-        this.userRepo = userRepo;
-        this.availibilityRepo = availibilityRepo;
-    }
+    private ObjectMapper objectMapper;
 
-    @KafkaListener(
-            topics = "user_created",
-            groupId = "group_id",
-            containerFactory = "userKafkaEventListenerFactory"
-    )
-    public void consumeUserEvent(UserKafkaEvent event) {
-        System.out.println("Received User Event: " + event);
+    @Autowired
+    private UserRepo userRepository;
+    @Autowired
+    private AvailibilityRepo availibilityRepo;
 
-        if ("DOCTOR".equalsIgnoreCase(event.getRole()) || "STAFF".equalsIgnoreCase(event.getRole())) {
-            Users user = new Users();
-            user.setId(event.getUserId());
-            user.setUsername(event.getUsername());
-            user.setEmail(event.getEmail());
-            user.setRole(event.getRole());
+    @KafkaListener(topics = "${kafka.topic.user-created}", groupId = "${spring.kafka.consumer.group-id}")
+    public void consumeUserCreatedEvent(String message, Acknowledgment acknowledgment) {
+        try {
+            logger.info("Received message: {}", message);
+            UserKafkaEvent userEvent = objectMapper.readValue(message, UserKafkaEvent.class);
 
-            userRepo.save(user);
+            if ("USER_CREATED".equals(userEvent.getEventType())) {
+                processUserCreatedEvent(userEvent);
+            } else {
+                logger.warn("Unknown event type: {}", userEvent.getEventType());
+            }
 
-            List<Users> staffUsers = userRepo.findAllByRole("STAFF");
-            System.out.println("Staff users: " + staffUsers);
+            // Acknowledge the message after successful processing
+            acknowledgment.acknowledge();
+            logger.info("User event processed successfully: {}", userEvent);
+        } catch (Exception e) {
+            logger.error("Error processing Kafka message: {}", e.getMessage(), e);
+            // In case of error, we could implement retry logic here or send to DLQ
+            // For now, we'll still acknowledge to prevent endless retries
+            acknowledgment.acknowledge();
         }
     }
 
-    @KafkaListener(
-            topics = "availability_settled",
-            groupId = "group_id",
-            containerFactory = "doctorKafkaEventListenerFactory"
-    )
-    public void consumeDoctorEvent(DoctorKafkaEvent event) {
-        System.out.println("Received Doctor Event: " + event);
+    @KafkaListener(topics = "${kafka.topic.availability-settled}", groupId ="${spring.kafka.consumer.group-id}")
+    public void consueAvailabilitySettledEvent(String message, Acknowledgment acknowledgment) {
+        try {
+            logger.info("Received message: {}", message);
+            DoctorKafkaEvent doctorEvent = objectMapper.readValue(message, DoctorKafkaEvent.class);
 
-        Availibility availability = new Availibility();
-        availability.setSession_id(event.getSession_id());
-        availability.setDoctor_id(event.getDoctor_id());
-        availability.setFrom(event.getFrom());
-        availability.setTo(event.getTo());
-        availability.setNumber_of_patients(event.getNumber_of_patients());
+            if ("AVAILABILITY_SETTLED".equals(doctorEvent.getEventType())) {
+                processAvailabilitySettledEvent(doctorEvent);
+            } else {
+                logger.warn("Unknown event type: {}", doctorEvent.getEventType());
+            }
 
-        availibilityRepo.save(availability);
-        System.out.println("Saved availability: " + availability);
+            // Acknowledge the message after successful processing
+            acknowledgment.acknowledge();
+            logger.info("User event processed successfully: {}", doctorEvent);
+
+        } catch (Exception e) {
+            logger.error("Error processing Kafka message: {}", e.getMessage(), e);
+            // In case of error, we could implement retry logic here or send to DLQ
+            // For now, we'll still acknowledge to prevent endless retries
+            acknowledgment.acknowledge();
+        }
+    }
+
+    private void processUserCreatedEvent(UserKafkaEvent userEvent) {
+        if (userRepository.findById(userEvent.getUserId()).isPresent()) {
+            logger.info("User already exists with ID: {}", userEvent.getUserId());
+            return;
+        }
+
+        Users user = new Users ();
+        user.setId(userEvent.getUserId());
+        user.setEmail(userEvent.getEmail());
+        user.setRole(userEvent.getRole());
+        user.setUsername(userEvent.getUsername());
+
+        userRepository.save(user);
+        logger.info("User saved to database: {}", user);
+    }
+
+    private void processAvailabilitySettledEvent(DoctorKafkaEvent doctorEvent) {
+        Availibility availibility = new Availibility();
+        availibility.setSession_id(doctorEvent.getSession_id());
+        availibility.setDoctor_id(doctorEvent.getDoctor_id());
+        availibility.setFrom(doctorEvent.getFrom());
+        availibility.setTo(doctorEvent.getTo());
+        availibility.setNumber_of_patients(doctorEvent.getNumber_of_patients());
+
+        availibilityRepo.save(availibility);
+        logger.info("Availability settled to database: {}", availibility);
     }
 }

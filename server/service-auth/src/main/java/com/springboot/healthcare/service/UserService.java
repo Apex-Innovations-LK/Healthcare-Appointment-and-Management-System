@@ -104,24 +104,18 @@ public class UserService {
         }
         String token = jwtService.generateToken(user.getUsername(), user.getRole());
 
-//        String kafkaMessage = String.format(
-//                "{\"userId\":\"%s\", \"username\":\"%s\", \"email\":\"%s\", \"role\":\"%s\"}",
-//                savedUser.getId().toString(),
-//                savedUser.getUsername(),
-//                savedUser.getEmail(),
-//                savedUser.getRole()
-//        );
-//
-//        kafkaProducerService.sendMessage(kafkaMessage);
+        // Create the UserKafkaEvent object
+        UserKafkaEvent userEvent = new UserKafkaEvent(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getEmail(),
+                savedUser.getRole()
+        );
 
-//        UserKafkaEvent event = new UserKafkaEvent(
-//                savedUser.getId(),
-//                savedUser.getUsername(),
-//                savedUser.getEmail(),
-//                savedUser.getRole()
-//        );
-//
-//        kafkaProducerService.sendMessage(event);
+        // Send to Kafka
+        kafkaProducerService.sendUserCreatedEvent(userEvent);
+
+
 
 
         return new AuthResponse(token, user.getUsername(), user.getRole(), user.getStatus(),"Registration successful");

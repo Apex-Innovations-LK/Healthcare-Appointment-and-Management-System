@@ -12,7 +12,7 @@ import { AuthStateService } from '../../../service/auth-state.service';
     selector: 'staff-topbar-widget',
     providers: [MessageService],
     imports: [ToastModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator],
-    template: `<a class="flex items-center" href="#">
+    template: `<a class="flex items-center" href="/staff">
             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 mr-2">
                 <path
                     fill-rule="evenodd"
