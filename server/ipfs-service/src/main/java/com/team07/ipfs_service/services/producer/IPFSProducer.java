@@ -20,10 +20,10 @@ public class IPFSProducer {
     public void sendToBlockchain(HealthRecordHashed hashedRecord) {
         try {
             String json = objectMapper.writeValueAsString(hashedRecord);
-            kafkaTemplate.send(KafkaTopics.TO_BLOCKCHAIN_TOPIC, json);
-            System.out.println("📤 Sent Hashed Record to Blockchain: " + json);
+            kafkaTemplate.send(KafkaTopics.BLOCKCHAIN_TOPIC, json);
+            System.out.println("Sent Hashed Record to Blockchain: " + json);
         } catch (Exception e) {
-            System.err.println("❌ Failed to send Hashed Record to Blockchain");
+            System.err.println("Failed to send Hashed Record to Blockchain");
             e.printStackTrace();
         }
     }

@@ -4,14 +4,16 @@ public class HealthRecordHashed {
 
     private String recordId;
     private String patientId;
+    private String doctorId;
     private String ipfsHash;
 
     public HealthRecordHashed() {
     }
 
-    public HealthRecordHashed(String recordId, String patientId, String ipfsHash) {
+    public HealthRecordHashed(String recordId, String patientId, String doctorId, String ipfsHash) {
         this.recordId = recordId;
         this.patientId = patientId;
+        this.doctorId = doctorId;
         this.ipfsHash = ipfsHash;
     }
 
@@ -29,6 +31,14 @@ public class HealthRecordHashed {
 
     public void setPatientId(String patientId) {
         this.patientId = patientId;
+    }
+
+    public String getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
     }
 
     public String getIpfsHash() {
