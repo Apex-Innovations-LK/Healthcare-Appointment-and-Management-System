@@ -46,6 +46,7 @@ services:
       - SPRING_PROFILES_ACTIVE=default
       - IPFS_NODE_HOST=ipfs-node
       - IPFS_NODE_PORT=5001
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=broker:29092
     restart: on-failure
 
 volumes:
