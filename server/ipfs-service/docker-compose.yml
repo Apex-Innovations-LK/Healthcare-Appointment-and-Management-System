@@ -44,6 +44,8 @@ services:
       - ipfs
     environment:
       - SPRING_PROFILES_ACTIVE=default
+      - IPFS_NODE_HOST=ipfs-node
+      - IPFS_NODE_PORT=5001
     restart: on-failure
 
 volumes:
