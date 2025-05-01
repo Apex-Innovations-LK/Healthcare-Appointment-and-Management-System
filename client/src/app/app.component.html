@@ -1,0 +1,11 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Show navbar only when not on auth page -->
+  <app-navbar *ngIf="!router.url.includes('auth')"></app-navbar>
+  
+  <!-- Main Content -->
+  <router-outlet></router-outlet>
+  
+  <!-- Toast container for notifications -->
+  <p-toast></p-toast>
+</div>
+
