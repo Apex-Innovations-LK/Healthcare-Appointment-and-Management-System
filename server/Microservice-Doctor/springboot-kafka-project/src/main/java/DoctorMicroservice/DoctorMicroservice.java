@@ -1,13 +1,13 @@
-package DoctorMicroservice.springboot_kafka_project;
+package DoctorMicroservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringbootKafkaProjectApplication {
+public class DoctorMicroservice {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringbootKafkaProjectApplication.class, args);
+		SpringApplication.run(DoctorMicroservice.class, args);
 	}
 
 }
