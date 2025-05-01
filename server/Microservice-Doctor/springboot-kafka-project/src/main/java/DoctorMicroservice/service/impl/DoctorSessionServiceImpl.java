@@ -3,7 +3,8 @@ package DoctorMicroservice.service.impl;
 import org.springframework.stereotype.Service;
 
 import DoctorMicroservice.dto.DoctorSessionDto;
-import DoctorMicroservice.entity.DoctorSession;
+import DoctorMicroservice.entity.DoctorSession; 
+import DoctorMicroservice.kafka.DoctorSessionKafkaProducer;
 import DoctorMicroservice.mapper.DoctorSessionMapper;
 import DoctorMicroservice.repository.DoctorSessionRepository;
 import DoctorMicroservice.service.DoctorSessionService;
@@ -16,12 +17,15 @@ import lombok.RequiredArgsConstructor;
 public class DoctorSessionServiceImpl implements DoctorSessionService {
     private final DoctorSessionRepository doctorSessionRepository;
     private final DoctorSessionMapper availabilityMapper;
+    private final DoctorSessionKafkaProducer doctorSessionKafkaProducer;
 
 
     @Override
     public DoctorSessionDto addDoctorSession(DoctorSessionDto doctorSessionDto) {
         DoctorSession doctorSession = availabilityMapper.mapToDoctorSession(doctorSessionDto);
         DoctorSession savedDoc = doctorSessionRepository.save(doctorSession);
-        return availabilityMapper.mapToDoctorSessionDto(savedDoc);
+        DoctorSessionDto responseDto = availabilityMapper.mapToDoctorSessionDto(savedDoc);
+        doctorSessionKafkaProducer.sendDoctorSession(responseDto);
+        return responseDto;
     }
 }

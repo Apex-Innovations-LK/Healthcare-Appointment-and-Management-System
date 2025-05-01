@@ -30,7 +30,14 @@ public class DoctorController {
 
     //addDoctorAvailability REST API
     @PostMapping("/addSession")
-    public ResponseEntity<DoctorSessionDto> addDoctor(@RequestBody DoctorSessionDto doctorSessionDto){
+    public ResponseEntity<DoctorSessionDto> addSession(@RequestBody DoctorSessionDto doctorSessionDto){
+        DoctorSessionDto savedDocAvailability = doctorSessionService.addDoctorSession(doctorSessionDto);
+        return new ResponseEntity<>(savedDocAvailability, HttpStatus.CREATED);
+    };
+
+    //rejectAppointment REST API
+    @PostMapping("/rejectAppointment")
+    public ResponseEntity<ScheduleSlotDto> rejectAppointment(@RequestBody ScheduleSlotDto doctorSessionDto){
         DoctorSessionDto savedDocAvailability = doctorSessionService.addDoctorSession(doctorSessionDto);
         return new ResponseEntity<>(savedDocAvailability, HttpStatus.CREATED);
     };
