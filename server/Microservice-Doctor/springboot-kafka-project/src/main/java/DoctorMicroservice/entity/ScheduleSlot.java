@@ -1,8 +1,6 @@
 package DoctorMicroservice.entity;
 
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,12 +30,6 @@ public class ScheduleSlot {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DoctorSession_id", referencedColumnName = "DoctorSession_id", nullable = false)
     private DoctorSession session;
-
-    @Column(name = "start_time", nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime startTime;
-
-    @Column(name = "end_time", nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime endTime;
 
     @Column(name = "status")
     private String status;

@@ -11,6 +11,7 @@ import DoctorMicroservice.dto.DoctorDto;
 import DoctorMicroservice.dto.DoctorSessionDto;
 import DoctorMicroservice.service.DoctorService;
 import DoctorMicroservice.service.DoctorSessionService;
+import DoctorMicroservice.dto.ScheduleSlotDto;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

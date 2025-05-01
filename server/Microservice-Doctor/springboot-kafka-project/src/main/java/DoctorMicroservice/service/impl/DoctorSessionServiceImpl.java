@@ -26,6 +26,8 @@ public class DoctorSessionServiceImpl implements DoctorSessionService {
         DoctorSession savedDoc = doctorSessionRepository.save(doctorSession);
         DoctorSessionDto responseDto = availabilityMapper.mapToDoctorSessionDto(savedDoc);
         doctorSessionKafkaProducer.sendDoctorSession(responseDto);
+
+        
         return responseDto;
     }
 }

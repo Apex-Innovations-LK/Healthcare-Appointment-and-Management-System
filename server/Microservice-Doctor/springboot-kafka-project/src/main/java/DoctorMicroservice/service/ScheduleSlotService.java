@@ -4,5 +4,5 @@ import DoctorMicroservice.dto.ScheduleSlotDto;
 
 public interface ScheduleSlotService {
 
-    ScheduleSlotDto rejectSceduleSlot(ScheduleSlotDto scheduleSlotDto);
+    ScheduleSlotDto rejectScheduleSlot(ScheduleSlotDto scheduleSlotDto);
 }
