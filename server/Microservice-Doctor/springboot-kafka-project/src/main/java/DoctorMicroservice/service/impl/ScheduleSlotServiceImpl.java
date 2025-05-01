@@ -1,10 +1,13 @@
 package DoctorMicroservice.service.impl;
 
 import DoctorMicroservice.dto.ScheduleSlotDto;
+import DoctorMicroservice.entity.ScheduleSlot;
 import DoctorMicroservice.service.ScheduleSlotService;
 import DoctorMicroservice.mapper.ScheduleSlotMapper;
 import DoctorMicroservice.repository.ScheduleSlotRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.Service;
+import lombok.transaction.Transactional;
 
 @Service
 @Transactional
@@ -16,9 +19,12 @@ public class ScheduleSlotServiceImpl implements ScheduleSlotService {
 
 
     @Override
-    public ScheduleSlotDto rejectSceduleSlot(ScheduleSlotDto scheduleSlotDto) {
-        // Logic to reject the schedule slot
-        return scheduleSlotDto;
+    public void rejectScheduleSlot(ScheduleSlotDto scheduleSlotDto) {
+        ScheduleSlot slot = scheduleSlotRepository.findById(scheduleSlotDto.getSlotId())
+                .orElseThrow(() -> new RuntimeException("Slot not found"));
+
+        slot.setStatus("rejected");
+        scheduleSlotRepository.save(slot);
     }
 
 }
