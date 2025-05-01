@@ -12,7 +12,7 @@ import { ToastModule } from 'primeng/toast';
     selector: 'doctor-topbar-widget',
     providers: [MessageService],
     imports: [RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator, ToastModule],
-    template: `<a class="flex items-center" href="#">
+    template: `<a class="flex items-center" href="/doctor">
             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 mr-2">
                 <path
                     fill-rule="evenodd"

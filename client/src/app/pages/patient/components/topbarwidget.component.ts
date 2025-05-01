@@ -12,7 +12,7 @@ import { MessageService } from 'primeng/api';
     selector: 'patient-topbar-widget',
      providers: [MessageService],
     imports: [RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator, ToastModule],
-    template: `<a class="flex items-center" href="#">
+    template: `<a class="flex items-center" href="/patient">
             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 mr-2">
                 <path
                     fill-rule="evenodd"
@@ -67,7 +67,7 @@ import { MessageService } from 'primeng/api';
             </ul>
             <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0">
                 <button pButton pRipple label="Logout" [rounded]="true" (click)="logout()"></button>
-                <app-floating-configurator />
+                <app-floating-configurator/>
             </div>
         </div> `
 })

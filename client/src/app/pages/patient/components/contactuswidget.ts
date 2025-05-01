@@ -65,6 +65,6 @@ import { Router } from '@angular/router';
 export class ContactusWidget {
     constructor(private router: Router) {}
     navigateToAppointment() {
-        this.router.navigate(['appiontment']);
+        this.router.navigate(['patient/appointment']);
     }
 }
