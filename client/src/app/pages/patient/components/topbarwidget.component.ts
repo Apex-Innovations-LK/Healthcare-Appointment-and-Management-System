@@ -4,10 +4,14 @@ import { Router, RouterModule } from '@angular/router';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { AppFloatingConfigurator } from "../../admin/components/app.floatingconfigurator";
+import { AuthStateService } from '../../../service/auth-state.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'patient-topbar-widget',
-    imports: [RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator],
+     providers: [MessageService],
+    imports: [RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator, ToastModule],
     template: `<a class="flex items-center" href="#">
             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 mr-2">
                 <path
@@ -62,11 +66,23 @@ import { AppFloatingConfigurator } from "../../admin/components/app.floatingconf
                 </li>
             </ul>
             <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0">
-                <button pButton pRipple label="Logout" [rounded]="true"></button>
+                <button pButton pRipple label="Logout" [rounded]="true" (click)="logout()"></button>
                 <app-floating-configurator />
             </div>
         </div> `
 })
 export class TopbarWidget {
-    constructor(public router: Router) {}
+    constructor(
+        public router: Router,
+        private authStateService: AuthStateService,
+        private messageService : MessageService
+    ) {}
+
+    logout() {
+        this.authStateService.clear();
+        this.messageService.add({ severity: 'success', summary: 'Logout', detail: 'Logged out successfully' });
+        setTimeout(() => {
+            this.router.navigate(['/auth/login']);
+        }, 2000);
+    }
 }

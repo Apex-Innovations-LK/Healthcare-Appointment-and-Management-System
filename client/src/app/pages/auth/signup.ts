@@ -12,11 +12,12 @@ import { User } from '../../models/user';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../service/auth.service';
 import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
     selector: 'app-signup',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator, DropdownModule, CommonModule],
+    imports: [ToastModule, ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator, DropdownModule, CommonModule],
     providers: [MessageService],
     template: `
         <app-floating-configurator />
@@ -155,9 +156,8 @@ export class Signup {
 
     private redirectUserBasedOnRole(token: string, username: string, role: string, status: string): void {
         localStorage.setItem('token', token);
-        localStorage.setItem('username', username);
         const routesByRole: Record<string, string> = {
-            PATIENT: '/',
+            PATIENT: '/patient',
             ADMIN: '/admin',
             DOCTOR: '/doctor',
             STAFF: '/staff'
@@ -171,15 +171,15 @@ export class Signup {
     registerUser() {
         this.authService.registerUser(this.user).subscribe({
             next: (data) => {
-                console.log(data);
-                if (!data.token) {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: data.message || 'Signup failed.'
-                    });
-                    return;
-                }
+                // console.log(data);
+                // if (!data.token) {
+                //     this.messageService.add({
+                //         severity: 'error',
+                //         summary: 'Error',
+                //         detail: data.message || 'Signup failed.'
+                //     });
+                //     return;
+                // }
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',

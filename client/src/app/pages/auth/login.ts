@@ -10,11 +10,12 @@ import { AppFloatingConfigurator } from '../admin/components/app.floatingconfigu
 import { User } from '../../models/user';
 import { AuthService } from '../../service/auth.service';
 import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
+    imports: [ToastModule, ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
     providers: [MessageService],
     template: `
         <app-floating-configurator />
@@ -117,9 +118,8 @@ export class Login {
 
     private redirectUserBasedOnRole(token: string, username: string, role: string, status: string): void {
         localStorage.setItem('token', token);
-        localStorage.setItem('username', username);
         const routesByRole: Record<string, string> = {
-            PATIENT: '/',
+            PATIENT: '/patient',
             ADMIN: '/admin',
             DOCTOR: '/doctor',
             STAFF: '/staff'

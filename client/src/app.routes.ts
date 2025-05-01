@@ -1,11 +1,16 @@
 import { Routes } from '@angular/router';
 import { AppLayout } from './app/pages/admin/app.layout';
-import { Notfound } from './app/pages/notfound/notfound';
+import { NotFound } from './app/pages/notfound/notfound';
 import { DoctorLayout } from './app/pages/doctor/doctor.layout';
 import { PatientLayout } from './app/pages/patient/patient.layout';
 import { StaffLayout } from './app/pages/staff/staff.layout';
+import { HomeComponent } from './app/pages/home/home';
 
 export const appRoutes: Routes = [
+    {
+        path: '',
+        component: HomeComponent
+    },
     {
         path: 'admin',
         component: AppLayout,
@@ -52,7 +57,7 @@ export const appRoutes: Routes = [
     },
     {
         path: 'notfound',
-        component: Notfound
+        component: NotFound
     },
     {
         path: '**',

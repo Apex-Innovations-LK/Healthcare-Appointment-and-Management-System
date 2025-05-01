@@ -79,6 +79,12 @@ export class LayoutService {
     private initialized = false;
 
     constructor() {
+        const savedConfig = localStorage.getItem('layoutConfig');
+        if (savedConfig) {
+            this._config = JSON.parse(savedConfig);
+            this.layoutConfig.set(this._config);
+            this.toggleDarkMode(this._config); // Apply dark mode on load
+        }
         effect(() => {
             const config = this.layoutConfig();
             if (config) {
@@ -165,6 +171,7 @@ export class LayoutService {
 
     onConfigUpdate() {
         this._config = { ...this.layoutConfig() };
+        localStorage.setItem('layoutConfig', JSON.stringify(this._config));
         this.configUpdate.next(this.layoutConfig());
     }
 

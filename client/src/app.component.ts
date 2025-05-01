@@ -8,4 +8,4 @@ import { ToastModule } from 'primeng/toast';
     imports: [RouterModule, ToastModule],
     template: `<router-outlet></router-outlet>`
 })
-export class AppComponent {}
+export class AppComponent{}
