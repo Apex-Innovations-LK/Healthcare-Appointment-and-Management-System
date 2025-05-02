@@ -39,7 +39,7 @@ import { Product, ProductService } from '../../service/product.service';
 export class RecentSalesWidget {
     products!: Product[];
 
-    constructor(private productService: ProductService) {}
+    constructor(private productService : ProductService) {}
 
     ngOnInit() {
         this.productService.getProductsSmall().then((data) => (this.products = data));
