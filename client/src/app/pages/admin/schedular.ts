@@ -1,12 +1,17 @@
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-admin-schedular',
-    imports: [],
+    standalone: true,
+    imports: [CommonModule],
     template: `
-        <div class="grid grid-cols-12 gap-8">
-            <h2>Admin Schedular Page</h2>
+        <div>
+            <h1>Schedular works!</h1>
         </div>
     `
 })
-export class Schedular {}
+export class Schedular {
+
+}
