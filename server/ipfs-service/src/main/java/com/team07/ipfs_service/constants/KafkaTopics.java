@@ -1,6 +1,6 @@
 package com.team07.ipfs_service.constants;
 
 public class KafkaTopics {
-    public static final String TO_IPFS_TOPIC = "to-ipfs-topic";
-    public static final String TO_BLOCKCHAIN_TOPIC = "to-blockchain-topic";
+    public static final String IPFS_TOPIC = "ipfs-topic";
+    public static final String BLOCKCHAIN_TOPIC = "blockchain-topic";
 }

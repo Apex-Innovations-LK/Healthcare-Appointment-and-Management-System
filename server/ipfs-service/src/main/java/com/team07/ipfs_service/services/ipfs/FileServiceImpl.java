@@ -1,9 +1,10 @@
 package com.team07.ipfs_service.services.ipfs;
 
-import org.springframework.web.multipart.MultipartFile;
+
+import com.team07.ipfs_service.dto.HealthRecord;
 
 public interface FileServiceImpl {
 
-    String saveFile(MultipartFile file);
+    String saveFile(HealthRecord record);
     byte[] loadFile(String hash);
 }

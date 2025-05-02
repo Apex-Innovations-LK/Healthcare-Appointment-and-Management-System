@@ -1,13 +1,10 @@
 package com.team07.ipfs_service.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.team07.ipfs_service.dto.HealthRecord;
 import com.team07.ipfs_service.services.ipfs.IPFSService;
 
 @RestController
@@ -17,9 +14,11 @@ public class IPFSController {
     private IPFSService ipfsService;
 
     @PostMapping(value = "upload")
-    public String saveFile(@RequestParam ("file")MultipartFile file){
+    public String saveFile(@RequestBody HealthRecord record){
 
-        return ipfsService.saveFile(file);
+        System.out.println("Received request: " + record);
+        
+        return ipfsService.saveFile(record);
     }
 
     @GetMapping(value = "file/{hash}")

@@ -6,9 +6,12 @@ import io.ipfs.api.NamedStreamable;
 import io.ipfs.multihash.Multihash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team07.ipfs_service.config.IpfsConfig;
+import com.team07.ipfs_service.dto.HealthRecord;
+import com.team07.ipfs_service.dto.HealthRecordHashed;
+import com.team07.ipfs_service.services.producer.IPFSProducer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -18,30 +21,44 @@ public class IPFSService implements FileServiceImpl {
 
     @Autowired
     private IpfsConfig ipfsConfig;
-
+    
+    @Autowired
+    private IPFSProducer ipfsProducer; 
 
     @Override
-    public String saveFile(MultipartFile file) {
+    public String saveFile(HealthRecord record) {
         try{
-
-            InputStream stream = new ByteArrayInputStream(file.getBytes());
-            NamedStreamable.InputStreamWrapper inputStreamWrapper = new NamedStreamable.InputStreamWrapper(stream);
+            ObjectMapper objectMapper = new ObjectMapper();
+            byte[] recordBytes = objectMapper.writeValueAsBytes(record);
+            
+            // Create an input stream from the record bytes
+            InputStream stream = new ByteArrayInputStream(recordBytes);
+            NamedStreamable.InputStreamWrapper inputStreamWrapper = 
+                new NamedStreamable.InputStreamWrapper(record.getRecordId() + ".json", stream);
+            
+            // Get IPFS instance and add the file
             IPFS ipfs = ipfsConfig.getIpfs();
-
             MerkleNode merkleNode = ipfs.add(inputStreamWrapper).get(0);
+            String ipfsHash = merkleNode.hash.toBase58();
+            
+
+            HealthRecordHashed healthRecordHashed = new HealthRecordHashed(
+                record.getRecordId(),
+                record.getPatientId(),
+                record.getReferringDoctor(),
+                ipfsHash
+            );
+            
+            ipfsProducer.sendToBlockchain(healthRecordHashed);
 
             return merkleNode.hash.toBase58();
-
-
         } catch (Exception e){
             throw new RuntimeException("Error whilst communicating with the IPFS node.",e);
-
         }
     }
 
     @Override
     public byte[] loadFile(String hash) {
-
         try {
 
             IPFS ipfs = ipfsConfig.getIpfs();
@@ -52,6 +69,5 @@ public class IPFSService implements FileServiceImpl {
         } catch (Exception e){
             throw new RuntimeException("Error whilst communicating with the IPFS node.",e);
         }
-
     }
 }
