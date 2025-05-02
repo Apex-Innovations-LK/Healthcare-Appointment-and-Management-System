@@ -26,10 +26,11 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("appointment_rejected")
                 .build();
     }
-    
+
     @Bean
     public NewTopic AppointmentUpdateTopic() {
         return TopicBuilder.name("appointment_update")
                 .build();
-    
+
+    }
 }

@@ -12,7 +12,7 @@ import DoctorMicroservice.dto.ScheduleSlotDto;
 
 @Service
 public class RejectAppointmentKafkaProducer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DoctorSessionKafkaProducer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RejectAppointmentKafkaProducer.class);
     private static final String TOPIC = "appointment_rejected";
 
     private final KafkaTemplate<String, ScheduleSlotDto> kafkaTemplate;

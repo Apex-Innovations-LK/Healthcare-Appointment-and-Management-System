@@ -1,12 +1,15 @@
 package DoctorMicroservice.mapper;
 
 
+import org.springframework.stereotype.Component;
+
 import DoctorMicroservice.dto.ScheduleSlotDto;
 import DoctorMicroservice.entity.DoctorSession;
 import DoctorMicroservice.entity.ScheduleSlot;
 import DoctorMicroservice.exception.ResourceNotFoundException;
 import DoctorMicroservice.repository.DoctorSessionRepository;
 
+@Component
 public class ScheduleSlotMapper {
 
     private DoctorSessionRepository doctorSessionRepository;

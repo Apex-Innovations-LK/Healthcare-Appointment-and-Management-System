@@ -13,7 +13,7 @@ import DoctorMicroservice.dto.ScheduleSlotDto;
 
 @Service
 public class ScheduleSlotKafkaProducer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DoctorSessionKafkaProducer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleSlotKafkaProducer.class);
     private static final String TOPIC = "schedule_slot";
 
     private final KafkaTemplate<String, ScheduleSlotDto> kafkaTemplate;
@@ -22,8 +22,8 @@ public class ScheduleSlotKafkaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendDoctorSession(ScheduleSlotDto scheduleSlotDto) {
-        LOGGER.info("Sending schedule slots to Kafka topic: {schedule_slot}", scheduleSlotDto);
+    public void sendDoctorScheduleSlot(ScheduleSlotDto scheduleSlotDto) {
+        LOGGER.info("Sending schedule slots to Kafka topic: {}", scheduleSlotDto);
 
         Message<ScheduleSlotDto> message = MessageBuilder
                 .withPayload(scheduleSlotDto)

@@ -55,7 +55,7 @@ public class DoctorSessionServiceImpl implements DoctorSessionService {
             slot.setSlotId((long) i);  // Manually set from 0 to count-1
             slot.setSession(savedDoc); // FK to DoctorSession
             slot.setStatus("available");
-            scheduleSlotKafkaProducer.sendDoctorSession(scheduleSlotMapper.mapToScheduleSlotDto(slot));
+            scheduleSlotKafkaProducer.sendDoctorScheduleSlot(scheduleSlotMapper.mapToScheduleSlotDto(slot));
             slots.add(slot);
         }
 

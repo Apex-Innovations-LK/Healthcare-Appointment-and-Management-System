@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import DoctorMicroservice.dto.ScheduleSlotDto;
 import DoctorMicroservice.entity.ScheduleSlot;
-import DoctorMicroservice.kafka.AppointmentKafkaConsumer;
+//import DoctorMicroservice.kafka.AppointmentKafkaConsumer;
 import DoctorMicroservice.kafka.RejectAppointmentKafkaProducer;
 import DoctorMicroservice.mapper.ScheduleSlotMapper;
 import DoctorMicroservice.repository.ScheduleSlotRepository;
@@ -19,7 +19,7 @@ public class ScheduleSlotServiceImpl implements ScheduleSlotService {
 
     private final ScheduleSlotRepository scheduleSlotRepository;
     private final ScheduleSlotMapper scheduleSlotMapper;
-    private final AppointmentKafkaConsumer appointmentKafkaConsumer;
+    //private final AppointmentKafkaConsumer appointmentKafkaConsumer;
     private final RejectAppointmentKafkaProducer rejectAppointmentKafkaProducer;
 
 
@@ -41,7 +41,7 @@ public class ScheduleSlotServiceImpl implements ScheduleSlotService {
 
         slot.setStatus("booked");
         scheduleSlotRepository.save(slot);
-        appointmentKafkaConsumer.update(scheduleSlotDto);
+        //appointmentKafkaConsumer.update(scheduleSlotDto);
         return scheduleSlotMapper.mapToScheduleSlotDto(slot);
     }
 
