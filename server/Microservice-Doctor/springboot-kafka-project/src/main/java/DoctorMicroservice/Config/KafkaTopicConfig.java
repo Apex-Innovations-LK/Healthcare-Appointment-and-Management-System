@@ -16,9 +16,20 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic AppointmentTopic(){
-        return TopicBuilder.name("appointment")
+    public NewTopic ScheduleSlotTopic() {
+        return TopicBuilder.name("schedule_slot")
                 .build();
     }
+
+    @Bean
+    public NewTopic AppointmentRejectedTopic() {
+        return TopicBuilder.name("appointment_rejected")
+                .build();
+    }
+    
+    @Bean
+    public NewTopic AppointmentUpdateTopic() {
+        return TopicBuilder.name("appointment_update")
+                .build();
     
 }

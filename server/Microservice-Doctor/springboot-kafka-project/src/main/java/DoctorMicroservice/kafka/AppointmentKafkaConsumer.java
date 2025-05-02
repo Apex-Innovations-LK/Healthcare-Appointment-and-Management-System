@@ -7,7 +7,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import DoctorMicroservice.dto.ScheduleSlotDto;
-import DoctorMicroservice.service.impl.ScheduleSlotServiceImpl;
+import DoctorMicroservice.service.ScheduleSlotService;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -15,11 +15,11 @@ import lombok.RequiredArgsConstructor;
 public class AppointmentKafkaConsumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentKafkaConsumer.class);
-    private final ScheduleSlotServiceImpl scheduleSlotService;
+    private final ScheduleSlotService scheduleSlotService;
 
     @KafkaListener(topics = "appointment", containerFactory = "scheduleSlotKafkaListenerContainerFactory")
-    public void consume(ScheduleSlotDto scheduleSlotDto) {
-        LOGGER.info("Consumed appointment message: {}", scheduleSlotDto);
-        scheduleSlotService.rejectScheduleSlot(scheduleSlotDto);
+    public void update(ScheduleSlotDto scheduleSlotDto) {
+        LOGGER.info("Updated appointment status to booked", scheduleSlotDto);
+        scheduleSlotService.updateScheduleSlot(scheduleSlotDto);
     }
 }

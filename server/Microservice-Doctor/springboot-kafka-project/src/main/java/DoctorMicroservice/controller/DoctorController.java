@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import DoctorMicroservice.dto.DoctorDto;
 import DoctorMicroservice.dto.DoctorSessionDto;
+import DoctorMicroservice.dto.ScheduleSlotDto;
 import DoctorMicroservice.service.DoctorService;
 import DoctorMicroservice.service.DoctorSessionService;
-import DoctorMicroservice.dto.ScheduleSlotDto;
+import DoctorMicroservice.service.ScheduleSlotService;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -21,6 +22,8 @@ public class DoctorController {
 
     private final DoctorService doctorService;
     private final DoctorSessionService doctorSessionService;
+    private final ScheduleSlotService scheduleSlotService;
+
 
     //addDoctor REST API
     @PostMapping("/addDoc")
@@ -38,9 +41,9 @@ public class DoctorController {
 
     //rejectAppointment REST API
     @PostMapping("/rejectAppointment")
-    public ResponseEntity<ScheduleSlotDto> rejectAppointment(@RequestBody ScheduleSlotDto doctorSessionDto){
-        DoctorSessionDto savedDocAvailability = doctorSessionService.addDoctorSession(doctorSessionDto);
-        return new ResponseEntity<>(savedDocAvailability, HttpStatus.CREATED);
+    public ResponseEntity<ScheduleSlotDto> rejectAppointment(@RequestBody ScheduleSlotDto scheduleSlotDto){
+        ScheduleSlotDto rejectedAppointment = scheduleSlotService.rejectScheduleSlot(scheduleSlotDto);
+        return new ResponseEntity<>(rejectedAppointment, HttpStatus.OK);
     };
 
 }
