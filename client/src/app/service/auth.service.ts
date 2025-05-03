@@ -19,4 +19,12 @@ export class AuthService {
     loginUser(user: User): Observable<AuthResponse> {
         return this.httpClient.post<AuthResponse>(`${this.baseURL}/login`, user);
     }
+
+    getUser(username: String): Observable<User> {
+        return this.httpClient.post<User>(`${this.baseURL}/get-user`, username);
+    }
+
+    getCount(): Observable<Object> {
+        return this.httpClient.get<Object>(`${this.baseURL}/get-count`);
+    }
 }

@@ -19,9 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -142,5 +146,15 @@ public class UserService {
 
     public Optional<Users> getUserByUsername(String username) {
         return userRepo.findByUsername(username);
+    }
+    public List<Users> getUsers() {
+        return userRepo.findAll();
+    }
+
+    public Map<String, Long> getCount() {
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("DoctorsAvailable",userRepo.countByRole("DOCTOR"));
+        stats.put("StaffsAvailable",userRepo.countByRole("STAFF"));
+        return stats;
     }
 }
