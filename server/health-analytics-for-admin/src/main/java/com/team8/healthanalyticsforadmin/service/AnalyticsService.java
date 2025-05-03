@@ -14,11 +14,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Builds a compact DTO that the Angular dashboard can consume.
- */
 @Service
-@RequiredArgsConstructor        // generates ctor for final field(s)
+@RequiredArgsConstructor
 public class AnalyticsService {
 
     private final RestTemplate restTemplate;
@@ -28,70 +25,76 @@ public class AnalyticsService {
     private static final DateTimeFormatter MONTH_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM").withZone(ZONE);
 
-    /* ------------------------------------------------------------------ */
+    /* ─────────────────────────────────────────────────────── */
     public AnalyticsData fetchAnalytics() {
 
-        /* 1 ──────────────────────────────────────────────────────────── */
         HealthRecord[] raw = restTemplate
                 .exchange(RECORDS_URL, HttpMethod.GET, null, HealthRecord[].class)
                 .getBody();
 
         List<HealthRecord> records = Arrays.asList(Objects.requireNonNull(raw));
 
-        /* 2 ─ Patient‑count timeline  ───────────────────────────────── */
+        /* 1 ─ Distinct‑patient count / month */
         Map<String, Long> perMonth = records.stream()
                 .map(HealthRecord::getDateOfService)
                 .filter(s -> s != null && !s.isBlank())
-                .map(AnalyticsService::toMonth)                  // yyyy‑MM
-                .collect(Collectors.groupingBy(m -> m,
-                        TreeMap::new,
-                        Collectors.counting()));
+                .map(AnalyticsService::toMonth)
+                .collect(Collectors.groupingBy(m -> m, TreeMap::new, Collectors.counting()));
 
         List<Point> patientTimeline = perMonth.entrySet().stream()
                 .map(e -> new Point(e.getKey(), e.getValue().intValue()))
                 .toList();
 
-        /* 3 ─ Allergies distribution  ───────────────────────────────── */
+        /* 2 ─ Allergy distribution */
         Map<String,Integer> allergyCounts = new HashMap<>();
-        records.forEach(r -> Optional.ofNullable(r.getAllergies())
-                .orElse(List.of())
-                .forEach(a -> allergyCounts.merge(a, 1, Integer::sum)));
+        records.forEach(r -> Optional.ofNullable(r.getAllergies()).orElse(List.of())
+                .forEach(a -> allergyCounts.merge(a,1,Integer::sum)));
 
-        /* 4 ─ Problem‑list statistics  ─────────────────────────────── */
-        Map<String,Integer> problemCounts = new HashMap<>();
-        Map<String,Map<String,Integer>> problemBySex = new HashMap<>();
+        /* 3 ─ Problem statistics */
+        Map<String,Integer> problemCounts  = new HashMap<>();
+        Map<String,Map<String,Integer>> bySex = new HashMap<>();
 
         records.forEach(r -> {
             String sex = Optional.ofNullable(r.getPatientSex()).orElse("Unknown");
-            Map<String,Integer> sexMap = problemBySex.computeIfAbsent(sex, k -> new HashMap<>());
-
+            Map<String,Integer> sexMap = bySex.computeIfAbsent(sex, k -> new HashMap<>());
             Optional.ofNullable(r.getProblemList()).orElse(List.of())
                     .forEach(p -> {
-                        problemCounts.merge(p, 1, Integer::sum);
-                        sexMap.merge(p, 1, Integer::sum);
+                        problemCounts.merge(p,1,Integer::sum);
+                        sexMap.merge(p,1,Integer::sum);
                     });
         });
 
-        /* 5 ─ DTO out ──────────────────────────────────────────────── */
+        /* 4 ─ Risk‑category calculation (Low / Moderate / High) */
+        Map<String,Integer> riskCounts = new HashMap<>(Map.of(
+                "Low",0,"Moderate",0,"High",0));
+
+        records.forEach(r -> {
+            int score = computeRiskScore(r);
+            String cat = score >= 8 ? "High" : score >= 4 ? "Moderate" : "Low";
+            riskCounts.merge(cat,1,Integer::sum);
+        });
+
+        /* 5 ─ Build DTO */
         return new AnalyticsData(
                 patientTimeline,
                 allergyCounts,
                 problemCounts,
-                problemBySex
+                bySex,
+                riskCounts
         );
     }
 
-    /* helper: turn any ISO date string into “yyyy‑MM” */
+    /* ========== helpers =================================== */
     private static String toMonth(String iso) {
-        // supports “yyyy‑MM‑dd” and full ISO‑instant strings
-        try {
-            if (iso.length() == 10) {                  // yyyy‑MM‑dd
-                return iso.substring(0, 7);
-            }
-            LocalDate d = LocalDate.parse(iso.substring(0, 10));
-            return MONTH_FMT.format(d);
-        } catch (Exception ex) {
-            return "Unknown";
-        }
+        try { return iso.substring(0,7); } catch (Exception e) { return "Unknown"; }
+    }
+
+    /** simplistic rule‑based score – adjust as you see fit */
+    private static int computeRiskScore(HealthRecord r) {
+        int base = 0;
+        base += Optional.ofNullable(r.getProblemList()).orElse(List.of()).size();
+        base += Optional.ofNullable(r.getMedications()).orElse(List.of()).size() / 2;
+        base += Optional.ofNullable(r.getAllergies()).orElse(List.of()).size() / 3;
+        return base;
     }
 }

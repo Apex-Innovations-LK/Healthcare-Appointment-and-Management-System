@@ -12,11 +12,12 @@
    }
    
    export interface AnalyticsData {
-     patientCountTimeline : Point[];
-     allergiesDistribution: Record<string, number>;
-     problemListCounts    : Record<string, number>;
-     problemListBySex     : Record<string, Record<string, number>>;
-   }
+    patientCountTimeline : Point[];
+    allergiesDistribution: Record<string, number>;
+    problemListCounts    : Record<string, number>;
+    problemListBySex     : Record<string, Record<string, number>>;
+    riskCategoryCounts   : Record<string, number>;     
+  }
    
    @Injectable({ providedIn: 'root' })
    export class AnalyticsService {

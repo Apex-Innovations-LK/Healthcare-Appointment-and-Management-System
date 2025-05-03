@@ -8,44 +8,32 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ───────────────────────────────────────────────────────────
+ * Single DTO consumed by the Angular dashboard.
+ *
  *  ┌──────────────────────────────────────────────────────┐
  *  │  AnalyticsData                                       │
  *  │──────────────────────────────────────────────────────│
- *  │  patientCountTimeline  : List<Point>                 │ ← line / bar
- *  │  allergiesDistribution : Map<String,Integer>         │ ← pie / doughnut
- *  │  problemListCounts     : Map<String,Integer>         │ ← bar / polar
- *  │  problemListBySex      : Map<String,Map<String,Integer>>│ ← radar/table
+ *  │  patientCountTimeline  : List<Point>                 │ ← Line / Bar   │
+ *  │  allergiesDistribution : Map<String,Integer>         │ ← Pie          │
+ *  │  problemListCounts     : Map<String,Integer>         │ ← Bar / Polar  │
+ *  │  problemListBySex      : Map<String,Map<String,Integer>>│ ← Radar   │
+ *  │  riskCategoryCounts    : Map<String,Integer>         │ ← Polar‑Area   │
  *  └──────────────────────────────────────────────────────┘
- *  Point = { date : String (yyyy‑MM), count : Integer }
- * ───────────────────────────────────────────────────────────
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnalyticsData {
 
-    /** How many distinct patients per month */
-    private List<Point> patientCountTimeline;
+    private List<Point>                           patientCountTimeline;
+    private Map<String,Integer>                   allergiesDistribution;
+    private Map<String,Integer>                   problemListCounts;
+    private Map<String,Map<String,Integer>>       problemListBySex;
+    private Map<String,Integer>                   riskCategoryCounts;
 
-    /** “Penicillin” → 42, “Peanuts” → 17 … */
-    private Map<String, Integer> allergiesDistribution;
-
-    /** “Diabetes” → 31, “Hypertension” → 64 … */
-    private Map<String, Integer> problemListCounts;
-
-    /**
-     *  {
-     *    "Male"   : { "Diabetes": 12, "Hypertension": 22 … },
-     *    "Female" : { "Diabetes": 19, "Hypertension": 42 … }
-     *  }
-     */
-    private Map<String, Map<String, Integer>> problemListBySex;
-
-    /** Small helper record used by the timeline */
     @Data @AllArgsConstructor
     public static class Point {
-        private String date;  // e.g. "2024‑11"
+        private String  date;    // yyyy‑MM
         private Integer count;
     }
 }
