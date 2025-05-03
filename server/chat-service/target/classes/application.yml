@@ -10,7 +10,3 @@ spring:
 logging:
   level:
     root: INFO
-
-huggingface:
-  api:
-    key: ${HUGGINGFACE_API_KEY}

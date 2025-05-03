@@ -1,7 +1,6 @@
 com\healthcare\chat\model\ChatSession.class
 com\healthcare\chat\controller\ChatController.class
-com\healthcare\chat\service\ChatService$HuggingFaceResponse.class
+com\healthcare\chat\service\ChatService$FlaskResponse.class
 com\healthcare\chat\ChatServiceApplication.class
 com\healthcare\chat\model\ChatMessage.class
-com\healthcare\chat\service\ChatService$1.class
 com\healthcare\chat\service\ChatService.class
