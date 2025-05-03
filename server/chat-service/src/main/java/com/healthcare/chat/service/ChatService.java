@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
-import org.springframework.util.LinkedMultiValueMap;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +22,7 @@ public class ChatService {
 
     public ChatService(WebClient.Builder builder) {
         this.webClient = builder
-                .baseUrl("https://ce1d-34-168-122-218.ngrok-free.app")
+                .baseUrl("https://ce1d-34-168-122-218.ngrok-free.app") // the link should be changed.
                 .build();
     }
 
