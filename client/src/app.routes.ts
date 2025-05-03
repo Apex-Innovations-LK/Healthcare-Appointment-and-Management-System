@@ -5,8 +5,21 @@ import { DoctorLayout } from './app/pages/doctor/doctor.layout';
 import { PatientLayout } from './app/pages/patient/patient.layout';
 import { StaffLayout } from './app/pages/staff/staff.layout';
 import { HomeComponent } from './app/pages/home/home';
+import { Documentation } from './app/pages/documentation/documentation';
+import { Dashboard } from './app/pages/dashboard/dashboard';
 
 export const appRoutes: Routes = [
+    // {
+        
+    //     path: 'uikit',
+    //     component: AppLayout,
+    //     children: [
+    //         { path: '', component: Dashboard },
+    //         { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
+    //         { path: 'documentation', component: Documentation },
+    //         { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
+    //     ]
+    // },
     {
         path: '',
         component: HomeComponent
