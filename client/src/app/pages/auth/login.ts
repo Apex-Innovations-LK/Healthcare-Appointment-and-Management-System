@@ -1,17 +1,22 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
-import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
+import { AppFloatingConfigurator } from '../admin/components/app.floatingconfigurator';
+import { User } from '../../models/user';
+import { AuthService } from '../../service/auth.service';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
+    imports: [ToastModule, ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
+    providers: [MessageService],
     template: `
         <app-floating-configurator />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
@@ -36,16 +41,30 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                     />
                                 </g>
                             </svg>
-                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome to PrimeLand!</div>
-                            <span class="text-muted-color font-medium">Sign in to continue</span>
+                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome to Medicare!</div>
+                            <span class="text-muted-color font-medium">
+                                <h2 class="text-3xl font-bold text-center mb-6">
+                                    {{ isLogin ? 'Log In' : 'Sign Up' }}
+                                </h2>
+
+                                <p class="text-center text-sm mb-4">
+                                    {{ isLogin ? "Don't have an account?" : 'Already have an account?' }}
+                                    <span class="text-primary cursor-pointer font-semibold" (click)="toggleForm()">
+                                        {{ isLogin ? 'Sign Up' : 'Login' }}
+                                    </span>
+                                </p>
+                            </span>
                         </div>
 
                         <div>
-                            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                            <input pInputText id="email1" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-8" [(ngModel)]="email" />
-
+                            <label for="username1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Username</label>
+                            <input pInputText id="username1" type="text" placeholder="Username" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.username" />
+                            <!-- 
+                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label> -->
+                            <!-- <p-password id="password1" [(ngModel)]="user.password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="true"></p-password> -->
+                            <!-- <input type="password" pPassword [(ngMo    del)]="user.password" name="password" /> -->
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <p-password id="password1" [(ngModel)]="password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
+                            <p-password id="password1" [(ngModel)]="user.password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false" class="w-full md:w-[30rem] mb-8"></p-password>
 
                             <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                                 <div class="flex items-center">
@@ -54,7 +73,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                 </div>
                                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
                             </div>
-                            <p-button label="Sign In" styleClass="w-full" routerLink="/"></p-button>
+                            <p-button label="Log In" styleClass="w-full" (click)="login()"></p-button>
                         </div>
                     </div>
                 </div>
@@ -63,9 +82,72 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
     `
 })
 export class Login {
+    user: User = new User(
+        '', // username
+        '', // first_name
+        '', // last_name
+        new Date(), // date_of_birth
+        '', // gender
+        '', // role
+        '', // email
+        '', // phone_number
+        '', // status
+        '', // password
+        '', // speciality
+        '' // license_number
+    );
+
+    constructor(
+        private router: Router,
+        private authService: AuthService,
+        private messageService: MessageService
+    ) {}
+
     email: string = '';
 
     password: string = '';
 
     checked: boolean = false;
+
+    isLogin: boolean = true;
+
+    toggleForm() {
+        this.isLogin = !this.isLogin;
+        this.router.navigate(['/auth/signup']);
+    }
+
+    private redirectUserBasedOnRole(token: string, username: string, role: string, status: string): void {
+        localStorage.setItem('token', token);
+        const routesByRole: Record<string, string> = {
+            PATIENT: '/patient',
+            ADMIN: '/admin',
+            DOCTOR: '/doctor',
+            STAFF: '/staff'
+        };
+        const route = routesByRole[role] || '/auth/access';
+        this.router.navigate([route]);
+    }
+
+    login() {
+        console.log('user', this.user);
+        this.authService.loginUser(this.user).subscribe({
+            next: (data) => {
+                console.log(data);
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Login successful!'
+                });
+                this.redirectUserBasedOnRole(data.token, data.username, data.role, data.status);
+            },
+            error: (error) => {
+                console.log('Error in login' + error.message);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Login failed!'
+                });
+            }
+        });
+    }
 }
