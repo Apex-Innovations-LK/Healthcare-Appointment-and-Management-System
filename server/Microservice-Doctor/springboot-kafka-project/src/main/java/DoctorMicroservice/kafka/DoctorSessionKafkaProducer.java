@@ -14,7 +14,7 @@ import DoctorMicroservice.dto.DoctorSessionDto;
 public class DoctorSessionKafkaProducer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoctorSessionKafkaProducer.class);
-    private static final String TOPIC = "doctor_session";
+    private static final String TOPIC = "AVAILABILITY_SETTLED";
 
     private final KafkaTemplate<String, DoctorSessionDto> kafkaTemplate;
 
@@ -22,11 +22,11 @@ public class DoctorSessionKafkaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendDoctorSession(DoctorSessionDto doctorSessionDto) {
-        LOGGER.info("Sending doctor session to Kafka topic: {}", doctorSessionDto);
+    public void sendDoctorSession(DoctorKafkaEvent doctorKafkaEvent) {
+        LOGGER.info("Sending doctor session to Kafka topic: {}", doctorKafkaEvent);
 
-        Message<DoctorSessionDto> message = MessageBuilder
-                .withPayload(doctorSessionDto)
+        Message<DoctorKafkaEvent> message = MessageBuilder
+                .withPayload(doctorKafkaEvent)
                 .setHeader(KafkaHeaders.TOPIC, TOPIC)
                 .build();
 

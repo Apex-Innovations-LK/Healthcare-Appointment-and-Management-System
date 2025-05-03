@@ -8,15 +8,17 @@ import org.springframework.stereotype.Service;
 import DoctorMicroservice.dto.DoctorSessionDto;
 import DoctorMicroservice.entity.DoctorSession;
 import DoctorMicroservice.entity.ScheduleSlot;
+import DoctorMicroservice.kafka.DoctorKafkaEvent;
 import DoctorMicroservice.kafka.DoctorSessionKafkaProducer;
+import DoctorMicroservice.kafka.ScheduleSlotKafkaProducer;
 import DoctorMicroservice.mapper.DoctorSessionMapper;
+import DoctorMicroservice.mapper.DoctorSessionToDoctorKafkaMapper;
+import DoctorMicroservice.mapper.ScheduleSlotMapper;
 import DoctorMicroservice.repository.DoctorSessionRepository;
 import DoctorMicroservice.repository.ScheduleSlotRepository;
 import DoctorMicroservice.service.DoctorSessionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import DoctorMicroservice.mapper.ScheduleSlotMapper;
-import DoctorMicroservice.kafka.ScheduleSlotKafkaProducer;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +65,8 @@ public class DoctorSessionServiceImpl implements DoctorSessionService {
 
         // Send Kafka message
         DoctorSessionDto responseDto = availabilityMapper.mapToDoctorSessionDto(savedDoc);
-        doctorSessionKafkaProducer.sendDoctorSession(responseDto);
+        DoctorKafkaEvent doctorEvent = DoctorSessionToDoctorKafkaMapper.toKafkaEvent(responseDto);
+        doctorSessionKafkaProducer.sendDoctorSession(doctorEvent);
 
         return responseDto;
 }
