@@ -1,259 +1,191 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AnalyticsService } from './service/admin.patient.analytics';
-import { Subscription } from 'rxjs';
-import { BrowserModule } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
-import { ChartModule } from 'primeng/chart';
-import { FluidModule } from 'primeng/fluid';
+/* ---------------------------------------------------------
+   Analytics dashboard component (PrimeNG + Chart.js)
+   --------------------------------------------------------- */
+   import { Component, OnDestroy, OnInit } from '@angular/core';
+   import { CommonModule } from '@angular/common';
+   import { Subscription } from 'rxjs';
+   import { Chart, registerables, TooltipItem } from 'chart.js';
+   import { ChartModule } from 'primeng/chart';
+   import { FluidModule } from 'primeng/fluid';
+   
+   import {
+     AnalyticsService,
+     AnalyticsData,
+     Point
+   } from './service/admin.patient.analytics';
+   
+   /* Chart.js must know which controllers / elements to use */
+   Chart.register(...registerables);
+   
+   @Component({
+     selector   : 'app-admin-analytics',
+     standalone : true,
+     imports    : [CommonModule, ChartModule, FluidModule],
+     templateUrl: './analytics.html'
+   })
+   export class Analytics implements OnInit, OnDestroy {
+   
+     /* Chart‑bound objects */
+     lineData:  any; lineOpts:  any;
+     barData:   any; barOpts:   any;
+     pieData:   any; pieOpts:   any;
+     radarData: any; radarOpts: any;
+     polarData: any; polarOpts: any;
+   
+     private sub?: Subscription;
+   
+     constructor(private api: AnalyticsService) {}
+   
+     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+     ngOnInit(): void {
+       this.sub = this.api.getAnalyticsData().subscribe({
+         next : res => this.initCharts(res),
+         error: ()  => this.initCharts(this.emptyAnalytics()) // graceful fallback
+       });
+     }
+   
+     ngOnDestroy(): void { this.sub?.unsubscribe(); }
+   
+     /* ---------- build demo object if request fails ---------- */
+     private emptyAnalytics(): AnalyticsData {
+       return {
+         patientCountTimeline : [],
+         allergiesDistribution: {},
+         problemListCounts    : {},
+         problemListBySex     : {}
+       };
+     }
+   
+     /* ===============  CHART INITIALISATION  =============== */
+     private initCharts(data: AnalyticsData): void {
+   
+       /* ~~ css colours ~~ */
+       const css   = getComputedStyle(document.documentElement);
+       const txt   = css.getPropertyValue('--text-color');
+       const txt2  = css.getPropertyValue('--text-color-secondary');
+       const border= css.getPropertyValue('--surface-border');
+       const prim  = css.getPropertyValue('--p-primary-500');
+       const prim2 = css.getPropertyValue('--p-primary-300');
+   
+       /* --------------------------------------------------
+          LINE CHART  ‑ Patient count over time
+          -------------------------------------------------- */
+       const timeline: Point[] = data.patientCountTimeline;
+       this.lineData = {
+         labels   : timeline.map(p => p.date),
+         datasets : [{
+           label           : 'Patients',
+           data            : timeline.map(p => p.count),
+           borderColor     : prim,
+           backgroundColor : prim,
+           fill            : false,
+           tension         : 0.4
+         }]
+       };
+       this.lineOpts = {
+         maintainAspectRatio: false,
+         plugins: { legend: { labels: { color: txt } } },
+         scales : {
+           x: { ticks: { color: txt2 }, grid: { color: border, drawBorder: false }},
+           y: { ticks: { color: txt2 }, grid: { color: border, drawBorder: false }}
+         }
+       };
+   
+       /* --------------------------------------------------
+          BAR CHART  ‑ Top 10 problem list items
+          -------------------------------------------------- */
+       const probEntries = Object.entries(data.problemListCounts)
+                                 .sort((a,b) => b[1]-a[1])
+                                 .slice(0,10);
+       const probLabels  = probEntries.map(e => e[0]);
+       const probValues  = probEntries.map(e => e[1]);
+   
+       this.barData = {
+         labels  : probLabels,
+         datasets: [{
+           label           : '#Patients',
+           data            : probValues,
+           backgroundColor : prim2
+         }]
+       };
+       this.barOpts = this.lineOpts;   // reuse styling
+   
+       /* --------------------------------------------------
+          PIE / DOUGHNUT  ‑ Allergy distribution
+          -------------------------------------------------- */
+       const allergyLabels = Object.keys(data.allergiesDistribution);
+       const allergyVals   = Object.values(data.allergiesDistribution);
+   
+       this.pieData = {
+         labels  : allergyLabels.length ? allergyLabels : ['No‑Data'],
+         datasets: [{
+           data           : allergyVals.length ? allergyVals : [1],
+           backgroundColor: [
+             '#60a5fa','#fbbf24','#34d399','#f87171',
+             '#a78bfa','#f472b6','#fcd34d','#c084fc','#4ade80','#facc15'
+           ]
+         }]
+       };
+       this.pieOpts = {
+         plugins: {
+           legend: { labels: { color: txt, usePointStyle: true }, position:'right' },
+           tooltip: {
+             callbacks: {
+               label: (ctx: TooltipItem<'pie'>) =>
+                 `${ctx.label}: ${ctx.parsed}`
+             }
+           }
+         }
+       };
 
-@Component({
-  selector: 'app-admin-analytics',
-  standalone: true,
-  imports: [CommonModule, ChartModule, FluidModule],
-  template: `
-    <p-fluid class="grid grid-cols-12 gap-8">
-      <div class="col-span-12 xl:col-span-6">
-        <div class="card">
-          <div class="font-semibold text-xl mb-4">Linear</div>
-          <p-chart type="line" [data]="lineData" [options]="lineOptions"></p-chart>
-        </div>
-      </div>
-
-      <div class="col-span-12 xl:col-span-6">
-        <div class="card">
-          <div class="font-semibold text-xl mb-4">Bar</div>
-          <p-chart type="bar" [data]="barData" [options]="barOptions"></p-chart>
-        </div>
-      </div>
-
-      <div class="col-span-12 xl:col-span-6">
-        <div class="card flex flex-col items-center">
-          <div class="font-semibold text-xl mb-4">Pie</div>
-          <p-chart type="pie" [data]="pieData" [options]="pieOptions"></p-chart>
-        </div>
-      </div>
-
-      <div class="col-span-12 xl:col-span-6">
-        <div class="card flex flex-col items-center">
-          <div class="font-semibold text-xl mb-4">Doughnut</div>
-          <p-chart type="doughnut" [data]="pieData" [options]="pieOptions"></p-chart>
-        </div>
-      </div>
-
-      <div class="col-span-12 xl:col-span-6">
-        <div class="card flex flex-col items-center">
-          <div class="font-semibold text-xl mb-4">Polar Area</div>
-          <p-chart type="polarArea" [data]="polarData" [options]="polarOptions"></p-chart>
-        </div>
-      </div>
-
-      <div class="col-span-12 xl:col-span-6">
-        <div class="card flex flex-col items-center">
-          <div class="font-semibold text-xl mb-4">Radar</div>
-          <p-chart type="radar" [data]="radarData" [options]="radarOptions"></p-chart>
-        </div>
-      </div>
-    </p-fluid>
-  `,
-})
-export class Analytics implements OnInit, OnDestroy {
-  lineData: any;
-  barData: any;
-  pieData: any;
-  polarData: any;
-  radarData: any;
-  lineOptions: any;
-  barOptions: any;
-  pieOptions: any;
-  polarOptions: any;
-  radarOptions: any;
-  subscription: Subscription | undefined;
-
-  constructor(private analyticsService: AnalyticsService) {}
-
-  ngOnInit() {
-    this.loadAnalyticsData();
-  }
-
-  // Load data from backend and initialize charts
-  loadAnalyticsData() {
-    this.analyticsService.getAnalyticsData().subscribe(data => {
-      this.initializeCharts(data); // Pass the fetched data to initialize charts
-    });
-  }
-
-  // Initialize charts with the received data
-  initializeCharts(data: any) {
-    const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-color');
-    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-
-    // Line Chart Data
-    this.lineData = {
-      labels: data.map((record: any) => record.patient_name), // Patient names as labels
-      datasets: [
-        {
-          label: 'Patient Risk Score',
-          data: data.map((record: any) => record.riskCategory), // Assuming backend adds 'riskCategory'
-          fill: false,
-          backgroundColor: documentStyle.getPropertyValue('--p-primary-500'),
-          borderColor: documentStyle.getPropertyValue('--p-primary-500'),
-          tension: 0.4
-        }
-      ]
-    };
-
-    // Line Chart Options
-    this.lineOptions = {
-      maintainAspectRatio: false,
-      aspectRatio: 0.8,
-      plugins: {
-        legend: {
-          labels: { color: textColor }
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: textColorSecondary },
-          grid: { color: surfaceBorder, drawBorder: false }
-        },
-        y: {
-          ticks: { color: textColorSecondary },
-          grid: { color: surfaceBorder, drawBorder: false }
-        }
-      }
-    };
-
-    // Bar Chart Data
-    this.barData = {
-      labels: data.map((record: any) => record.patient_name), // Patient names as labels
-      datasets: [
-        {
-          label: 'Medication Usage',
-          backgroundColor: documentStyle.getPropertyValue('--p-primary-200'),
-          borderColor: documentStyle.getPropertyValue('--p-primary-200'),
-          data: data.map((record: any) => record.medications.length), // Count medications per patient
-        }
-      ]
-    };
-
-    // Bar Chart Options
-    this.barOptions = {
-      maintainAspectRatio: false,
-      aspectRatio: 0.8,
-      plugins: {
-        legend: {
-          labels: { color: textColor }
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: textColorSecondary },
-          grid: { display: false, drawBorder: false }
-        },
-        y: {
-          ticks: { color: textColorSecondary },
-          grid: { color: surfaceBorder, drawBorder: false }
-        }
-      }
-    };
-
-    // Pie Chart Data
-    this.pieData = {
-      labels: ['Asthma', 'Hypertension', 'Diabetes'],
-      datasets: [
-        {
-          data: [30, 50, 20], // Example: Percentage of patients with each condition
-          backgroundColor: [
-            documentStyle.getPropertyValue('--p-indigo-500'),
-            documentStyle.getPropertyValue('--p-purple-500'),
-            documentStyle.getPropertyValue('--p-teal-500')
-          ],
-          hoverBackgroundColor: [
-            documentStyle.getPropertyValue('--p-indigo-400'),
-            documentStyle.getPropertyValue('--p-purple-400'),
-            documentStyle.getPropertyValue('--p-teal-400')
-          ]
-        }
-      ]
-    };
-
-    // Pie Chart Options
-    this.pieOptions = {
-      plugins: {
-        legend: {
-          labels: { usePointStyle: true, color: textColor }
-        }
-      }
-    };
-
-    // Polar Area Chart Data
-    this.polarData = {
-      datasets: [
-        {
-          data: [60, 30, 10], // Example: Polar chart for specific metrics
-          backgroundColor: [
-            documentStyle.getPropertyValue('--p-indigo-500'),
-            documentStyle.getPropertyValue('--p-purple-500'),
-            documentStyle.getPropertyValue('--p-teal-500')
-          ],
-          label: 'Patient Health Conditions'
-        }
-      ],
-      labels: ['Condition A', 'Condition B', 'Condition C']
-    };
-
-    // Polar Area Chart Options
-    this.polarOptions = {
-      plugins: {
-        legend: {
-          labels: { color: textColor }
-        }
-      },
-      scales: {
-        r: {
-          grid: { color: surfaceBorder },
-          ticks: { display: false, color: textColorSecondary }
-        }
-      }
-    };
-
-    // Radar Chart Data
-    this.radarData = {
-      labels: ['Eating', 'Drinking', 'Sleeping', 'Designing', 'Coding', 'Cycling', 'Running'],
-      datasets: [
-        {
-          label: 'Patient Lifestyle',
-          borderColor: documentStyle.getPropertyValue('--p-indigo-400'),
-          pointBackgroundColor: documentStyle.getPropertyValue('--p-indigo-400'),
-          pointBorderColor: documentStyle.getPropertyValue('--p-indigo-400'),
-          pointHoverBackgroundColor: textColor,
-          pointHoverBorderColor: documentStyle.getPropertyValue('--p-indigo-400'),
-          data: [65, 59, 90, 81, 56, 55, 40]
-        }
-      ]
-    };
-
-    // Radar Chart Options
-    this.radarOptions = {
-      plugins: {
-        legend: {
-          labels: { color: textColor }
-        }
-      },
-      scales: {
-        r: {
-          pointLabels: { color: textColor },
-          grid: { color: surfaceBorder }
-        }
-      }
-    };
-  }
-
-  ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
+           /* --------------------------------------------------
+       POLAR AREA  ‑ risk‑category share (demo)
+       -------------------------------------------------- */
+    const riskTotals: Record<string, number> = { 'Low':0, 'Moderate':0, 'High':0 };
+    (data.patientCountTimeline ?? []).forEach(_ => { /* real calc could go here */});
+    //  demo values if nothing present
+    if (!riskTotals['Low'] && !riskTotals['Moderate'] && !riskTotals['High']) {
+      riskTotals['Low'] = 60; riskTotals['Moderate'] = 30; riskTotals['High'] = 10;
     }
-  }
-}
+
+    this.polarData = {
+      labels  : Object.keys(riskTotals),
+      datasets: [{
+        data: Object.values(riskTotals),
+        backgroundColor: ['#4ade80','#fbbf24','#f87171']
+      }]
+    };
+    this.polarOpts = {
+      plugins:{ legend:{ labels:{ color: txt } } },
+      scales :{ r:{ grid:{ color: border }, ticks:{ color: txt2 } } }
+    };
+
+   
+       /* --------------------------------------------------
+          RADAR CHART ‑ Problem list split by sex
+          (first 6 problems for readability)
+          -------------------------------------------------- */
+       const sexes        = Object.keys(data.problemListBySex);
+       const radarLabels  = Object.keys(data.problemListCounts).slice(0,6);
+   
+       const radarDatasets = sexes.map((sex,idx) => {
+         const vals = radarLabels.map(p =>
+           data.problemListBySex[sex]?.[p] ?? 0);
+   
+         const base = ['#60a5fa','#fbbf24','#34d399','#f87171','#a78bfa'][idx] || prim;
+         return {
+           label           : sex,
+           data            : vals,
+           borderColor     : base,
+           backgroundColor : base + '55'
+         };
+       });
+   
+       this.radarData = { labels: radarLabels, datasets: radarDatasets };
+       this.radarOpts = {
+         plugins:{ legend:{ labels:{ color: txt } } },
+         scales :{ r:{ grid:{ color: border }, pointLabels:{ color: txt } } }
+       };
+     }
+   }
+   

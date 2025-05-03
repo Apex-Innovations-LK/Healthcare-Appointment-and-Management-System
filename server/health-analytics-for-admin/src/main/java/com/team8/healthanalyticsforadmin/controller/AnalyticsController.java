@@ -1,21 +1,21 @@
 package com.team8.healthanalyticsforadmin.controller;
 
+import com.team8.healthanalyticsforadmin.dto.AnalyticsData;
 import com.team8.healthanalyticsforadmin.service.AnalyticsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
-
 @RestController
+@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")   // single place for CORS
 public class AnalyticsController {
 
-    @Autowired
-    private AnalyticsService analyticsService;
+    private final AnalyticsService analyticsService;
 
     @GetMapping("/api/analytics")
-    public List<Map<String, Object>> getAnalytics() {
-        return analyticsService.fetchAndAnalyzeData();
+    public AnalyticsData analytics() {
+        return analyticsService.fetchAnalytics();
     }
 }
