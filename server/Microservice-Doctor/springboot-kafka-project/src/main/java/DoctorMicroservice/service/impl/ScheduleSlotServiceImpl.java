@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import DoctorMicroservice.dto.ScheduleSlotDto;
 import DoctorMicroservice.entity.ScheduleSlot;
-//import DoctorMicroservice.kafka.AppointmentKafkaConsumer;
 import DoctorMicroservice.kafka.RejectAppointmentKafkaProducer;
 import DoctorMicroservice.mapper.ScheduleSlotMapper;
 import DoctorMicroservice.repository.ScheduleSlotRepository;
