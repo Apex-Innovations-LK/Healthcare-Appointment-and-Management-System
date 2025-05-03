@@ -1,0 +1,56 @@
+<div class="py-10 px-6 lg:px-20 mx-0 my-12 lg:mx-20 bg-white dark:bg-gray-900 rounded-xl shadow-md">
+  <div class="text-center mb-10">
+    <h2 class="text-4xl font-bold text-surface-900 dark:text-white mb-2">Schedule Appointment</h2>
+    <span class="text-muted-color text-2xl">Book your appointment with ease and convenience.</span>
+  </div>
+
+  <form class="space-y-6 max-w-2xl mx-auto" (ngSubmit)="onSubmit()">
+    <!-- Doctor Selection -->
+    <div>
+      <label for="doctor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Doctor</label>
+      <select
+        id="doctor"
+        [(ngModel)]="selectedDoctor"
+        name="doctor"
+        required
+        class="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-primary dark:text-white"
+      >
+        <option value="" class="text-gray-500">Select a doctor</option>
+        <option *ngFor="let doctor of doctors" [value]="doctor.id">
+          {{ doctor.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Date Selection -->
+    <div>
+      <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Date</label>
+      <input
+        type="date"
+        id="date"
+        [(ngModel)]="selectedDate"
+        name="date"
+        required
+        class="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-primary dark:text-white"
+      />
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex justify-end space-x-4 pt-4">
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="px-6 py-2 border rounded-lg text-sm font-medium text-gray-700 dark:text-white bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        [disabled]="!selectedDoctor || !selectedDate"
+        class="px-6 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Next
+      </button>
+    </div>
+  </form>
+</div>

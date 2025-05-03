@@ -58,6 +58,7 @@ import { Router } from '@angular/router';
             <div class="flex flex-col items-center justify-center space-y-4">
                 <span class="text-muted-color text-2xl">Connect with trusted specialists and manage appointments effortlessly.</span>
                 <p-button label=" Make an Appointment" styleClass="p-button p-component md:w-full text-center block" (click)="navigateToAppointment()"></p-button>
+                 <p-button label=" View your Appointments" styleClass="p-button p-component md:w-full text-center block" (click)="navigateToViewAppointments()"></p-button>
             </div>
         </div>
     `
@@ -65,6 +66,9 @@ import { Router } from '@angular/router';
 export class ContactusWidget {
     constructor(private router: Router) {}
     navigateToAppointment() {
-        this.router.navigate(['patient/appointment']);
+        this.router.navigate(['patient/appointment/add']);
+    }
+    navigateToViewAppointments() {
+        this.router.navigate(['patient/appointment/view']); 
     }
 }

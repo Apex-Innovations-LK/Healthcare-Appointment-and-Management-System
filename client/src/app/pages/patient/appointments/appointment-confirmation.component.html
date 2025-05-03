@@ -1,0 +1,42 @@
+
+<div class="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Confirm Appointment</h2>
+      
+      <!-- Appointment Details -->
+      <div class="space-y-4 mb-8">
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Appointment Details</h3>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Doctor:</span>
+              <span class="text-gray-900 font-medium">{{ selectedDoctor }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Date:</span>
+              <span class="text-gray-900 font-medium">{{ date }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Buttons -->
+      <div class="flex justify-end space-x-4">
+        <button
+          type="button"
+          (click)="onBack()"
+          class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Back
+        </button>
+        <button
+          type="button"
+          (click)="onSubmit()"
+          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Submit Appointment
+        </button>
+      </div>
+    </div>
+  </div> 
+  
