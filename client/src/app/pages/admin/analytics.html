@@ -1,47 +1,41 @@
 <p-fluid class="grid grid-cols-12 gap-8">
     <!-- LINE ---------------------------------------------------- -->
     <div class="col-span-12 xl:col-span-6">
-      <div class="card">
-        <div class="font-semibold text-xl mb-4">Risk score per patient</div>
-        <p-chart type="line" [data]="lineData" [options]="lineOpts"></p-chart>
-      </div>
+        <div class="card">
+            <div class="font-semibold text-xl mb-4">Risk score per patient</div>
+            <p-chart type="line" [data]="lineData" [options]="lineOpts"></p-chart>
+        </div>
     </div>
-  
+
     <!-- BAR ----------------------------------------------------- -->
     <div class="col-span-12 xl:col-span-6">
-      <div class="card">
-        <div class="font-semibold text-xl mb-4">Medication count per patient</div>
-        <p-chart type="bar" [data]="barData" [options]="barOpts"></p-chart>
-      </div>
+        <div class="card">
+            <div class="font-semibold text-xl mb-4">Medication count per patient</div>
+            <p-chart type="bar" [data]="barData" [options]="barOpts"></p-chart>
+        </div>
     </div>
-  
+
     <!-- PIE / DOUGHNUT ----------------------------------------- -->
     <div class="col-span-12 xl:col-span-6">
-      <div class="card flex flex-col items-center">
-        <div class="font-semibold text-xl mb-4">Allergy distribution</div>
-        <p-chart type="pie" [data]="pieData" [options]="pieOpts"></p-chart>
-      </div>
+        <div class="card flex flex-col items-center">
+            <div class="font-semibold text-xl mb-4">Allergy distribution</div>
+            <p-chart type="pie" [data]="pieData" [options]="pieOpts"></p-chart>
+        </div>
     </div>
+
+    <!-- POLAR & RADAR------------------------ -->
     <div class="col-span-12 xl:col-span-6">
-      <div class="card flex flex-col items-center">
-        <div class="font-semibold text-xl mb-4">Allergy distribution</div>
-        <p-chart type="doughnut" [data]="pieData" [options]="pieOpts"></p-chart>
-      </div>
+        <div class="card flex flex-col items-center">
+            <div class="font-semibold text-xl mb-4">Risk categories</div>
+            <p-chart type="polarArea" [data]="polarData" [options]="polarOpts"></p-chart>
+        </div>
     </div>
-  
-    <!-- POLAR & RADAR (static examples) ------------------------ -->
-    <div class="col-span-12 xl:col-span-6">
-      <div class="card flex flex-col items-center">
-        <div class="font-semibold text-xl mb-4">Risk categories</div>
-        <p-chart type="polarArea" [data]="polarData" [options]="polarOpts"></p-chart>
-      </div>
+
+    <!-- LAST GRAPH — centered on XL screens ------------------- -->
+    <div class="col-span-12 xl:col-span-6 xl:col-start-4">
+        <div class="card flex flex-col items-center">
+            <div class="font-semibold text-xl mb-4">Lifestyle</div>
+            <p-chart type="radar" [data]="radarData" [options]="radarOpts"></p-chart>
+        </div>
     </div>
-  
-    <div class="col-span-12 xl:col-span-6">
-      <div class="card flex flex-col items-center">
-        <div class="font-semibold text-xl mb-4">Lifestyle</div>
-        <p-chart type="radar" [data]="radarData" [options]="radarOpts"></p-chart>
-      </div>
-    </div>
-  </p-fluid>
-  
+</p-fluid>
