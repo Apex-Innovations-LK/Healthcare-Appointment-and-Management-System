@@ -1,0 +1,187 @@
+[
+  {
+    "record_id": "HR-001",
+    "patient_id": "PAT-12345",
+    "patient_name": "Jane Doe",
+    "patient_dob": "1998-11-23",
+    "date_of_service": "2025-05-01T10:30:00.000+0000",
+    "referring_doctor": "DR-67890",
+    "chief_complaint": ["Headache", "Blurred vision"],
+    "allergies": ["Ibuprofen", "Pollen"],
+    "medications": ["Paracetamol", "Amoxicillin"],
+    "problem_list": ["Hypertension", "Migraines"],
+    "patient_sex": "Female",
+    "address": "456 Park Avenue",
+    "city": "Colombo",
+    "state": "Western",
+    "zip": "00700",
+    "patient_phone": "0712345678",
+    "lbf_data": [
+      "LBF101:4.5",
+      "LBF102:13.2",
+      "LBF103:120/80"
+    ],
+    "his_data": [
+      "HIS001",
+      "HIS002"
+    ]
+  },
+  {
+    "record_id": "HR-002",
+    "patient_id": "PAT-67890",
+    "patient_name": "John Smith",
+    "patient_dob": "1985-03-15",
+    "date_of_service": "2025-05-02T14:00:00.000+0000",
+    "referring_doctor": "DR-12345",
+    "chief_complaint": ["Chest pain"],
+    "allergies": ["None"],
+    "medications": ["Aspirin"],
+    "problem_list": ["Hypertension"],
+    "patient_sex": "Male",
+    "address": "123 Main Street",
+    "city": "Colombo",
+    "state": "Western",
+    "zip": "00800",
+    "patient_phone": "0771234567",
+    "lbf_data": [
+      "LBF101:5.0",
+      "LBF102:14.0",
+      "LBF103:130/85"
+    ],
+    "his_data": [
+      "HIS003"
+    ]
+  },
+  {
+    "record_id": "HR-003",
+    "patient_id": "PAT-11223",
+    "patient_name": "Emily Johnson",
+    "patient_dob": "2002-08-14",
+    "date_of_service": "2025-05-03T09:00:00.000+0000",
+    "referring_doctor": "DR-34567",
+    "chief_complaint": ["Fatigue", "Dizziness"],
+    "allergies": ["Penicillin"],
+    "medications": ["Ibuprofen"],
+    "problem_list": ["Anemia"],
+    "patient_sex": "Female",
+    "address": "789 Elm Street",
+    "city": "Kandy",
+    "state": "Central",
+    "zip": "20000",
+    "patient_phone": "0781234567",
+    "lbf_data": [
+      "LBF101:4.8",
+      "LBF102:12.5",
+      "LBF103:110/70"
+    ],
+    "his_data": [
+      "HIS004",
+      "HIS005"
+    ]
+  },
+  {
+    "record_id": "HR-004",
+    "patient_id": "PAT-33445",
+    "patient_name": "Michael Brown",
+    "patient_dob": "1990-12-30",
+    "date_of_service": "2025-05-04T11:00:00.000+0000",
+    "referring_doctor": "DR-45678",
+    "chief_complaint": ["Shortness of breath", "Coughing"],
+    "allergies": ["None"],
+    "medications": ["Loratadine"],
+    "problem_list": ["Asthma"],
+    "patient_sex": "Male",
+    "address": "321 Oak Road",
+    "city": "Galle",
+    "state": "Southern",
+    "zip": "10000",
+    "patient_phone": "0778765432",
+    "lbf_data": [
+      "LBF101:4.0",
+      "LBF102:15.0",
+      "LBF103:125/85"
+    ],
+    "his_data": [
+      "HIS006"
+    ]
+  },
+  {
+    "record_id": "HR-005",
+    "patient_id": "PAT-55678",
+    "patient_name": "Sarah Wilson",
+    "patient_dob": "1993-04-12",
+    "date_of_service": "2025-05-05T13:30:00.000+0000",
+    "referring_doctor": "DR-56789",
+    "chief_complaint": ["Back pain", "Insomnia"],
+    "allergies": ["Aspirin"],
+    "medications": ["Paracetamol", "Gabapentin"],
+    "problem_list": ["Chronic pain", "Insomnia"],
+    "patient_sex": "Female",
+    "address": "456 Maple Street",
+    "city": "Negombo",
+    "state": "Western",
+    "zip": "11500",
+    "patient_phone": "0712348901",
+    "lbf_data": [
+      "LBF101:5.2",
+      "LBF102:14.8",
+      "LBF103:130/90"
+    ],
+    "his_data": [
+      "HIS007",
+      "HIS008"
+    ]
+  },
+  {
+    "record_id": "HR-006",
+    "patient_id": "PAT-78901",
+    "patient_name": "David Miller",
+    "patient_dob": "1982-02-25",
+    "date_of_service": "2025-05-06T15:30:00.000+0000",
+    "referring_doctor": "DR-67890",
+    "chief_complaint": ["Severe headache", "Nausea"],
+    "allergies": ["None"],
+    "medications": ["Amoxicillin", "Paracetamol"],
+    "problem_list": ["Migraine"],
+    "patient_sex": "Male",
+    "address": "123 Pine Avenue",
+    "city": "Kandy",
+    "state": "Central",
+    "zip": "20100",
+    "patient_phone": "0789876543",
+    "lbf_data": [
+      "LBF101:4.3",
+      "LBF102:13.5",
+      "LBF103:115/75"
+    ],
+    "his_data": [
+      "HIS009"
+    ]
+  },
+  {
+    "record_id": "HR-007",
+    "patient_id": "PAT-89012",
+    "patient_name": "Sophia Davis",
+    "patient_dob": "1995-07-07",
+    "date_of_service": "2025-05-07T16:00:00.000+0000",
+    "referring_doctor": "DR-12345",
+    "chief_complaint": ["Stomach pain", "Vomiting"],
+    "allergies": ["Shellfish"],
+    "medications": ["Omeprazole", "Hydrocodone"],
+    "problem_list": ["Gastroenteritis"],
+    "patient_sex": "Female",
+    "address": "654 Birch Road",
+    "city": "Colombo",
+    "state": "Western",
+    "zip": "00850",
+    "patient_phone": "0771122334",
+    "lbf_data": [
+      "LBF101:4.1",
+      "LBF102:14.0",
+      "LBF103:120/80"
+    ],
+    "his_data": [
+      "HIS010"
+    ]
+  }
+]
