@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: chatdb
+    ports:
+      - "5432:5432"
+
+  chat-service:
+    build: ./chat-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+
+  chat-history-service:
+    build: ./chat-history-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - kafka
+      - postgres
