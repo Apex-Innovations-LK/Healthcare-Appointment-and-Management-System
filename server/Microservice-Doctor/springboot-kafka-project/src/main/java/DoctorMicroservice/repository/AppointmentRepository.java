@@ -1,9 +1,9 @@
-package DoctorMicroservice.repository;
+// package DoctorMicroservice.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.JpaRepository;
 
-import DoctorMicroservice.entity.Appointment;   
+// import DoctorMicroservice.entity.Appointment;   
 
-public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+// public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
    
-}
+// }
