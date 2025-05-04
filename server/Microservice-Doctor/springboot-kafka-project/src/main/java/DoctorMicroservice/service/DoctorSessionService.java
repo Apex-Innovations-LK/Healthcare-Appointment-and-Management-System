@@ -1,7 +1,7 @@
 package DoctorMicroservice.service;
 
-import DoctorMicroservice.dto.DoctorSessionDto;
+import DoctorMicroservice.dto.DoctorAvailabilityDto;
 
 public interface DoctorSessionService {
-    DoctorSessionDto addDoctorSession(DoctorSessionDto doctorSessionDto);
+    DoctorAvailabilityDto addDoctorSession(DoctorAvailabilityDto doctorSessionDto);
 }

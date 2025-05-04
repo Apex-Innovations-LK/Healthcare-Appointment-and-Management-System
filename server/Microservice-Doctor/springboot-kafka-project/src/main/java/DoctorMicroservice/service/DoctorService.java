@@ -1,7 +1,7 @@
-package DoctorMicroservice.service;
+// package DoctorMicroservice.service;
 
-import DoctorMicroservice.dto.DoctorDto;
+// import DoctorMicroservice.dto.DoctorDto;
 
-public interface DoctorService {
-    DoctorDto addDoctor(DoctorDto doctorDto);
-}
+// public interface DoctorService {
+//     DoctorDto addDoctor(DoctorDto doctorDto);
+// }

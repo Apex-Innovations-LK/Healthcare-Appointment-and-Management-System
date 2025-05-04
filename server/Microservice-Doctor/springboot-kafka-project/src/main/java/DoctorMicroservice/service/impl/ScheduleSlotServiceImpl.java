@@ -1,5 +1,7 @@
 package DoctorMicroservice.service.impl;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +26,10 @@ public class ScheduleSlotServiceImpl implements ScheduleSlotService {
 
     @Override
     public ScheduleSlotDto rejectScheduleSlot(ScheduleSlotDto scheduleSlotDto) {
-        ScheduleSlot slot = scheduleSlotRepository.findById(scheduleSlotDto.getSlotId())
-                .orElseThrow(() -> new RuntimeException("Slot not found"));
+        UUID slotId = scheduleSlotDto.getSlotId();
+
+        ScheduleSlot slot = scheduleSlotRepository.findBySlotId(slotId)
+            .orElseThrow(() -> new RuntimeException("Slot not found"));
 
         slot.setStatus("rejected");
         scheduleSlotRepository.save(slot);
@@ -35,8 +39,10 @@ public class ScheduleSlotServiceImpl implements ScheduleSlotService {
     
     @Override
     public ScheduleSlotDto updateScheduleSlot(ScheduleSlotDto scheduleSlotDto) {
-        ScheduleSlot slot = scheduleSlotRepository.findById(scheduleSlotDto.getSlotId())
-                .orElseThrow(() -> new RuntimeException("Slot not found"));
+        UUID slotId = scheduleSlotDto.getSlotId();
+
+        ScheduleSlot slot = scheduleSlotRepository.findBySlotId(slotId)
+            .orElseThrow(() -> new RuntimeException("Slot not found"));
 
         slot.setStatus("booked");
         scheduleSlotRepository.save(slot);

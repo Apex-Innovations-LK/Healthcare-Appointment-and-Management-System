@@ -1,12 +1,12 @@
 package DoctorMicroservice.entity;
 
 
+import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,11 +22,11 @@ import lombok.Setter;
 public class ScheduleSlot {
     @Id
     @Column(name = "slot_id", nullable = false) 
-    private Long slotId; // assigned at time of setting doctorAvailability
+    private UUID slotId; // assigned at time of setting doctorAvailability
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    //@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DoctorSession_id", referencedColumnName = "DoctorSession_id", nullable = false)
-    private DoctorSession session;
+    private UUID session_id;
 
     @Column(name = "status")
     private String status;

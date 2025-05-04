@@ -1,6 +1,8 @@
 package DoctorMicroservice.dto;
 
 
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScheduleSlotDto {
-    private Long slotId;
-    private Long sessionId;
+    private UUID slotId;
+    private UUID session_id;
     private String status;
 }

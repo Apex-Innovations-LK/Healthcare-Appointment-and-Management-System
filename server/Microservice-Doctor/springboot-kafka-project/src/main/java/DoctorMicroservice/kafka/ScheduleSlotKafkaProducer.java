@@ -8,7 +8,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
-import DoctorMicroservice.dto.DoctorSessionDto;
 import DoctorMicroservice.dto.ScheduleSlotDto;
 
 @Service
