@@ -43,8 +43,8 @@ interface ChatMessage {
   ],
   providers: [MessageService],
   template: `
-    <div class="flex justify-center w-full h-screen bg-surface-50 dark:bg-surface-800 p-0 md:p-4">
-      <div class="bg-surface-0 dark:bg-surface-900 flex flex-col w-full md:w-4/5 lg:w-4/5 max-w-5xl h-full md:h-[95%] md:rounded-lg md:shadow-lg overflow-hidden">
+    <div class="flex justify-center w-full h-screen p-0 md:p-4" style="background-image: url('https://img.freepik.com/free-photo/nurse-measuring-patient-blood-pressure_53876-14933.jpg?t=st=1746481571~exp=1746485171~hmac=6887fffbca219bb846598fd0fe0b0f44a9b6bcca8c7bc543e8f12fea2b4c040a&w=1380'); background-size: cover; background-position: center;">
+      <div class="bg-surface-0 dark:bg-surface-900 flex flex-col w-4/5 md:w-4/5 lg:w-4/5 max-w-5xl h-[85%] md:h-[85%] rounded-lg shadow-lg overflow-hidden mt-4">
         <!-- Header with responsive padding -->
         <div class="flex justify-between items-center px-3 py-3 md:px-4 md:py-3 bg-primary shadow-md">
           <div class="flex items-center gap-2">
@@ -158,6 +158,7 @@ interface ChatMessage {
     :host {
       display: block;
       height: 100%;
+      background-color: rgba(255, 255, 255, 0.5);
     }
     
     .typing-indicator {
@@ -216,7 +217,7 @@ export class Chatbot implements OnInit {
   
   ngOnInit() {
     // Initialize with a welcome message
-    this.addBotMessage('Hello! Im your health assistant. How can I help you today?');
+    this.addBotMessage('Hello! Im your health assistant. How can I help you  today?');
   }
   
   sendMessage() {
