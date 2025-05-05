@@ -1,9 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, SimpleChanges } from '@angular/core';
+import { MenuItem } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
     selector: 'app-calendar-session',
-    imports: [DatePipe],
+    imports: [DatePipe, ButtonModule],
     templateUrl: './calendar-session.component.html',
     styleUrl: './calendar-session.component.scss'
 })
@@ -20,18 +22,23 @@ export class CalendarSessionComponent {
         from: string;
         to: string;
         patientsCount: number;
+        slots: boolean[];
     };
 
     fromTime!: Date;
     toTime!: Date;
     appointments: any[] = [];
+    height!:string;
+    items: MenuItem[] = [];
+    expanded = false;
 
     ngOnChanges(changes: SimpleChanges): void {
         if (this.session) {
             this.fromTime = new Date(this.session.from);
             this.toTime = new Date(this.session.to);
-            this.appointments = Array.from({ length: this.session.patientsCount ?? 5 });
+            this.setHeight();
         }
+        this.items = [{ label: 'Update', icon: 'pi pi-refresh' }, { label: 'Delete', icon: 'pi pi-times' }, { label: 'Angular.io', icon: 'pi pi-info', url: 'http://angular.io' }, { separator: true }, { label: 'Setup', icon: 'pi pi-cog' }];
     }
 
     getTopOffset(): string {
@@ -44,9 +51,35 @@ export class CalendarSessionComponent {
         return `${totalMinutes + this.calendarConfig.calendarLineHeight * linesCount}px`;
     }
 
-    getHeight(): string {
+    setHeight(): void {
         const diffMinutes = Math.floor((this.toTime.getTime() - this.fromTime.getTime()) / (1000 * 60));
         const height = Math.floor(diffMinutes / 60) * this.calendarConfig.calendarLineHeight + diffMinutes;
-        return `${height}px`;
+        this.height = `${height}px`;
+    }
+
+    onMouseEnter(event: MouseEvent): void {
+        this.height = 'auto';
+        this.expanded = true;
+    }
+
+    onMouseLeave(event: MouseEvent): void {
+        this.setHeight();
+        this.expanded = false;
+    }
+
+    getBookedCount(): number {
+        let count = 0;
+        for (let i = 0; i < this.session.slots.length; i++) {
+            if (this.session.slots[i] === true) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    isExpired(): boolean {
+        const currentDate = new Date();
+        const sessionDate = new Date(this.session.to);
+        return sessionDate < currentDate;
     }
 }

@@ -1,0 +1,15 @@
+<div class="calendar-view w-100 flex flex-row items-end">
+    <div class="w-[100px] py-[0.625rem] mb-[2px] flex flex-col gap-0 justify-evenly overflow-hidden relative items-center"
+    [style.height]="calendarConfig.calendarColHeight - 2*calendarConfig.calendarLineHeight + 'px'">
+        @for (time of timeLabels; track $index) {
+            <p class="text-sm m-0 text-right w-full">{{ time }}</p>
+        }
+    </div>
+
+    @if (weekDates.length > 0) {
+        @for (date of weekDates; track $index) {
+            <app-calendar-col [date]="date" [calendarConfig]="calendarConfig" class="flex flex-1" [style.height]="calendarConfig.calendarColHeight+80+'px'"/>
+        }
+    }
+    
+</div>
