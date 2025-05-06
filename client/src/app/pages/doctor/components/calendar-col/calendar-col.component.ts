@@ -3,6 +3,7 @@ import { Component, Input, SimpleChanges } from '@angular/core';
 import { CalendarSessionComponent } from '../calendar-session/calendar-session.component';
 import { ButtonModule } from 'primeng/button';
 import { CalendarAvailabilityComponent } from '../calendar-availability/calendar-availability.component';
+import { DoctorService } from '../../../../service/doctor.service';
 
 @Component({
     selector: 'app-calendar-col',
@@ -49,6 +50,9 @@ export class CalendarColComponent {
         }
     ];
 
+    constructor(private doctorService: DoctorService) {}
+    
+
 
     @Input() date!: Date;
     
@@ -70,6 +74,30 @@ export class CalendarColComponent {
     @Input() type!: 'schedule' | 'plan';
 
     lines: number[] = Array.from({ length: 19 });
+
+    loadSessions() {
+        const doctor_id = 'doctor_id'; // Replace with actual doctor ID
+        this.doctorService.getSessionsForDate(doctor_id, this.date.toISOString()).subscribe({
+            next: (response) => {
+                this.sessions = response;
+            },
+            error: (error) => {
+                console.error('Error fetching sessions for date'+this.date+': ', error);
+            }
+        });
+    }
+
+    loadAvailabilities() {
+        const doctor_id = 'doctor_id'; // Replace with actual doctor ID
+        this.doctorService.getAvailabilityForDate(doctor_id, this.date.toISOString()).subscribe({
+            next: (response) => {
+                this.availabilities = response;
+            },
+            error: (error) => {
+                console.error('Error fetching availabilities for date'+this.date+': ', error);
+            }
+        });
+    }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (this.calendarConfig) {
