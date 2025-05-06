@@ -1,0 +1,4 @@
+com\kafka\emailproducer\EmailproducerApplication.class
+com\kafka\emailproducer\controller\NotificationController.class
+com\kafka\emailproducer\model\EmailRequest.class
+com\kafka\emailproducer\service\KafkaSenderService.class

@@ -1,0 +1,4 @@
+D:\notification-service-\Healthcare-Appointment-and-Management-System\emailproducer\src\main\java\com\kafka\emailproducer\controller\NotificationController.java
+D:\notification-service-\Healthcare-Appointment-and-Management-System\emailproducer\src\main\java\com\kafka\emailproducer\EmailproducerApplication.java
+D:\notification-service-\Healthcare-Appointment-and-Management-System\emailproducer\src\main\java\com\kafka\emailproducer\model\EmailRequest.java
+D:\notification-service-\Healthcare-Appointment-and-Management-System\emailproducer\src\main\java\com\kafka\emailproducer\service\KafkaSenderService.java
