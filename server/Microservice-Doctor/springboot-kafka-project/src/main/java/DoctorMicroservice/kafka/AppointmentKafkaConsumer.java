@@ -17,7 +17,7 @@ public class AppointmentKafkaConsumer {
     private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentKafkaConsumer.class);
     private final ScheduleSlotService scheduleSlotService;
  // temporily made the topic to schedule_slot, but actually it should be a new topic to which booked appointments are notified to 
-    @KafkaListener(topics = "test",groupId ="booked_appointments")
+    @KafkaListener(topics = "schedule_slot",groupId ="booked_appointments")
     public void update(ScheduleSlotDto scheduleSlotDto) {
         LOGGER.info("Updated appointment status to booked", scheduleSlotDto);
         scheduleSlotService.updateScheduleSlot(scheduleSlotDto);

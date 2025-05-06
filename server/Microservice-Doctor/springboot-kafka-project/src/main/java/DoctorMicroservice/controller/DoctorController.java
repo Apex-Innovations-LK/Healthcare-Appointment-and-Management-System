@@ -1,5 +1,7 @@
 package DoctorMicroservice.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import DoctorMicroservice.dto.DoctorAvailabilityDto;
 import DoctorMicroservice.dto.ScheduleSlotDto;
+import DoctorMicroservice.dto.ScheduleSlotSearchRequest;
+import DoctorMicroservice.entity.DoctorAvailability;
 import DoctorMicroservice.service.DoctorSessionService;
 import DoctorMicroservice.service.ScheduleSlotService;
 import lombok.AllArgsConstructor;
@@ -36,6 +40,22 @@ public class DoctorController {
         DoctorAvailabilityDto savedDocAvailability = doctorSessionService.addDoctorSession(doctorSessionDto);
         return new ResponseEntity<>(savedDocAvailability, HttpStatus.CREATED);
     };
+
+    // getScheduleSlots for a date REST API
+    @PostMapping("/getScheduleSlotsByDate")
+    public ResponseEntity<List<ScheduleSlotDto>> getScheduleSlotsByDate(
+            @RequestBody ScheduleSlotSearchRequest request) {
+        List<ScheduleSlotDto> slots = scheduleSlotService.getSlotsByDoctorAndDate(request);
+        return new ResponseEntity<>(slots, HttpStatus.OK);
+    }
+    
+    // getSessionsByDate for a date REST API
+    @PostMapping("/getSessionsByDateAndDocId")
+    public ResponseEntity<List<DoctorAvailabilityDto>> getSessionsByDate(@RequestBody ScheduleSlotSearchRequest request) {
+        List<DoctorAvailabilityDto> sessions = doctorSessionService.getSessions(request);
+        return new ResponseEntity<>(sessions, HttpStatus.OK);
+    }
+
 
     //rejectAppointment REST API
     @PostMapping("/rejectAppointment")
