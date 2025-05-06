@@ -71,7 +71,6 @@ public class GatewayController {
         return switch (service.toLowerCase()) {
             case "auth" -> "1";   // http://localhost:8081
             case "schedule" -> "2";   // http://localhost:8082
-            case "appointment" -> "3";  // http://localhost:8083
             default -> throw new IllegalArgumentException("Unknown service: " + service);
         };
     }
