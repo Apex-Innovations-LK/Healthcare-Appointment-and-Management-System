@@ -3,6 +3,7 @@ package com.springboot.healthcare.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springboot.healthcare.dto.AuthResponse;
+import com.springboot.healthcare.dto.DoctorDetails;
 import com.springboot.healthcare.dto.RegisterRequest;
 import com.springboot.healthcare.dto.UserKafkaEvent;
 import com.springboot.healthcare.exception.EmailAlreadyExistsException;
@@ -156,5 +157,9 @@ public class UserService {
         stats.put("DoctorsAvailable",userRepo.countByRole("DOCTOR"));
         stats.put("StaffsAvailable",userRepo.countByRole("STAFF"));
         return stats;
+    }
+
+    public List<DoctorDetails> fetchAllDoctors() {
+        return userRepo.findAllDoctors();
     }
 }

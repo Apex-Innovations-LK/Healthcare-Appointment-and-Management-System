@@ -2,6 +2,7 @@ package com.springboot.healthcare.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.springboot.healthcare.dto.AuthResponse;
+import com.springboot.healthcare.dto.DoctorDetails;
 import com.springboot.healthcare.dto.RegisterRequest;
 import com.springboot.healthcare.model.Users;
 import com.springboot.healthcare.service.UserService;
@@ -44,5 +45,10 @@ public class UserController {
     @GetMapping("/get-count")
     public Map<String, Long> getCount() {
         return userService.getCount();
+    }
+
+    @GetMapping("/fetch-doctors")
+    public List<DoctorDetails> fetchAllDoctors() {
+        return userService.fetchAllDoctors();
     }
 }
