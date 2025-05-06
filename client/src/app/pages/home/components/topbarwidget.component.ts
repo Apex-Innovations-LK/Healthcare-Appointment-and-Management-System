@@ -3,16 +3,16 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { Router, RouterModule } from '@angular/router';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
-import { AppFloatingConfigurator } from "../../admin/components/app.floatingconfigurator";
+import { AppFloatingConfigurator } from '../../admin/components/app.floatingconfigurator';
 import { AuthStateService } from '../../../service/auth-state.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
 
 @Component({
-    selector: 'patient-topbar-widget',
+    selector: 'home-topbar-widget',
     providers: [MessageService],
-    imports: [MenubarModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator, ToastModule],
+    imports: [MenubarModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, ToastModule],
     template: `<a class="flex items-center" href="/patient">
             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 mr-2">
                 <path
@@ -38,41 +38,8 @@ import { MenubarModule } from 'primeng/menubar';
             <i class="pi pi-bars !text-2xl"></i>
         </a>
 
-        <div class="items-center dark:bg-surface-900 grow justify-between hidden lg:flex absolute lg:static w-full left-0 top-full px-12 lg:px-0 z-20 rounded-border dark:bg-black">
-            <ul class="list-none p-0 m-0 flex lg:items-center select-none flex-col lg:flex-row cursor-pointer gap-8">
-                <li>
-                    <a (click)="router.navigate(['/patient'], { fragment: 'hero' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>Home</span>
-                    </a>
-                </li>
-                <li>
-                    <a (click)="router.navigate(['/patient'], { fragment: 'highlights' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>Features</span>
-                    </a>
-                </li>
-                <li>
-                    <a (click)="router.navigate(['/patient'], { fragment: 'aboutus' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>About Us</span>
-                    </a>
-                </li>
-                <li>
-                    <a (click)="router.navigate(['/patient'], { fragment: 'contactus' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>Contact Us</span>
-                    </a>
-                </li>
-                <li>
-                    <a (click)="router.navigate(['/patient/appointment'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>Appointment</span>
-                    </a>
-                </li>
-                <!-- <li>
-                    <p-menubar [model]="nestedMenuItems"> </p-menubar>
-                </li> -->
-            </ul>
-            <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0">
-                <button pButton pRipple label="Logout" [rounded]="true" (click)="logout()"></button>
-                <app-floating-configurator />
-            </div>
+        <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0">
+            <button pButton pRipple label="Login" [rounded]="true" (click)="gotoLogin()"></button>
         </div> `
 })
 export class TopbarWidget {
@@ -82,33 +49,8 @@ export class TopbarWidget {
         private messageService: MessageService
     ) {}
 
-    logout() {
-        this.authStateService.clear();
-        this.messageService.add({ severity: 'success', summary: 'Logout', detail: 'Logged out successfully' });
-        setTimeout(() => {
-            this.router.navigate(['/auth/login']);
-        }, 2000);
+    gotoLogin() {
+        this.router.navigate(['/auth/login']);
     }
 
-    // nestedMenuItems = [
-    //     {
-    //         label: 'Appointments',
-    //         items: [
-    //             {
-    //                 label: 'Add Appointments',
-    //                 icon: 'pi pi-calendar-plus',
-    //                 command: () => {
-    //                     this.router.navigate(['/patient/appointment/add']);
-    //                 }
-    //             },
-    //             {
-    //                 label: 'View Appointments',
-    //                 icon: 'pi pi-eye',
-    //                 command: () => {
-    //                     this.router.navigate(['/patient/appointment/view']);
-    //                 }
-    //             }
-    //         ]
-    //     }
-    // ];
 }

@@ -3,6 +3,7 @@ import { Injectable, OnInit } from '@angular/core';
 import { JwtPayload, TokenDecoderService } from './token-decoder.service';
 import { AuthService } from './auth.service';
 import { User } from '../models/user';
+import { UserDetails } from '../models/userDetails';
 
 @Injectable({
     providedIn: 'root'
@@ -10,7 +11,8 @@ import { User } from '../models/user';
 export class AuthStateService{
 
     private userInfo: JwtPayload | null = null;
-    private user: User | null = null;
+    private user: UserDetails | null = null;
+    private id : string | null = null;
 
     constructor(
         private tokenDecoder: TokenDecoderService,
@@ -28,7 +30,7 @@ export class AuthStateService{
         return this.userInfo;
     }
 
-    getUserDetails(): User | null {
+    getUserDetails(): UserDetails | null {
         return this.user;
     }
 
@@ -38,6 +40,10 @@ export class AuthStateService{
 
     getRole(): string | null {
         return this.userInfo?.role || null;
+    }
+
+    getId(): string | null {
+        return this.id || null;
     }
 
     isAuthenticated(): boolean {
