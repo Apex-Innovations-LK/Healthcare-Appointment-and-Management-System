@@ -5,13 +5,13 @@ import { DoctorSessions } from '../models/DoctorSessions';
 import { map } from 'rxjs/operators';
 import { MakeAppointment } from '../models/makeAppointment';
 import { BookingResponse } from '../models/BookingResponse';
+import { Appointment } from '../models/Appointment';
 
 interface Appointments {
     patient_id: string;
     appointment_type: string;
     slot_id: string;
 }
-
 
 @Injectable({
     providedIn: 'root'
@@ -27,6 +27,11 @@ export class AppointmentsService {
 
     bookAppointment(appointment: MakeAppointment): Observable<string> {
         return this.httpClient.post<string>(`${this.backendUrl}/book-appointment`, appointment);
+    }
+
+    // Fetch appointments for the logged-in patient
+    viewAppointments(patientId: string): Observable<Appointment[]> {
+        return this.httpClient.get<Appointment[]>(`${this.backendUrl}/view-appointments/${patientId}`);
     }
 
     // getAppointments(): Observable<DoctorSessions[]> {

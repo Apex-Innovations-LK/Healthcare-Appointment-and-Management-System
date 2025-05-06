@@ -40,4 +40,14 @@ public class AppointmentController {
         }
     }
 
+    @GetMapping("/view-appointments/{patientId}")
+    public ResponseEntity<List<Appointment>> viewAppointments(@PathVariable String patientId) {
+        try {
+            List<Appointment> appointments = appointmentService.getAppointmentsByPatientId(patientId);
+            return ResponseEntity.ok(appointments);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 }
