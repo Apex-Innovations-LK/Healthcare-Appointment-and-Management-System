@@ -23,7 +23,7 @@ public class RiskAssessmentService {
     public void loadPatientData() {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            InputStream is = getClass().getClassLoader().getResourceAsStream("patient_data.json");
+            InputStream is = getClass().getClassLoader().getResourceAsStream("health_records.json");
             patientRecords = mapper.readValue(is, new TypeReference<List<PatientRecord>>() {});
         } catch (Exception e) {
             e.printStackTrace();
