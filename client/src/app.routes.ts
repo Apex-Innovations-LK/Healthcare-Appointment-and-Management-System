@@ -8,6 +8,7 @@ import { HomeComponent } from './app/pages/home/home';
 import { Documentation } from './app/pages/documentation/documentation';
 import { Dashboard } from './app/pages/dashboard/dashboard';
 
+import { VideoCallComponent } from './app/video-call/video-call.component';
 export const appRoutes: Routes = [
     // {
         
@@ -54,6 +55,7 @@ export const appRoutes: Routes = [
             }
         ]
     },
+    { path: 'telehealth', component: VideoCallComponent },
     {
         path: 'staff',
         component: StaffLayout,
