@@ -22,7 +22,7 @@ import { AuthStateService } from '../../../service/auth-state.service';
                 <i class="pi pi-bars"></i>
             </button>
             <a class="layout-topbar-logo" routerLink="/admin">
-                <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         fill-rule="evenodd"
                         clip-rule="evenodd"
@@ -38,8 +38,10 @@ import { AuthStateService } from '../../../service/auth-state.service';
                             fill="var(--primary-color)"
                         />
                     </g>
-                </svg>
-                <span>Medicare</span>
+                </svg> -->
+                <div class="logo flex items-center">
+                    <h2>MediCare<span class="plus text-primary">+</span></h2>
+                </div>
             </a>
         </div>
 

@@ -4,45 +4,30 @@ import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
-import { AuthStateService } from '../../service/auth-state.service'; // Adjust if needed
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { FormsModule } from '@angular/forms';
+import { ImageModule } from 'primeng/image';
+import { AuthStateService } from '../../service/auth-state.service';
+import { TopbarWidget } from "./components/topbarwidget.component";
+import { HomeBody } from "./components/homeBody";
+import { FooterWidget } from "./components/footerwidget";
 
 @Component({
-  selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule, CardModule, ButtonModule, DividerModule],
-  template: `
-    <div>
-        <h1>Home Works!</h1>
-    </div>
-  `,
-  styles: []
+    selector: 'app-home',
+    standalone: true,
+    imports: [CommonModule, CardModule, ButtonModule, DividerModule, InputSwitchModule, FormsModule, ImageModule, TopbarWidget, HomeBody, FooterWidget],
+    template: `
+        <div class="landing-page" [ngClass]="{ 'dark-theme': isDarkMode }">
+            <home-topbar-widget class="py-6 px-6 mx-0 md:mx-12 lg:mx-20 lg:px-20 flex items-center justify-between relative lg:static"></home-topbar-widget>
+            <app-home-body></app-home-body>
+            <home-footer-widget></home-footer-widget>
+        </div>
+    `
 })
-export class HomeComponent {
-//   constructor(
-//     private router: Router,
-//     public authStateService: AuthStateService
-//   ) {}
+export class HomeComponent implements OnInit {
+    isDarkMode = false;
 
-//   ngOnInit(): void {
-//     if (this.authStateService.isAuthenticated()) {
-//       const role = this.authStateService.getRole();
-//       switch (role) {
-//         case 'doctor':
-//           this.router.navigate(['/doctor/home']);
-//           break;
-//         case 'admin':
-//           this.router.navigate(['/admin/home']);
-//           break;
-//         case 'patient':
-//           this.router.navigate(['/patient/home']);
-//           break;
-//         default:
-//           this.router.navigate(['/login']);
-//       }
-//     }
-//   }
+    constructor() {}
 
-//   goToLogin() {
-//     this.router.navigate(['/auth/login']);
-//   }
+    ngOnInit(): void {}
 }

@@ -7,11 +7,12 @@ import { AppFloatingConfigurator } from "../../admin/components/app.floatingconf
 import { AuthStateService } from '../../../service/auth-state.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { MenubarModule } from 'primeng/menubar';
 
 @Component({
     selector: 'patient-topbar-widget',
-     providers: [MessageService],
-    imports: [RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator, ToastModule],
+    providers: [MessageService],
+    imports: [MenubarModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator, ToastModule],
     template: `<a class="flex items-center" href="/patient">
             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 mr-2">
                 <path
@@ -37,7 +38,7 @@ import { MessageService } from 'primeng/api';
             <i class="pi pi-bars !text-2xl"></i>
         </a>
 
-        <div class="items-center dark:bg-surface-900 grow justify-between hidden lg:flex absolute lg:static w-full left-0 top-full px-12 lg:px-0 z-20 rounded-border">
+        <div class="items-center dark:bg-surface-900 grow justify-between hidden lg:flex absolute lg:static w-full left-0 top-full px-12 lg:px-0 z-20 rounded-border dark:bg-black">
             <ul class="list-none p-0 m-0 flex lg:items-center select-none flex-col lg:flex-row cursor-pointer gap-8">
                 <li>
                     <a (click)="router.navigate(['/patient'], { fragment: 'hero' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
@@ -64,10 +65,13 @@ import { MessageService } from 'primeng/api';
                         <span>Appointment</span>
                     </a>
                 </li>
+                <!-- <li>
+                    <p-menubar [model]="nestedMenuItems"> </p-menubar>
+                </li> -->
             </ul>
             <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0">
                 <button pButton pRipple label="Logout" [rounded]="true" (click)="logout()"></button>
-                <app-floating-configurator/>
+                <app-floating-configurator />
             </div>
         </div> `
 })
@@ -75,7 +79,7 @@ export class TopbarWidget {
     constructor(
         public router: Router,
         private authStateService: AuthStateService,
-        private messageService : MessageService
+        private messageService: MessageService
     ) {}
 
     logout() {
@@ -85,4 +89,26 @@ export class TopbarWidget {
             this.router.navigate(['/auth/login']);
         }, 2000);
     }
+
+    // nestedMenuItems = [
+    //     {
+    //         label: 'Appointments',
+    //         items: [
+    //             {
+    //                 label: 'Add Appointments',
+    //                 icon: 'pi pi-calendar-plus',
+    //                 command: () => {
+    //                     this.router.navigate(['/patient/appointment/add']);
+    //                 }
+    //             },
+    //             {
+    //                 label: 'View Appointments',
+    //                 icon: 'pi pi-eye',
+    //                 command: () => {
+    //                     this.router.navigate(['/patient/appointment/view']);
+    //                 }
+    //             }
+    //         ]
+    //     }
+    // ];
 }
