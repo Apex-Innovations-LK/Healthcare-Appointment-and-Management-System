@@ -37,7 +37,18 @@ export class AppMenu {
                         label: 'Analytics',
                         icon: 'pi pi-chart-line',
                         routerLink: ['/admin/analytics']
+                    },
+                    {
+                        label: 'Patient Risk Assessment',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/admin/patients']
+                    },
+                    {
+                        label: 'Risk Dashboard',
+                        icon: 'pi pi-fw pi-chart-pie',
+                        routerLink: ['/admin/dashboard']
                     }
+
                     //,
                     // {
                     //     label: 'Auth',
