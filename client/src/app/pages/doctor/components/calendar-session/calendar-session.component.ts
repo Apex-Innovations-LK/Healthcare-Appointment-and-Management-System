@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, Input, SimpleChanges, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 
@@ -24,6 +24,8 @@ export class CalendarSessionComponent {
         patientsCount: number;
         slots: boolean[];
     };
+
+    @ViewChild('componentRef2') componentRef!: ElementRef;
 
     fromTime!: Date;
     toTime!: Date;
@@ -58,8 +60,8 @@ export class CalendarSessionComponent {
     }
 
     onMouseEnter(event: MouseEvent): void {
-        this.height = 'auto';
         this.expanded = true;
+        this.height='auto';
     }
 
     onMouseLeave(event: MouseEvent): void {

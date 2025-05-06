@@ -4,6 +4,7 @@
     [style.height]="height"
     (mouseenter)="onMouseEnter($event)"
     (mouseleave)="onMouseLeave($event)"
+    #componentRef2
 >
     <p class="time-duration text-lg m-0 font-bold">{{ fromTime | date: 'shortTime' }} - {{ toTime | date: 'shortTime' }}</p>
     <div class="flex flex-row items-center justify-start mt-1 w-full flex-wrap">

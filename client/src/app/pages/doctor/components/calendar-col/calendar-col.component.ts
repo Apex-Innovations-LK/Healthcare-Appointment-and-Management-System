@@ -1,10 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { CalendarSessionComponent } from '../calendar-session/calendar-session.component';
+import { ButtonModule } from 'primeng/button';
+import { CalendarAvailabilityComponent } from '../calendar-availability/calendar-availability.component';
 
 @Component({
     selector: 'app-calendar-col',
-    imports: [DatePipe, CalendarSessionComponent],
+    imports: [ButtonModule, DatePipe, CalendarAvailabilityComponent, CalendarSessionComponent],
     templateUrl: './calendar-col.component.html',
     styleUrl: './calendar-col.component.scss'
 })
@@ -28,7 +30,34 @@ export class CalendarColComponent {
         }
     ];
 
+    availabilities: any[] = [
+        {
+            from: '2025-05-03T08:30:00',
+            to: '2025-05-03T10:00:00',
+            patientsCount: 8,
+            slots: [
+                true, true, true, true, true, false, false, false
+            ],
+        },
+        {
+            from: '2025-05-08T17:00:00',
+            to: '2025-05-08T22:00:00',
+            patientsCount: 12,
+            slots: [
+                true, true, true, false, false, true, false, true, true, false, false, false
+            ],
+        }
+    ];
+
+
     @Input() date!: Date;
+    
+    @Input() modalHandlers!:{
+        addModalHandler: () => void;
+        editModalHandler: () => void;
+        deleteModalHandler: () => void;
+        //rejectModalHandler: () => void;
+      };
 
     @Input() calendarConfig!: {
         startTime: number;
@@ -37,6 +66,8 @@ export class CalendarColComponent {
         calendarLineHeight: number;
         calendarColHeight: number;
     };
+
+    @Input() type!: 'schedule' | 'plan';
 
     lines: number[] = Array.from({ length: 19 });
 
