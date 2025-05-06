@@ -3,10 +3,13 @@ package DoctorMicroservice.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import DoctorMicroservice.dto.DoctorAvailabilityDto;
+import DoctorMicroservice.dto.ScheduleSlotDto;
+import DoctorMicroservice.dto.ScheduleSlotSearchRequest;
 import DoctorMicroservice.entity.DoctorAvailability;
 import DoctorMicroservice.entity.ScheduleSlot;
 import DoctorMicroservice.kafka.DoctorAvailabilityKafkaProducer;
@@ -62,6 +65,19 @@ public class DoctorSessionServiceImpl implements DoctorSessionService {
         DoctorAvailabilityKafkaProducer.sendDoctorAvailability(responseDto);
 
         return responseDto;
+    }
+    public List<ScheduleSlotDto> getSlotsByDoctorAndDate(ScheduleSlotSearchRequest request) {
+        List<ScheduleSlot> slots = scheduleSlotRepository.findByDoctorIdAndDate(request.getDoctorId(), request.getDate());
+        return slots.stream()
+            .map(slot -> new ScheduleSlotDto(slot.getSlotId(), slot.getSession_id(), slot.getStatus()))
+            .collect(Collectors.toList());
+    }
+    
+    public List<DoctorAvailabilityDto> getSessions(ScheduleSlotSearchRequest request) {
+        List<DoctorAvailability> slots = doctorSessionRepository.findByDoctorIdAndDateInSessions(request.getDoctorId(), request.getDate());
+        return slots.stream()
+            .map(slot -> new DoctorAvailabilityDto(slot.getSession_id(),slot.getDoctor_id(), slot.getTo(), slot.getFrom(),slot.getNumber_of_patients()))
+            .collect(Collectors.toList());
     }
 
     

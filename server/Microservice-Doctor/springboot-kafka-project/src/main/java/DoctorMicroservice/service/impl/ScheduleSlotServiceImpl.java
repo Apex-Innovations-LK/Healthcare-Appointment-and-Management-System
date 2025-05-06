@@ -9,12 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import DoctorMicroservice.dto.ScheduleSlotDto;
 import DoctorMicroservice.dto.ScheduleSlotSearchRequest;
+import DoctorMicroservice.entity.DoctorAvailability;
 import DoctorMicroservice.entity.ScheduleSlot;
 import DoctorMicroservice.kafka.RejectAppointmentKafkaProducer;
 import DoctorMicroservice.mapper.ScheduleSlotMapper;
 import DoctorMicroservice.repository.ScheduleSlotRepository;
 import DoctorMicroservice.service.ScheduleSlotService;
 import lombok.RequiredArgsConstructor;
+import DoctorMicroservice.repository.DoctorSessionRepository;
+
 
 @Service
 @Transactional
@@ -22,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class ScheduleSlotServiceImpl implements ScheduleSlotService {
 
     private final ScheduleSlotRepository scheduleSlotRepository;
+    private final DoctorSessionRepository doctorSessionRepository;
     private final ScheduleSlotMapper scheduleSlotMapper;
     //private final AppointmentKafkaConsumer appointmentKafkaConsumer;
     private final RejectAppointmentKafkaProducer rejectAppointmentKafkaProducer;
@@ -53,6 +57,9 @@ public class ScheduleSlotServiceImpl implements ScheduleSlotService {
         return scheduleSlotMapper.mapToScheduleSlotDto(slot);
     }
     
+    
+    
+
     public List<ScheduleSlotDto> getSlotsByDoctorAndDate(ScheduleSlotSearchRequest request) {
         List<ScheduleSlot> slots = scheduleSlotRepository.findByDoctorIdAndDate(request.getDoctorId(), request.getDate());
         return slots.stream()
