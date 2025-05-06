@@ -7,7 +7,7 @@ import DoctorMicroservice.dto.ScheduleSlotDto;
 import DoctorMicroservice.entity.ScheduleSlot;
 
 @Component
-public class ScheduleSlotMapper {
+public class ScheduleSlotMapper  {
 
 
     public ScheduleSlot mapToScheduleSlot(ScheduleSlotDto dto) {

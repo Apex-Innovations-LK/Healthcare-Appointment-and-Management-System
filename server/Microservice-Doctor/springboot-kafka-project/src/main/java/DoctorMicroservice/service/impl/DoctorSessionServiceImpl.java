@@ -41,14 +41,14 @@ public class DoctorSessionServiceImpl implements DoctorSessionService {
         // Map and save DoctorSession
         DoctorAvailability doctorSession = availabilityMapper.mapToDoctorAvailability(doctorSessionDto);
         DoctorAvailability savedDocAvailability = doctorSessionRepository.save(doctorSession);
-        
+
         // Generate ScheduleSlots from 0 to count-1
         int slotCount = savedDocAvailability.getNumber_of_patients();
         List<ScheduleSlot> slots = new ArrayList<>();
 
-        for (int i = 1; i < slotCount+1; i++) {
+        for (int i = 1; i < slotCount + 1; i++) {
             ScheduleSlot slot = new ScheduleSlot();
-            slot.setSlotId(UUID.randomUUID());  // Generate a unique UUID for each slot
+            slot.setSlotId(UUID.randomUUID()); // Generate a unique UUID for each slot
             slot.setSession_id(savedDocAvailability.getSession_id()); // FK to DoctorSession
             slot.setStatus("available");
             scheduleSlotKafkaProducer.sendDoctorScheduleSlot(scheduleSlotMapper.mapToScheduleSlotDto(slot));
@@ -62,7 +62,8 @@ public class DoctorSessionServiceImpl implements DoctorSessionService {
         DoctorAvailabilityKafkaProducer.sendDoctorAvailability(responseDto);
 
         return responseDto;
-}
+    }
 
+    
     
 }
