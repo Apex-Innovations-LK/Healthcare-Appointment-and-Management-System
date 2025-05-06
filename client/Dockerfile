@@ -1,35 +1,20 @@
-# Step 1: Use Node.js 20 for the build stage
-FROM node:20 AS build
+# Stage 1: Install dependencies
+FROM node:20
 
-# Step 2: Set working directory inside the container
+# Create app directory
 WORKDIR /app
 
-# Step 3: Copy dependency files
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Step 4: Install dependencies
+# Install dependencies
 RUN npm install
 
-# Step 5: Copy rest of the Angular app
+# Copy the rest of the app
 COPY . .
 
-# Step 6: Build the Angular app
-RUN npm run build
+# Expose Angular dev server port
+EXPOSE 4200
 
-# Step 7: Use lightweight Node runtime to serve the app
-FROM node:20 AS runtime
-
-# Step 8: Set working directory
-WORKDIR /app
-
-# Step 9: Install static file server
-RUN npm install -g http-server
-
-# Step 10: Copy built output from the build stage
-COPY --from=build /app/dist/sakai-ng ./dist/sakai-ng
-
-# Step 11: Expose port
-EXPOSE 8080
-
-# Step 12: Start the static server from the correct path
-CMD ["http-server", "dist/sakai-ng/browser", "-p", "8080"]
+# Run Angular dev server
+CMD ["npm", "run", "start"]
