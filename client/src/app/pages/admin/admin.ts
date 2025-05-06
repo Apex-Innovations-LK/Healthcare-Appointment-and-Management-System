@@ -98,8 +98,8 @@ import { HttpClient } from '@angular/common/http';
                             <div class="col-12 lg:col-6 mb-4">
                                 <p-card styleClass="h-full shadow-4 cursor-pointer" (click)="navigateToRiskDistribution()">
                                     <div class="flex align-items-center">
-                                        <div class="flex justify-content-center align-items-center bg-primary-100 border-round" style="width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                            <i class="pi pi-chart-pie text-primary text-3xl"></i>
+                                        <div class="flex justify-content-center align-items-center bg-red-100 border-round" style="width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="pi pi-chart-pie text-red-800 text-3xl"></i>
                                         </div>
                                         <div class="ml-4">
                                             <h4 class="mt-0 mb-1">Patient Risk Distribution</h4>
