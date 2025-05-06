@@ -20,9 +20,9 @@ export const authInterceptor: HttpInterceptorFn = (request: HttpRequest<unknown>
         return next(authRequest).pipe(
             catchError((error: HttpErrorResponse) => {
                 console.log('Auth Interceptor - Error:', error);
-
                 if (error.status === 401 || error.status === 403) {
                     // Token might be expired or invalid
+
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
 

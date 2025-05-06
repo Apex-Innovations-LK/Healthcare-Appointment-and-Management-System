@@ -22,6 +22,7 @@ export class AuthService {
         return this.httpClient.post<AuthResponse>(`${this.baseURL}/login`, user);
     }
 
+
     getUser(username: String): Observable<UserDetails> {
         return this.httpClient.post<UserDetails>(`${this.baseURL}/get-user`, username);
     }
@@ -30,8 +31,8 @@ export class AuthService {
         return this.httpClient.get<Object>(`${this.baseURL}/get-count`);
     }
 
+
     getDoctors(): Observable<Doctor[]> {
         return this.httpClient.get<Doctor[]>(`${this.baseURL}/fetch-doctors`);
     }
-    
 }
