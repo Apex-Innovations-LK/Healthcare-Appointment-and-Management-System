@@ -1,0 +1,68 @@
+package DoctorMicroservice.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
+import DoctorMicroservice.dto.DoctorAvailabilityDto;
+import DoctorMicroservice.entity.DoctorAvailability;
+import DoctorMicroservice.entity.ScheduleSlot;
+import DoctorMicroservice.kafka.DoctorAvailabilityKafkaProducer;
+import DoctorMicroservice.kafka.ScheduleSlotKafkaProducer;
+import DoctorMicroservice.mapper.DoctorAvailabilityMapper;
+import DoctorMicroservice.mapper.ScheduleSlotMapper;
+import DoctorMicroservice.repository.DoctorSessionRepository;
+import DoctorMicroservice.repository.ScheduleSlotRepository;
+import DoctorMicroservice.service.DoctorSessionService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class DoctorSessionServiceImpl implements DoctorSessionService {
+    private final DoctorSessionRepository doctorSessionRepository;
+    private final DoctorAvailabilityMapper availabilityMapper;
+    private final DoctorAvailabilityKafkaProducer DoctorAvailabilityKafkaProducer;
+    private final ScheduleSlotRepository scheduleSlotRepository;
+    private final ScheduleSlotKafkaProducer scheduleSlotKafkaProducer;
+    private final ScheduleSlotMapper scheduleSlotMapper; 
+
+
+    @Override
+    public DoctorAvailabilityDto addDoctorSession(DoctorAvailabilityDto doctorSessionDto) {
+
+        // Generate session_id if null
+        if (doctorSessionDto.getSession_id() == null) {
+            doctorSessionDto.setSession_id(UUID.randomUUID());
+        }
+
+        // Map and save DoctorSession
+        DoctorAvailability doctorSession = availabilityMapper.mapToDoctorAvailability(doctorSessionDto);
+        DoctorAvailability savedDocAvailability = doctorSessionRepository.save(doctorSession);
+        
+        // Generate ScheduleSlots from 0 to count-1
+        int slotCount = savedDocAvailability.getNumber_of_patients();
+        List<ScheduleSlot> slots = new ArrayList<>();
+
+        for (int i = 1; i < slotCount+1; i++) {
+            ScheduleSlot slot = new ScheduleSlot();
+            slot.setSlotId(UUID.randomUUID());  // Generate a unique UUID for each slot
+            slot.setSession_id(savedDocAvailability.getSession_id()); // FK to DoctorSession
+            slot.setStatus("available");
+            scheduleSlotKafkaProducer.sendDoctorScheduleSlot(scheduleSlotMapper.mapToScheduleSlotDto(slot));
+            slots.add(slot);
+        }
+
+        scheduleSlotRepository.saveAll(slots);
+
+        // Send Kafka message
+        DoctorAvailabilityDto responseDto = availabilityMapper.mapToDoctorAvailabilityDto(savedDocAvailability);
+        DoctorAvailabilityKafkaProducer.sendDoctorAvailability(responseDto);
+
+        return responseDto;
+}
+
+    
+}
