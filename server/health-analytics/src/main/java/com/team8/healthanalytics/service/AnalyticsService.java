@@ -7,15 +7,9 @@ import com.team8.healthanalytics.model.HealthRecord;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.apache.spark.sql.SparkSession;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,46 +17,13 @@ import java.util.stream.Collectors;
 public class AnalyticsService implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    private transient SparkSession spark;
 
     private static final String JSON_FILE_PATH = "health_records.json";
-    private static final ZoneId ZONE = ZoneId.systemDefault();
-    private static final DateTimeFormatter MONTH_FMT =
-            DateTimeFormatter.ofPattern("yyyy-MM").withZone(ZONE);
             
     // Constructor to replace @RequiredArgsConstructor
     public AnalyticsService(RestTemplate restTemplate, ObjectMapper objectMapper) {
-        this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
-    }
-            
-    @PostConstruct
-    public void init() {
-        try {
-            // Use the same Spark session configuration as in RiskAssessmentService
-            System.setProperty("spark.hadoop.fs.permissions.umask-mode", "022");
-            System.setProperty("spark.hadoop.fs.defaultFS", "file:///");
-            System.setProperty("spark.driver.extraJavaOptions", "-Djava.security.manager=allow");
-            System.setProperty("spark.executor.extraJavaOptions", "-Djava.security.manager=allow");
-            System.setProperty("spark.hadoop.hadoop.security.authentication", "simple");
-            System.setProperty("spark.hadoop.hadoop.security.authorization", "false");
-            
-            spark = SparkSession.builder()
-                    .appName("HealthcareAnalytics")
-                    .master("local[1]") // Use just one core to avoid conflicts with RiskAssessmentService
-                    .config("spark.driver.host", "localhost")
-                    .config("spark.ui.enabled", "false")
-                    .getOrCreate();
-        } catch (Exception e) {
-            System.err.println("Error initializing Spark in AnalyticsService: " + e.getMessage());
-        }
-    }
-    
-    @PreDestroy
-    public void cleanup() {
-        // Note: We don't close the SparkSession here since it might be shared with RiskAssessmentService
     }
 
     /* ─────────────────────────────────────────────────────── */

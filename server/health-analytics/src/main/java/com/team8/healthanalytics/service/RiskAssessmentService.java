@@ -6,14 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.team8.healthanalytics.model.PatientRecord;
 import com.team8.healthanalytics.model.RiskAssessment;
 import org.springframework.stereotype.Service;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,56 +23,16 @@ public class RiskAssessmentService implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private List<PatientRecord> patientRecords = new ArrayList<>();
-    private transient SparkSession spark;
-    private transient JavaSparkContext jsc;
     
     // Cache for risk distribution data
     private Map<String, Long> distributionCache = null;
     private long cacheTimestamp = 0;
-    private static final long CACHE_DURATION_MS = 1; // 10 minutes
+    private static final long CACHE_DURATION_MS = 600000; // 10 minutes
 
     @PostConstruct
     public void init() {
-        try {
-            // Set Hadoop properties to avoid security manager issues in Java 21
-            System.setProperty("spark.hadoop.fs.permissions.umask-mode", "022");
-            System.setProperty("spark.hadoop.fs.defaultFS", "file:///");
-            System.setProperty("spark.driver.extraJavaOptions", "-Djava.security.manager=allow");
-            System.setProperty("spark.executor.extraJavaOptions", "-Djava.security.manager=allow");
-            
-            // Turn off security authentication for local development
-            System.setProperty("spark.hadoop.hadoop.security.authentication", "simple");
-            System.setProperty("spark.hadoop.hadoop.security.authorization", "false");
-            
-            // Initialize Spark session with Java 21 compatible config
-            spark = SparkSession.builder()
-                    .appName("HealthcareRiskAssessment")
-                    .master("local[*]") // Use all available cores for local development
-                    .config("spark.driver.memory", "2g")
-                    .config("spark.driver.host", "localhost")
-                    .config("spark.sql.session.timeZone", "UTC") 
-                    .config("spark.ui.enabled", "false") // Disable Spark UI to avoid additional complexity
-                    .getOrCreate();
-            
-            jsc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-            
-            // Load data
-            loadPatientData();
-        } catch (Exception e) {
-            System.err.println("Error initializing Spark: " + e.getMessage());
-            e.printStackTrace();
-            
-            // Create a fallback implementation without Spark
-            patientRecords = new ArrayList<>();
-            loadPatientData();
-        }
-    }
-    
-    @PreDestroy
-    public void cleanup() {
-        if (spark != null) {
-            spark.close();
-        }
+        // Load patient data
+        loadPatientData();
     }
 
     public void loadPatientData() {
@@ -87,39 +41,14 @@ public class RiskAssessmentService implements Serializable {
             InputStream is = getClass().getClassLoader().getResourceAsStream("health_records.json");
             patientRecords = mapper.readValue(is, new TypeReference<List<PatientRecord>>() {});
         } catch (Exception e) {
+            System.err.println("Error loading patient data: " + e.getMessage());
             e.printStackTrace();
+            patientRecords = new ArrayList<>();
         }
     }
 
     public List<RiskAssessment> getAllRiskAssessments() {
-        try {
-            if (spark != null && jsc != null) {
-                // Use Spark when available
-                JavaRDD<PatientRecord> recordsRDD = jsc.parallelize(patientRecords);
-                
-                // Process in batches to improve performance
-                int batchSize = 100; // Adjust based on memory availability
-                
-                // Collect the RDD to get all records
-                List<PatientRecord> allRecords = recordsRDD.collect();
-                List<RiskAssessment> allAssessments = new ArrayList<>();
-                
-                // Process records in batches
-                for (int i = 0; i < allRecords.size(); i += batchSize) {
-                    int endIndex = Math.min(i + batchSize, allRecords.size());
-                    List<PatientRecord> batch = allRecords.subList(i, endIndex);
-                    List<RiskAssessment> batchResults = assessRiskWithSciPyBatch(batch);
-                    allAssessments.addAll(batchResults);
-                }
-                
-                return allAssessments;
-            }
-        } catch (Exception e) {
-            System.err.println("Error using Spark for risk assessments: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        // Fallback to non-Spark implementation with batching
+        // Process records in batches for better performance
         List<RiskAssessment> allAssessments = new ArrayList<>();
         int batchSize = 100;
         
@@ -245,32 +174,7 @@ public class RiskAssessmentService implements Serializable {
             return new ArrayList<>();
         }
         
-        try {
-            if (spark != null && jsc != null) {
-                // Use Spark when available, but still use batch processing
-                JavaRDD<PatientRecord> recordsRDD = jsc.parallelize(filteredRecords);
-                
-                // Process in batches for better performance
-                int batchSize = 100; // Adjust based on memory availability
-                List<PatientRecord> allRecords = recordsRDD.collect();
-                List<RiskAssessment> allAssessments = new ArrayList<>();
-                
-                // Process records in batches
-                for (int i = 0; i < allRecords.size(); i += batchSize) {
-                    int endIndex = Math.min(i + batchSize, allRecords.size());
-                    List<PatientRecord> batch = allRecords.subList(i, endIndex);
-                    List<RiskAssessment> batchResults = assessRiskWithSciPyBatch(batch);
-                    allAssessments.addAll(batchResults);
-                }
-                
-                return allAssessments;
-            }
-        } catch (Exception e) {
-            System.err.println("Error using Spark for batch processing: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        // Fallback to non-Spark implementation with batching
+        // Process in batches for better performance
         List<RiskAssessment> allAssessments = new ArrayList<>();
         int batchSize = 100;
         
@@ -295,39 +199,7 @@ public class RiskAssessmentService implements Serializable {
         
         System.out.println("Calculating fresh risk distribution data");
         
-        try {
-            if (spark != null) {
-                // Using Spark SQL for analytics when available
-                Dataset<Row> recordsDF = spark.createDataFrame(
-                    getAllRiskAssessments(), 
-                    RiskAssessment.class
-                );
-                
-                // Group by risk level and count
-                Dataset<Row> distribution = recordsDF.groupBy("riskLevel")
-                    .count()
-                    .orderBy("riskLevel");
-                    
-                // Convert to Map for API response
-                List<Row> rows = distribution.collectAsList();
-                Map<String, Long> result = new HashMap<>();
-                
-                for (Row row : rows) {
-                    result.put(row.getString(0), row.getLong(1));
-                }
-                
-                // Cache the result
-                distributionCache = result;
-                cacheTimestamp = now;
-                
-                return result;
-            }
-        } catch (Exception e) {
-            System.err.println("Error using Spark for risk distribution: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        // Fallback to Java Streams implementation
+        // Use Java Streams for calculating risk distribution
         Map<String, Long> distributionMap = new HashMap<>();
         
         // Get all risk assessments and count by risk level

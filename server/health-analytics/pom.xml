@@ -64,17 +64,6 @@
             <version>2.5.4</version> <!-- Use the latest version based on your Spring Boot version -->
             <scope>test</scope>
         </dependency>
-        <!-- Apache Spark Core & SQL -->
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.12</artifactId>
-            <version>3.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.12</artifactId>
-            <version>3.5.1</version>
-        </dependency>
 
         <!-- JUnit 5 Engine (for running tests) -->
         <dependency>
