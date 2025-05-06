@@ -17,16 +17,11 @@ export const authInterceptor: HttpInterceptorFn = (request: HttpRequest<unknown>
             }
         });
 
-        console.log('Auth Interceptor - Request with auth headers:', authRequest);
-
         return next(authRequest).pipe(
             catchError((error: HttpErrorResponse) => {
                 console.log('Auth Interceptor - Error:', error);
-
-                // Handle 401 Unauthorized or 403 Forbidden errors
                 if (error.status === 401 || error.status === 403) {
                     // Token might be expired or invalid
-                    console.log('Auth Interceptor - Auth error detected, redirecting to login');
 
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
