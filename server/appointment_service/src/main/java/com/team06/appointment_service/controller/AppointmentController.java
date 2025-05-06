@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -41,7 +42,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/view-appointments/{patientId}")
-    public ResponseEntity<List<Appointment>> viewAppointments(@PathVariable String patientId) {
+    public ResponseEntity<List<Appointment>> viewAppointments(@PathVariable UUID patientId) {
         try {
             List<Appointment> appointments = appointmentService.getAppointmentsByPatientId(patientId);
             return ResponseEntity.ok(appointments);

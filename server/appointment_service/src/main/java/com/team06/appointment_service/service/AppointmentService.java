@@ -32,4 +32,8 @@ public class AppointmentService {
 
         kafkaProducerService.sendAppointmentBookedEvent(appointmentBookedDto);
     }
+
+    public List<Appointment> getAppointmentsByPatientId(UUID patientId) {
+        return appointmentRepo.findByPatientId(patientId);
+    }
 }

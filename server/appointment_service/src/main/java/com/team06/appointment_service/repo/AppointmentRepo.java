@@ -52,4 +52,7 @@ public interface AppointmentRepo extends JpaRepository<Appointment, UUID> {
         WHERE slot_id = :slotId
         """, nativeQuery = true)
     void updateAppointmentTable(@Param("slotId") UUID slotId);
-}
+
+    @Query("SELECT a FROM Appointment a WHERE a.patient_id = :patientId")
+    List<Appointment> findByPatientId(@Param("patientId") UUID patientId);}
+
