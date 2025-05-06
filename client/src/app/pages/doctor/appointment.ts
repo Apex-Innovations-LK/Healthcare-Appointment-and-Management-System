@@ -9,7 +9,7 @@ import { CalendarViewComponent } from './components/calendar-view/calendar-view.
     imports: [CalendarViewComponent, ButtonModule, RippleModule, RouterModule, ButtonModule],
     standalone: true,
     template: `<div class="bg-surface-0 dark:bg-surface-900">
-        <div id="home" class="landing-wrapper overflow-hidden px-2 py-10">
+        <div id="home" class="landing-wrapper overflow-x-hidden px-2 py-10">
             <app-calendar-view type='schedule' [calendarConfig]="calendarConfig" class="w-full my-5" />      
         </div>
     </div> `

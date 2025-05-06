@@ -1,18 +1,38 @@
-<div class="calendar-view w-100 flex flex-row items-end">
-    <div class="w-[100px] py-[0.625rem] mb-[2px] flex flex-col gap-0 justify-evenly overflow-hidden relative items-center" [style.height]="calendarConfig.calendarColHeight - 2 * calendarConfig.calendarLineHeight + 'px'">
-        @for (time of timeLabels; track $index) {
-            <p class="text-sm m-0 text-right w-full">{{ time }}</p>
-        }
+<div class="flex flex-col items-center w-full overflow-x-auto mt-6 ">
+    <div class="flex flex-col w-[1440px]">
+        <div class="flex w-[1440px]  drop-shadow-2xl">
+            <div class="w-[50px]"></div>
+            @for (date of weekDates; track $index) {
+                <div class="day-divider flex-1 flex flex-col items-center calendar-header border-x-[1px] py-5">
+                    <p class="text-2xl text-center">{{ date | date: 'EEE' }}</p>
+                    <p class="str-date text-md text-center">{{ date | date: 'MMM d' }}</p>
+                    @if (type == 'plan') {
+                        <p-button icon="pi pi-plus" severity="info" (click)="modalHandlers.addModalHandler()" raised rounded />
+                    }
+                </div>
+            }
+        </div>
+        <div class="calendar-wrapper flex overflow-y-auto">
+            <div class="calendar-view w-full flex flex-row items-end justify-center" [style.height]="calendarConfig.calendarColHeight + 'px'">
+                <div class="w-[50px] py-[0.625rem] mb-[2px] flex flex-col gap-0 justify-evenly overflow-hidden relative items-center" [style.height]="calendarConfig.calendarColHeight - 2 * calendarConfig.calendarLineHeight + 'px'">
+                    @for (time of timeLabels; track $index) {
+                        <p class="text-sm m-0 text-right w-full">{{ time }}</p>
+                    }
+                </div>
+
+                <div class="flex w-[1390px]">
+                    @if (weekDates.length > 0) {
+                        @for (date of weekDates; track $index) {
+                            <app-calendar-col [modalHandlers]="modalHandlers" [type]="type" [date]="date" [calendarConfig]="calendarConfig" class="flex flex-1" />
+                        }
+                    }
+                </div>
+            </div>
+        </div>
     </div>
-
-    @if (weekDates.length > 0) {
-        @for (date of weekDates; track $index) {
-            <app-calendar-col [modalHandlers]="modalHandlers" [type]="type" [date]="date" [calendarConfig]="calendarConfig" class="flex flex-1" />
-        }
-    }
 </div>
-@if (type == 'plan') {
 
+@if (type == 'plan') {
     <!-- add new session modal -->
     <p-dialog header="Add New Session" [(visible)]="displayAddModal" [modal]="true" [closable]="true" [style]="{ width: '400px' }">
         <form [formGroup]="sessionForm" (ngSubmit)="submitAddForm()" class="p-fluid">

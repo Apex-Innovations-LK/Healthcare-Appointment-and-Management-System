@@ -1,9 +1,6 @@
-<div class="calendar-col flex flex-col w-full items-center justify-end border-l-[1px] border-r-[1px]">
-    <p class="text-2xl text-center">{{ date | date: 'EEE' }}</p>
-    <p class="str-date text-md text-center">{{ date | date: 'MMM d' }}</p>
-    @if (type == 'plan') {
-        <p-button icon="pi pi-plus" severity="info" class="mb-5" (click)="modalHandlers.addModalHandler()" raised rounded />
-    }
+<div class="calendar-col flex flex-1 flex-col w-full items-center justify-end border-x-[1px]">
+    <!-- Calendar Header -->
+
     <div class="day-col w-full flex flex-col justify-between overflow-hidden relative items-center" [style.height]="calendarConfig.calendarColHeight + 'px'">
         @for (line of lines; track $index) {
             <div class="w-full h-[2px] calendar-divider"></div>
