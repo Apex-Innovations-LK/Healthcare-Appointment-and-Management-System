@@ -261,5 +261,58 @@
     "his_data": [
       "HIS013"
     ]
+  },
+  {
+    "record_id": "HR-011",
+    "patient_id": "PAT-99999",
+    "patient_name": "Kasundra Jayasuriya",
+    "patient_dob": "1940-01-15",
+    "date_of_service": "2025-05-01T20:00:00.000+0000",
+    "referring_doctor": "DR-11111",
+    "chief_complaint": ["Severe chest pain", "Shortness of breath"],
+    "allergies": ["None"],
+    "medications": ["Warfarin", "Metoprolol", "Insulin"],
+    "problem_list": ["Coronary artery disease", "Congestive heart failure", "Diabetes Mellitus Type 2", "Chronic kidney disease"],
+    "patient_sex": "Male",
+    "address": "100 Senior Lane",
+    "city": "Colombo",
+    "state": "Western",
+    "zip": "00100",
+    "patient_phone": "0700000001",
+    "lbf_data": [
+      "LBF101:12.5",
+      "LBF102:25.0",
+      "LBF103:180/110"
+    ],
+    "his_data": [
+      "HIS014",
+      "HIS015"
+    ]
+  },
+  {
+    "record_id": "HR-012",
+    "patient_id": "PAT-88888",
+    "patient_name": "Nimna Perera",
+    "patient_dob": "1975-05-20",
+    "date_of_service": "2025-05-01T20:30:00.000+0000",
+    "referring_doctor": "DR-22222",
+    "chief_complaint": ["Mild chest discomfort", "Fatigue"],
+    "allergies": ["None"],
+    "medications": ["Amlodipine"],
+    "problem_list": ["Hypertension", "Obesity"],
+    "patient_sex": "Female",
+    "address": "200 Middle Road",
+    "city": "Gampaha",
+    "state": "Western",
+    "zip": "11000",
+    "patient_phone": "0700000002",
+    "lbf_data": [
+      "LBF101:8.9",
+      "LBF102:16.5",
+      "LBF103:145/95"
+    ],
+    "his_data": [
+      "HIS016"
+    ]
   }
 ]

@@ -33,13 +33,13 @@ import { PatientService, RiskAssessment, PatientRecord } from '../service/patien
         </div>
         <div class="col-12 md:col-6">
             <p-card header="Intervention Recommendation" *ngIf="risk">
-                <div *ngIf="risk.riskLevel === 'High'">
+                <div *ngIf="risk.riskLevel.trim().toLowerCase() === 'high'">
                     <b>Recommendation:</b> Immediate clinical intervention and lifestyle counseling.
                 </div>
-                <div *ngIf="risk.riskLevel === 'Moderate'">
+                <div *ngIf="risk.riskLevel.trim().toLowerCase() === 'moderate'">
                     <b>Recommendation:</b> Monitor closely and suggest preventive measures.
                 </div>
-                <div *ngIf="risk.riskLevel === 'Low'">
+                <div *ngIf="risk.riskLevel.trim().toLowerCase() === 'low'">
                     <b>Recommendation:</b> Maintain current health plan and regular checkups.
                 </div>
             </p-card>
@@ -58,9 +58,12 @@ export class RiskAssessmentComponent implements OnInit {
     ngOnInit() {
         const patientId = this.route.snapshot.paramMap.get('id');
         if (patientId) {
-            this.patientService.getRiskAssessment(patientId).subscribe((data: RiskAssessment) => this.risk = data);
+            this.patientService.getRiskAssessment(patientId).subscribe((data: RiskAssessment) => {
+                console.log('Risk assessment response:', data);
+                this.risk = data;
+            });
             this.patientService.getAllPatients().subscribe((patients: PatientRecord[]) => {
-                this.patient = patients.find(p => p.patientId === patientId);
+                this.patient = patients.find(p => String(p.patientId) === String(patientId));
                 if (this.patient) {
                     this.metricsChartData = this.buildMetricsChart(this.patient);
                 }
@@ -96,8 +99,10 @@ export class RiskAssessmentComponent implements OnInit {
     }
 
     riskLevelClass(level?: string) {
-        if (level === 'High') return 'high-risk';
-        if (level === 'Low') return 'low-risk';
+        if (!level) return 'moderate-risk';
+        const normalizedLevel = level.trim().toLowerCase();
+        if (normalizedLevel === 'high') return 'high-risk';
+        if (normalizedLevel === 'low') return 'low-risk';
         return 'moderate-risk';
     }
 }
