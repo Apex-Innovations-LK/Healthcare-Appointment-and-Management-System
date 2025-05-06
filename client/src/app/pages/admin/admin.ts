@@ -209,57 +209,57 @@ export class Admin implements OnInit {
     }
 
     loadRiskDistribution() {
-        this.http.get<{[key: string]: number}>('/api/risk-assessment/distribution')
-            .subscribe(distribution => {
-                // Calculate total patients and percentages
-                let total = 0;
-                Object.values(distribution).forEach(count => total += count);
-                
-                this.stats.totalPatients = total;
-                
-                const highCount = distribution['High'] || 0;
-                const moderateCount = distribution['Moderate'] || 0;
-                const lowCount = distribution['Low'] || 0;
-                
-                this.stats.highRiskCount = highCount;
-                this.stats.highRiskPercentage = Math.round((highCount / total) * 100);
-                
-                this.stats.moderateRiskCount = moderateCount;
-                this.stats.moderateRiskPercentage = Math.round((moderateCount / total) * 100);
-                
-                this.stats.lowRiskCount = lowCount;
-                this.stats.lowRiskPercentage = Math.round((lowCount / total) * 100);
-                
-                // Create pie chart data for risk distribution
-                this.riskDistributionData = {
-                    labels: ['High Risk', 'Moderate Risk', 'Low Risk'],
-                    datasets: [
-                        {
-                            data: [highCount, moderateCount, lowCount],
-                            backgroundColor: ['#e53935', '#fbc02d', '#43a047'],
-                            hoverBackgroundColor: ['#c62828', '#f9a825', '#2e7d32']
-                        }
-                    ]
-                };
-                
-                this.riskChartOptions = {
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx: any) => {
-                                    const label = ctx.label || '';
-                                    const value = ctx.parsed || 0;
-                                    const percentage = ((value / total) * 100).toFixed(1);
-                                    return `${label}: ${value} (${percentage}%)`;
-                                }
+        // Use the PatientService's caching mechanism instead of direct HTTP call
+        this.patientService.getRiskDistribution().subscribe(distribution => {
+            // Calculate total patients and percentages
+            let total = 0;
+            Object.values(distribution).forEach(count => total += count);
+            
+            this.stats.totalPatients = total;
+            
+            const highCount = distribution['High'] || 0;
+            const moderateCount = distribution['Moderate'] || 0;
+            const lowCount = distribution['Low'] || 0;
+            
+            this.stats.highRiskCount = highCount;
+            this.stats.highRiskPercentage = Math.round((highCount / total) * 100);
+            
+            this.stats.moderateRiskCount = moderateCount;
+            this.stats.moderateRiskPercentage = Math.round((moderateCount / total) * 100);
+            
+            this.stats.lowRiskCount = lowCount;
+            this.stats.lowRiskPercentage = Math.round((lowCount / total) * 100);
+            
+            // Create pie chart data for risk distribution
+            this.riskDistributionData = {
+                labels: ['High Risk', 'Moderate Risk', 'Low Risk'],
+                datasets: [
+                    {
+                        data: [highCount, moderateCount, lowCount],
+                        backgroundColor: ['#e53935', '#fbc02d', '#43a047'],
+                        hoverBackgroundColor: ['#c62828', '#f9a825', '#2e7d32']
+                    }
+                ]
+            };
+            
+            this.riskChartOptions = {
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx: any) => {
+                                const label = ctx.label || '';
+                                const value = ctx.parsed || 0;
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: ${value} (${percentage}%)`;
                             }
                         }
                     }
-                };
-            });
+                }
+            };
+        });
     }
     
     loadAnalyticsData() {

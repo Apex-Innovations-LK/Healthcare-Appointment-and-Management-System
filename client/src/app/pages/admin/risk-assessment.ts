@@ -190,14 +190,6 @@ import { PatientService, RiskAssessment, PatientRecord } from './service/patient
                                         <li class="mb-2">Provide lifestyle modification guidance</li>
                                         <li class="mb-2">Review risk factors at next visit</li>
                                     </ul>
-                                    <div class="flex">
-                                        <button pButton label="Schedule Check-up" icon="pi pi-calendar" 
-                                            class="p-button-warning mr-2 rounded-pill"
-                                            [style]="{'border-radius': '24px'}"></button>
-                                        <button pButton label="Send Resources" icon="pi pi-file-pdf" 
-                                            class="p-button-outlined p-button-warning rounded-pill"
-                                            [style]="{'border-radius': '24px'}"></button>
-                                    </div>
                                 </div>
                                 
                                 <div *ngIf="isLowRisk()">

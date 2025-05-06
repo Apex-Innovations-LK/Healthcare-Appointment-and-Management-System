@@ -50,6 +50,7 @@ import { PatientService, PatientRecord } from './service/patient.service';
                 >
                     <ng-template pTemplate="header">
                         <tr>
+                            <th pSortableColumn="patientId" style="width: 100px">ID <p-sortIcon field="patientId"></p-sortIcon></th>
                             <th pSortableColumn="patientName" style="min-width: 150px">Name <p-sortIcon field="patientName"></p-sortIcon></th>
                             <th pSortableColumn="patientDob">DOB <p-sortIcon field="patientDob"></p-sortIcon></th>
                             <th pSortableColumn="patientSex">Sex <p-sortIcon field="patientSex"></p-sortIcon></th>
@@ -58,6 +59,7 @@ import { PatientService, PatientRecord } from './service/patient.service';
                     </ng-template>
                     <ng-template pTemplate="body" let-patient>
                         <tr>
+                            <td>{{patient.patientId}}</td>
                             <td>
                                 <div class="flex align-items-center">
                                     <span class="font-semibold">{{patient.patientName}}</span>
@@ -80,7 +82,7 @@ import { PatientService, PatientRecord } from './service/patient.service';
                     </ng-template>
                     <ng-template pTemplate="emptymessage">
                         <tr>
-                            <td colspan="4" class="text-center p-4">
+                            <td colspan="5" class="text-center p-4">
                                 <div class="flex flex-column align-items-center">
                                     <i class="pi pi-search text-3xl text-500 mb-3"></i>
                                     <span>No patients found</span>
