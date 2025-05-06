@@ -29,7 +29,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic AppointmentUpdateTopic() {
-        return TopicBuilder.name("appointment_update")
+        return TopicBuilder.name("appointment_booked")
                 .build();
 
     }
