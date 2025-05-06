@@ -5,8 +5,6 @@ import { DoctorLayout } from './app/pages/doctor/doctor.layout';
 import { PatientLayout } from './app/pages/patient/patient.layout';
 import { StaffLayout } from './app/pages/staff/staff.layout';
 import { HomeComponent } from './app/pages/home/home';
-import { Documentation } from './app/pages/documentation/documentation';
-import { Dashboard } from './app/pages/dashboard/dashboard';
 
 export const appRoutes: Routes = [
     // {

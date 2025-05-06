@@ -14,6 +14,7 @@ export class AuthStateService{
     private user: UserDetails | null = null;
     private id : string | null = null;
 
+
     constructor(
         private tokenDecoder: TokenDecoderService,
         private authService: AuthService
@@ -31,6 +32,7 @@ export class AuthStateService{
     }
 
     getUserDetails(): UserDetails | null {
+
         return this.user;
     }
 
