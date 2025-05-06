@@ -39,8 +39,14 @@ export class Analytics implements OnInit, OnDestroy {
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
     ngOnInit(): void {
         this.sub = this.api.getAnalyticsData().subscribe({
-            next: (res) => this.initCharts(res),
-            error: () => this.initCharts(this.emptyAnalytics()) // graceful fallback
+            next: (res) => {
+                console.log('Analytics data received:', res); // Add logging
+                this.initCharts(res);
+            },
+            error: (err) => {
+                console.error('Error fetching analytics data:', err); // Better error logging
+                this.initCharts(this.emptyAnalytics()); // graceful fallback
+            }
         });
     }
 

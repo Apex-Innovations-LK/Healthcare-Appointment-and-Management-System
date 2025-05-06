@@ -1,14 +1,16 @@
 package com.team8.healthanalyticsforadmin.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team8.healthanalyticsforadmin.dto.AnalyticsData;
 import com.team8.healthanalyticsforadmin.dto.AnalyticsData.Point;
 import com.team8.healthanalyticsforadmin.model.HealthRecord;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -19,31 +21,45 @@ import java.util.stream.Collectors;
 public class AnalyticsService {
 
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
-    private static final String RECORDS_URL = "http://localhost:3000/records";
-    private static final ZoneId  ZONE       = ZoneId.systemDefault();
+    private static final String JSON_FILE_PATH = "health_records.json";
+    private static final ZoneId ZONE = ZoneId.systemDefault();
     private static final DateTimeFormatter MONTH_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM").withZone(ZONE);
 
     /* ─────────────────────────────────────────────────────── */
     public AnalyticsData fetchAnalytics() {
-
-        HealthRecord[] raw = restTemplate
-                .exchange(RECORDS_URL, HttpMethod.GET, null, HealthRecord[].class)
-                .getBody();
-
-        List<HealthRecord> records = Arrays.asList(Objects.requireNonNull(raw));
+        List<HealthRecord> records;
+        try {
+            // Load health records from the local JSON file
+            ClassPathResource resource = new ClassPathResource(JSON_FILE_PATH);
+            try (InputStream inputStream = resource.getInputStream()) {
+                HealthRecord[] raw = objectMapper.readValue(inputStream, HealthRecord[].class);
+                records = Arrays.asList(Objects.requireNonNull(raw));
+            }
+        } catch (IOException e) {
+            // Log error and return empty data in case of failure
+            e.printStackTrace();
+            return new AnalyticsData(
+                    Collections.emptyList(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap()
+            );
+        }
 
         /* 1 ─ Distinct‑patient count / month */
         Map<String, Long> perMonth = records.stream()
-                .map(HealthRecord::getDateOfService)
+                .map(r -> r.getDateOfService())
                 .filter(s -> s != null && !s.isBlank())
                 .map(AnalyticsService::toMonth)
                 .collect(Collectors.groupingBy(m -> m, TreeMap::new, Collectors.counting()));
 
         List<Point> patientTimeline = perMonth.entrySet().stream()
                 .map(e -> new Point(e.getKey(), e.getValue().intValue()))
-                .toList();
+                .collect(Collectors.toList());
 
         /* 2 ─ Allergy distribution */
         Map<String,Integer> allergyCounts = new HashMap<>();
