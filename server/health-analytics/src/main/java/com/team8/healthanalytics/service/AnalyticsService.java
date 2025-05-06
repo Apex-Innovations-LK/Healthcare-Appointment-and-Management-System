@@ -8,9 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.apache.spark.sql.SparkSession;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -18,15 +22,44 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AnalyticsService {
+public class AnalyticsService implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private transient SparkSession spark;
 
     private static final String JSON_FILE_PATH = "health_records.json";
     private static final ZoneId ZONE = ZoneId.systemDefault();
     private static final DateTimeFormatter MONTH_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM").withZone(ZONE);
+            
+    @PostConstruct
+    public void init() {
+        try {
+            // Use the same Spark session configuration as in RiskAssessmentService
+            System.setProperty("spark.hadoop.fs.permissions.umask-mode", "022");
+            System.setProperty("spark.hadoop.fs.defaultFS", "file:///");
+            System.setProperty("spark.driver.extraJavaOptions", "-Djava.security.manager=allow");
+            System.setProperty("spark.executor.extraJavaOptions", "-Djava.security.manager=allow");
+            System.setProperty("spark.hadoop.hadoop.security.authentication", "simple");
+            System.setProperty("spark.hadoop.hadoop.security.authorization", "false");
+            
+            spark = SparkSession.builder()
+                    .appName("HealthcareAnalytics")
+                    .master("local[1]") // Use just one core to avoid conflicts with RiskAssessmentService
+                    .config("spark.driver.host", "localhost")
+                    .config("spark.ui.enabled", "false")
+                    .getOrCreate();
+        } catch (Exception e) {
+            System.err.println("Error initializing Spark in AnalyticsService: " + e.getMessage());
+        }
+    }
+    
+    @PreDestroy
+    public void cleanup() {
+        // Note: We don't close the SparkSession here since it might be shared with RiskAssessmentService
+    }
 
     /* ─────────────────────────────────────────────────────── */
     public AnalyticsData fetchAnalytics() {
@@ -43,7 +76,6 @@ public class AnalyticsService {
             e.printStackTrace();
             return new AnalyticsData(
                     Collections.emptyList(),
-                    Collections.emptyMap(),
                     Collections.emptyMap(),
                     Collections.emptyMap(),
                     Collections.emptyMap()
@@ -80,37 +112,17 @@ public class AnalyticsService {
                     });
         });
 
-        /* 4 ─ Risk‑category calculation (Low / Moderate / High) */
-        Map<String,Integer> riskCounts = new HashMap<>(Map.of(
-                "Low",0,"Moderate",0,"High",0));
-
-        records.forEach(r -> {
-            int score = computeRiskScore(r);
-            String cat = score >= 8 ? "High" : score >= 4 ? "Moderate" : "Low";
-            riskCounts.merge(cat,1,Integer::sum);
-        });
-
-        /* 5 ─ Build DTO */
+        /* 4 ─ Build DTO */
         return new AnalyticsData(
                 patientTimeline,
                 allergyCounts,
                 problemCounts,
-                bySex,
-                riskCounts
+                bySex
         );
     }
 
     /* ========== helpers =================================== */
     private static String toMonth(String iso) {
         try { return iso.substring(0,7); } catch (Exception e) { return "Unknown"; }
-    }
-
-    /** simplistic rule‑based score – adjust as you see fit */
-    private static int computeRiskScore(HealthRecord r) {
-        int base = 0;
-        base += Optional.ofNullable(r.getProblemList()).orElse(List.of()).size();
-        base += Optional.ofNullable(r.getMedications()).orElse(List.of()).size() / 2;
-        base += Optional.ofNullable(r.getAllergies()).orElse(List.of()).size() / 3;
-        return base;
     }
 }

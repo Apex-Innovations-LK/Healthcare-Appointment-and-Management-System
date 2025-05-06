@@ -17,7 +17,6 @@ import java.util.Map;
  *  │  allergiesDistribution : Map<String,Integer>         │ ← Pie          │
  *  │  problemListCounts     : Map<String,Integer>         │ ← Bar / Polar  │
  *  │  problemListBySex      : Map<String,Map<String,Integer>>│ ← Radar   │
- *  │  riskCategoryCounts    : Map<String,Integer>         │ ← Polar‑Area   │
  *  └──────────────────────────────────────────────────────┘
  */
 @Data
@@ -29,7 +28,6 @@ public class AnalyticsData {
     private Map<String,Integer>                   allergiesDistribution;
     private Map<String,Integer>                   problemListCounts;
     private Map<String,Map<String,Integer>>       problemListBySex;
-    private Map<String,Integer>                   riskCategoryCounts;
 
     @Data @AllArgsConstructor
     public static class Point {
