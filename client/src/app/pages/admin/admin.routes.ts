@@ -6,6 +6,8 @@ import { Analytics } from './analytics';
 import { PatientListComponent } from './patient-list';
 import { RiskAssessmentComponent } from './risk-assessment'
 import { RiskDashboardComponent } from './risk-dashboard';
+import { StaffUtilization } from './Staff-Utilization/staffUtilization';
+import { StaffUtilizationDetailViewComponent } from './Staff-Utilization/components/staff-utilization-detail-view/staff-utilization-detail-view.component'
 
 export default [
     { path: '', component: Admin }, 
@@ -15,4 +17,7 @@ export default [
     { path: 'empty', component: Empty },
     { path: 'schedular', component: Schedular },
     { path: 'analytics', component: Analytics },
+    { path: 'staff-utilization', component: StaffUtilization},
+    { path: 'staff/:id', component: StaffUtilizationDetailViewComponent }
 ] as Routes;
+
