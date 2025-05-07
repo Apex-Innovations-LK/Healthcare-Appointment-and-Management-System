@@ -34,7 +34,7 @@ public class RiskAssessmentService implements Serializable {
     // Cache for risk distribution data
     private Map<String, Long> distributionCache = null;
     private long cacheTimestamp = 0;
-    private static final long CACHE_DURATION_MS = 1; // 10 minutes
+    private static final long CACHE_DURATION_MS = 1000; // 10 minutes
 
     @Autowired
     public RiskAssessmentService(SparkSession sparkSession) {
@@ -58,25 +58,16 @@ public class RiskAssessmentService implements Serializable {
     public List<RiskAssessment> getAllRiskAssessments() {
         try {
             if (spark != null && jsc != null) {
-                // Use Spark when available
+                // Use Spark RDD and mapPartitions for distributed batch processing
                 JavaRDD<PatientRecord> recordsRDD = jsc.parallelize(patientRecords);
-                
-                // Process in batches to improve performance
-                int batchSize = 100; // Adjust based on memory availability
-                
-                // Collect the RDD to get all records
-                List<PatientRecord> allRecords = recordsRDD.collect();
-                List<RiskAssessment> allAssessments = new ArrayList<>();
-                
-                // Process records in batches
-                for (int i = 0; i < allRecords.size(); i += batchSize) {
-                    int endIndex = Math.min(i + batchSize, allRecords.size());
-                    List<PatientRecord> batch = allRecords.subList(i, endIndex);
-                    List<RiskAssessment> batchResults = assessRiskWithSciPyBatch(batch);
-                    allAssessments.addAll(batchResults);
-                }
-                
-                return allAssessments;
+                // Each partition will process its records in batch using the Python script
+                JavaRDD<RiskAssessment> assessmentsRDD = recordsRDD.mapPartitions(recordsIter -> {
+                    List<PatientRecord> batch = new ArrayList<>();
+                    recordsIter.forEachRemaining(batch::add);
+                    // Use batch risk assessment for the partition
+                    return assessRiskWithSciPyBatch(batch).iterator();
+                });
+                return assessmentsRDD.collect();
             }
         } catch (Exception e) {
             System.err.println("Error using Spark for risk assessments: " + e.getMessage());
@@ -211,23 +202,14 @@ public class RiskAssessmentService implements Serializable {
         
         try {
             if (spark != null && jsc != null) {
-                // Use Spark when available, but still use batch processing
+                // Use Spark RDD and mapPartitions for distributed batch processing
                 JavaRDD<PatientRecord> recordsRDD = jsc.parallelize(filteredRecords);
-                
-                // Process in batches for better performance
-                int batchSize = 100; // Adjust based on memory availability
-                List<PatientRecord> allRecords = recordsRDD.collect();
-                List<RiskAssessment> allAssessments = new ArrayList<>();
-                
-                // Process records in batches
-                for (int i = 0; i < allRecords.size(); i += batchSize) {
-                    int endIndex = Math.min(i + batchSize, allRecords.size());
-                    List<PatientRecord> batch = allRecords.subList(i, endIndex);
-                    List<RiskAssessment> batchResults = assessRiskWithSciPyBatch(batch);
-                    allAssessments.addAll(batchResults);
-                }
-                
-                return allAssessments;
+                JavaRDD<RiskAssessment> assessmentsRDD = recordsRDD.mapPartitions(recordsIter -> {
+                    List<PatientRecord> batch = new ArrayList<>();
+                    recordsIter.forEachRemaining(batch::add);
+                    return assessRiskWithSciPyBatch(batch).iterator();
+                });
+                return assessmentsRDD.collect();
             }
         } catch (Exception e) {
             System.err.println("Error using Spark for batch processing: " + e.getMessage());
@@ -261,29 +243,24 @@ public class RiskAssessmentService implements Serializable {
         
         try {
             if (spark != null) {
-                // Using Spark SQL for analytics when available
-                Dataset<Row> recordsDF = spark.createDataFrame(
-                    getAllRiskAssessments(), 
-                    RiskAssessment.class
-                );
-                
-                // Group by risk level and count
-                Dataset<Row> distribution = recordsDF.groupBy("riskLevel")
-                    .count()
-                    .orderBy("riskLevel");
-                    
-                // Convert to Map for API response
+                // Use Spark RDD and mapPartitions for distributed batch risk assessment
+                JavaRDD<PatientRecord> recordsRDD = jsc.parallelize(patientRecords);
+                JavaRDD<RiskAssessment> assessmentsRDD = recordsRDD.mapPartitions(recordsIter -> {
+                    List<PatientRecord> batch = new ArrayList<>();
+                    recordsIter.forEachRemaining(batch::add);
+                    return assessRiskWithSciPyBatch(batch).iterator();
+                });
+                // Convert to DataFrame without collecting all data to driver
+                Dataset<Row> recordsDF = spark.createDataFrame(assessmentsRDD, RiskAssessment.class);
+                Dataset<Row> distribution = recordsDF.groupBy("riskLevel").count().orderBy("riskLevel");
                 List<Row> rows = distribution.collectAsList();
                 Map<String, Long> result = new HashMap<>();
-                
                 for (Row row : rows) {
                     result.put(row.getString(0), row.getLong(1));
                 }
-                
                 // Cache the result
                 distributionCache = result;
                 cacheTimestamp = now;
-                
                 return result;
             }
         } catch (Exception e) {
