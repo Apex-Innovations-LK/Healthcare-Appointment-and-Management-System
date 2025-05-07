@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { CalendarSessionComponent } from '../calendar-session/calendar-session.component';
 import { ButtonModule } from 'primeng/button';
@@ -7,7 +6,7 @@ import { DoctorService } from '../../../../service/doctor.service';
 
 @Component({
     selector: 'app-calendar-col',
-    imports: [ButtonModule, DatePipe, CalendarAvailabilityComponent, CalendarSessionComponent],
+    imports: [ButtonModule, CalendarAvailabilityComponent, CalendarSessionComponent],
     templateUrl: './calendar-col.component.html',
     styleUrl: './calendar-col.component.scss'
 })

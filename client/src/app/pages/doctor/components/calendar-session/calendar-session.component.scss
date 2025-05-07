@@ -22,10 +22,11 @@
 
     .key-staff {
         color: var(--code-color);
+        
     }
 
     .value-staff {
-        color: var(--primary-contrast-color);
+        background-color: var(--primary-contrast-color);
     }
 
     .appointments-key {

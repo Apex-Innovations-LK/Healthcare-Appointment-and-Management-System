@@ -2,10 +2,11 @@ import { DatePipe } from '@angular/common';
 import { Component, ElementRef, Input, SimpleChanges, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ChipModule } from 'primeng/chip';
 
 @Component({
     selector: 'app-calendar-session',
-    imports: [DatePipe, ButtonModule],
+    imports: [DatePipe, ButtonModule, ChipModule],
     templateUrl: './calendar-session.component.html',
     styleUrl: './calendar-session.component.scss'
 })
