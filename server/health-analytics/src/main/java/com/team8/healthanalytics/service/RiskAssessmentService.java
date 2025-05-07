@@ -49,7 +49,9 @@ public class RiskAssessmentService implements Serializable {
             InputStream is = getClass().getClassLoader().getResourceAsStream("health_records.json");
             patientRecords = mapper.readValue(is, new TypeReference<List<PatientRecord>>() {});
         } catch (Exception e) {
+            System.err.println("Error loading patient data: " + e.getMessage());
             e.printStackTrace();
+            patientRecords = new ArrayList<>();
         }
     }
 
