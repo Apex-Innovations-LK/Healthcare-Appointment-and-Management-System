@@ -2,9 +2,12 @@ import { Routes } from '@angular/router';
 import { Doctor } from './doctor';
 import { Appointment } from './appointment';
 import { Schedule } from './schedule';
+import { Chatbot } from './chatbot';
+
 
 export default [
     { path: '', component: Doctor },
     { path: 'appointment', component: Appointment },
+    { path: 'chatbot', component: Chatbot },
     { path: 'schedule', component: Schedule }
 ] as Routes;
