@@ -14,16 +14,20 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate; // Added import
-import java.time.Period; // Added import
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/reports")
 @CrossOrigin(origins = "http://localhost:4200")
 @Validated
 public class ReportController {
+    private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
+
     @Autowired
     private ReportGenerationService reportService;
 
@@ -45,9 +49,21 @@ public class ReportController {
         String csvContent = reportService.generateCsv(reportData, request.getReportType());
         ByteArrayResource resource = new ByteArrayResource(csvContent.getBytes(StandardCharsets.UTF_8));
 
+        // Sanitize filename to avoid special characters
+        String sanitizedFilename = request.getReportType() + "_" +
+                (request.getStartDate() != null ? request.getStartDate() : "all") + "_" +
+                (request.getEndDate() != null ? request.getEndDate() : "all") + ".csv";
+        sanitizedFilename = sanitizedFilename.replaceAll("[^a-zA-Z0-9_.-]", "_");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sanitizedFilename + "\"");
+        headers.setContentType(MediaType.parseMediaType("text/csv"));
+
+        logger.info("Response headers for CSV export: {}", headers);
+
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + reportData.getTitle().replace(" ", "_") + ".csv")
-                .contentType(MediaType.parseMediaType("text/csv"))
+                .headers(headers)
+                .contentLength(csvContent.length())
                 .body(resource);
     }
 
