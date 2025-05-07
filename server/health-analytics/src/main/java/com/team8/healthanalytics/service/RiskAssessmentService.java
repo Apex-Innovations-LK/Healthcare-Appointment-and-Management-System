@@ -6,14 +6,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.team8.healthanalytics.model.PatientRecord;
 import com.team8.healthanalytics.model.RiskAssessment;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ public class RiskAssessmentService implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private List<PatientRecord> patientRecords = new ArrayList<>();
-    private transient SparkSession spark;
+    private transient final SparkSession spark;
     private transient JavaSparkContext jsc;
     
     // Cache for risk distribution data
@@ -37,48 +36,11 @@ public class RiskAssessmentService implements Serializable {
     private long cacheTimestamp = 0;
     private static final long CACHE_DURATION_MS = 1; // 10 minutes
 
-    @PostConstruct
-    public void init() {
-        try {
-            // Set Hadoop properties to avoid security manager issues in Java 21
-            System.setProperty("spark.hadoop.fs.permissions.umask-mode", "022");
-            System.setProperty("spark.hadoop.fs.defaultFS", "file:///");
-            System.setProperty("spark.driver.extraJavaOptions", "-Djava.security.manager=allow");
-            System.setProperty("spark.executor.extraJavaOptions", "-Djava.security.manager=allow");
-            
-            // Turn off security authentication for local development
-            System.setProperty("spark.hadoop.hadoop.security.authentication", "simple");
-            System.setProperty("spark.hadoop.hadoop.security.authorization", "false");
-            
-            // Initialize Spark session with Java 21 compatible config
-            spark = SparkSession.builder()
-                    .appName("HealthcareRiskAssessment")
-                    .master("local[*]") // Use all available cores for local development
-                    .config("spark.driver.memory", "2g")
-                    .config("spark.driver.host", "localhost")
-                    .config("spark.sql.session.timeZone", "UTC") 
-                    .config("spark.ui.enabled", "false") // Disable Spark UI to avoid additional complexity
-                    .getOrCreate();
-            
-            jsc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-            
-            // Load data
-            loadPatientData();
-        } catch (Exception e) {
-            System.err.println("Error initializing Spark: " + e.getMessage());
-            e.printStackTrace();
-            
-            // Create a fallback implementation without Spark
-            patientRecords = new ArrayList<>();
-            loadPatientData();
-        }
-    }
-    
-    @PreDestroy
-    public void cleanup() {
-        if (spark != null) {
-            spark.close();
-        }
+    @Autowired
+    public RiskAssessmentService(SparkSession sparkSession) {
+        this.spark = sparkSession;
+        this.jsc = JavaSparkContext.fromSparkContext(sparkSession.sparkContext());
+        loadPatientData();
     }
 
     public void loadPatientData() {

@@ -1,6 +1,7 @@
 package com.team8.healthanalytics.model;
 
-public class RiskAssessment {
+public class RiskAssessment implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
     private String patientId;
     private String riskLevel; // e.g., Low, Moderate, High
     private String riskReason; // Short explanation

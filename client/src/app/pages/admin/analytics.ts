@@ -46,6 +46,16 @@ Chart.register(...registerables);
         
         <!-- Tab View for Different Analytics -->
         <div class="col-12">
+            <div class="col-12 text-right mb-3">
+                <button 
+                    pButton 
+                    icon="pi pi-refresh" 
+                    label="Refresh Data" 
+                    class="p-button-outlined" 
+                    (click)="forceRefreshAnalytics()"
+                    [disabled]="isRefreshing"
+                ></button>
+            </div>
             <p-tabView>
                 <!-- Patient Demographics Tab -->
                 <p-tabPanel header="Patient Demographics">
@@ -134,30 +144,91 @@ export class Analytics implements OnInit, OnDestroy {
     polarData: any;
     polarOpts: any;
 
+    private analyticsCache: AnalyticsData | null = null;
+    private analyticsCacheTime: number = 0;
+    private readonly CACHE_KEY = 'analytics_data_cache';
+    private readonly CACHE_TIME_KEY = 'analytics_data_cache_time';
+    private readonly CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes
+
     private sub?: Subscription;
+
+    isRefreshing = false;
 
     constructor(
         private api: AnalyticsService,
         private http: HttpClient,
         private router: Router
-    ) {}
+    ) {
+        this.loadCacheFromStorage();
+    }
 
-    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
     ngOnInit(): void {
-        this.sub = this.api.getAnalyticsData().subscribe({
-            next: (res) => {
-                console.log('Analytics data received:', res);
-                this.initCharts(res);
-            },
-            error: (err) => {
-                console.error('Error fetching analytics data:', err);
-                this.initCharts(this.emptyAnalytics());
-            }
-        });
+        if (this.analyticsCache && !this.isCacheExpired()) {
+            this.initCharts(this.analyticsCache);
+        } else {
+            this.fetchAndCacheAnalytics();
+        }
     }
 
     ngOnDestroy(): void {
         this.sub?.unsubscribe();
+    }
+
+    forceRefreshAnalytics(): void {
+        this.isRefreshing = true;
+        this.clearAnalyticsCache();
+        this.fetchAndCacheAnalytics(true);
+        // Set isRefreshing to false after data is loaded (in fetchAndCacheAnalytics)
+    }
+
+    private fetchAndCacheAnalytics(forceRefresh: boolean = false): void {
+        if (this.sub) this.sub.unsubscribe();
+        this.sub = this.api.getAnalyticsData().subscribe({
+            next: (res) => {
+                this.analyticsCache = res;
+                this.analyticsCacheTime = Date.now();
+                this.saveCacheToStorage(res, this.analyticsCacheTime);
+                this.initCharts(res);
+                this.isRefreshing = false;
+            },
+            error: (err) => {
+                console.error('Error fetching analytics data:', err);
+                this.initCharts(this.emptyAnalytics());
+                this.isRefreshing = false;
+            }
+        });
+    }
+
+    private isCacheExpired(): boolean {
+        const now = Date.now();
+        return (now - this.analyticsCacheTime) > this.CACHE_EXPIRY;
+    }
+
+    private loadCacheFromStorage(): void {
+        const cachedData = localStorage.getItem(this.CACHE_KEY);
+        const cachedTime = localStorage.getItem(this.CACHE_TIME_KEY);
+        if (cachedData && cachedTime) {
+            const timestamp = parseInt(cachedTime, 10);
+            const now = Date.now();
+            if (now - timestamp < this.CACHE_EXPIRY) {
+                this.analyticsCache = JSON.parse(cachedData);
+                this.analyticsCacheTime = timestamp;
+            } else {
+                this.clearAnalyticsCache();
+            }
+        }
+    }
+
+    private saveCacheToStorage(data: AnalyticsData, timestamp: number): void {
+        localStorage.setItem(this.CACHE_KEY, JSON.stringify(data));
+        localStorage.setItem(this.CACHE_TIME_KEY, timestamp.toString());
+    }
+
+    clearAnalyticsCache(): void {
+        this.analyticsCache = null;
+        this.analyticsCacheTime = 0;
+        localStorage.removeItem(this.CACHE_KEY);
+        localStorage.removeItem(this.CACHE_TIME_KEY);
     }
 
     /* ---------- build demo object if request fails ---------- */
