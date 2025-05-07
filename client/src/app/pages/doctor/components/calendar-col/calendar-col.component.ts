@@ -3,6 +3,7 @@ import { CalendarSessionComponent } from '../calendar-session/calendar-session.c
 import { ButtonModule } from 'primeng/button';
 import { CalendarAvailabilityComponent } from '../calendar-availability/calendar-availability.component';
 import { DoctorService } from '../../../../service/doctor.service';
+import { DoctorSession } from '../../../../models/doctor';
 
 @Component({
     selector: 'app-calendar-col',
@@ -11,23 +12,14 @@ import { DoctorService } from '../../../../service/doctor.service';
     styleUrl: './calendar-col.component.scss'
 })
 export class CalendarColComponent {
-    sessions: any[] = [
-        {
-            from: '2025-05-03T10:30:00',
-            to: '2025-05-03T13:00:00',
-            patientsCount: 8,
-            slots: [
-                true, true, true, true, true, false, false, false
-            ],
-        },
-        {
-            from: '2025-05-08T17:00:00',
-            to: '2025-05-08T20:00:00',
-            patientsCount: 12,
-            slots: [
-                true, true, true, false, false, true, false, true, true, false, false, false
-            ],
-        }
+    sessions: DoctorSession[] = [
+        // {
+        //     session_id: 'ec7d002a-2afe-11f0-9306-325096b39f47',
+        //     doctor_id: 'e7b5b3b4-8c9f-4e0c-ae90-6df45cbe9d24',
+        //     from: '2025-05-07T10:30:00.000+00:00',
+        //     to: '2025-05-07T13:00:00.000+00:00',
+        //     patientsCount: 10
+        // }
     ];
 
     availabilities: any[] = [
@@ -35,32 +27,26 @@ export class CalendarColComponent {
             from: '2025-05-03T08:30:00',
             to: '2025-05-03T10:00:00',
             patientsCount: 8,
-            slots: [
-                true, true, true, true, true, false, false, false
-            ],
+            slots: [true, true, true, true, true, false, false, false]
         },
         {
             from: '2025-05-08T17:00:00',
             to: '2025-05-08T22:00:00',
             patientsCount: 12,
-            slots: [
-                true, true, true, false, false, true, false, true, true, false, false, false
-            ],
+            slots: [true, true, true, false, false, true, false, true, true, false, false, false]
         }
     ];
 
     constructor(private doctorService: DoctorService) {}
-    
-
 
     @Input() date!: Date;
-    
-    @Input() modalHandlers!:{
+
+    @Input() modalHandlers!: {
         addModalHandler: () => void;
         editModalHandler: () => void;
         deleteModalHandler: () => void;
         //rejectModalHandler: () => void;
-      };
+    };
 
     @Input() calendarConfig!: {
         startTime: number;
@@ -74,15 +60,21 @@ export class CalendarColComponent {
 
     lines: number[] = Array.from({ length: 19 });
 
-    loadSessions() {
+    toLocalISOString(date: Date): string {
+        const offsetMs = date.getTimezoneOffset() * 60000;
+        const localDate = new Date(date.getTime() - offsetMs);
+        return localDate.toISOString().slice(0, -1); // remove trailing 'Z'
+    }
+
+    loadSessions(): void {
         const doctor_id = 'e7b5b3b4-8c9f-4e0c-ae90-6df45cbe9d24'; // Replace with actual doctor ID
-        this.doctorService.getSessionsForDate(doctor_id, this.date.toISOString()).subscribe({
+        this.doctorService.getSessionsForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
             next: (response) => {
                 this.sessions = response;
-                // console.log(this.sessions);
+                console.log(this.toLocalISOString(this.date), this.sessions);
             },
             error: (error) => {
-                console.error('Error fetching sessions for date'+this.date+': ', error);
+                console.error('Error fetching sessions for date' + this.date + ': ', error);
             }
         });
     }
@@ -94,7 +86,7 @@ export class CalendarColComponent {
                 this.availabilities = response;
             },
             error: (error) => {
-                console.error('Error fetching availabilities for date'+this.date+': ', error);
+                console.error('Error fetching availabilities for date' + this.date + ': ', error);
             }
         });
     }
@@ -104,8 +96,8 @@ export class CalendarColComponent {
             this.lines = Array.from({ length: this.calendarConfig.endTime - this.calendarConfig.startTime + 2 });
         }
         if (this.type === 'schedule') {
-            // this.loadSessions();
-        } 
+            this.loadSessions();
+        }
     }
 
     isToday(): boolean {
@@ -123,5 +115,4 @@ export class CalendarColComponent {
 
         return `${totalMinutes + this.calendarConfig.calendarLineHeight * linesCount}px`;
     }
-
 }

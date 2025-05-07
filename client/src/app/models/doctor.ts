@@ -13,3 +13,19 @@ export class Doctor {
         this.license_number = license_number;
     }
 }
+
+export interface DoctorSession {
+    session_id: string;
+    doctor_id: string;
+    from: string;
+    to: string;
+    number_of_patients: number;
+}
+
+export interface DoctorAvailability {
+    session_id: string;
+    doctor_id: string;
+    from: string;
+    to: string;
+    number_of_patients: number;
+}

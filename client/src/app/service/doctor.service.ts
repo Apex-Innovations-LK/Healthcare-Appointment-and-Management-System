@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { DoctorAvailability, DoctorSession } from '../models/doctor';
 
 @Injectable({
   providedIn: 'root'
@@ -10,22 +11,22 @@ export class DoctorService {
 
   getSessionsForDate(doctor_id:string, date: string) {
     const body = {
-      doctor_id: doctor_id,
+      doctorId: doctor_id,
       date: date,
     };
     const apiUrl = this.baseURL + '/getSessionsByDateAndDocId';
 
-    return this.httpClient.post<any[]>(apiUrl, body);
+    return this.httpClient.post<DoctorSession[]>(apiUrl, body);
   }
 
   getAvailabilityForDate(doctor_id:string, date: string) {
     const body = {
-      doctor_id: doctor_id,
+      doctorId: doctor_id,
       date: date,
     };
     const apiUrl = this.baseURL + '/availabilityForDate';
 
-    return this.httpClient.post<any[]>(apiUrl, body);
+    return this.httpClient.post<DoctorAvailability[]>(apiUrl, body);
   }
 
 }

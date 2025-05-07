@@ -3,6 +3,7 @@ import { Component, ElementRef, Input, SimpleChanges, ViewChild } from '@angular
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
+import { DoctorSession } from '../../../../models/doctor';
 
 @Component({
     selector: 'app-calendar-session',
@@ -19,12 +20,7 @@ export class CalendarSessionComponent {
         calendarColHeight: number;
     };
 
-    @Input() session!: {
-        from: string;
-        to: string;
-        patientsCount: number;
-        slots: boolean[];
-    };
+    @Input() session!: DoctorSession;
 
     @ViewChild('componentRef2') componentRef!: ElementRef;
 
@@ -71,12 +67,12 @@ export class CalendarSessionComponent {
     }
 
     getBookedCount(): number {
-        let count = 0;
-        for (let i = 0; i < this.session.slots.length; i++) {
-            if (this.session.slots[i] === true) {
-                count++;
-            }
-        }
+        let count = 5;
+        // for (let i = 0; i < this.session.slots.length; i++) {
+        //     if (this.session.slots[i] === true) {
+        //         count++;
+        //     }
+        // }
         return count;
     }
 
