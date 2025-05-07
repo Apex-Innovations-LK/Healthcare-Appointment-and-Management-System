@@ -51,4 +51,6 @@ public class UserController {
     public List<DoctorDetails> fetchAllDoctors() {
         return userService.fetchAllDoctors();
     }
+
+    
 }

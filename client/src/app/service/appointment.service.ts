@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { MakeAppointment } from '../models/makeAppointment';
 import { BookingResponse } from '../models/BookingResponse';
 import { Appointment } from '../models/Appointment';
+import { UserDetails } from '../models/userDetails';
 
 interface Appointments {
     patient_id: string;
@@ -32,6 +33,11 @@ export class AppointmentsService {
     // Fetch appointments for the logged-in patient
     viewAppointments(patientId: string): Observable<Appointment[]> {
         return this.httpClient.get<Appointment[]>(`${this.backendUrl}/view-appointments/${patientId}`);
+    }
+
+    // Fetch doctor details using doctor_id
+    getDoctorDetails(doctorId: string): Observable<UserDetails> {
+        return this.httpClient.get<UserDetails>(`${this.backendUrl}/get-doctor-details/${doctorId}`);
     }
 
     // getAppointments(): Observable<DoctorSessions[]> {

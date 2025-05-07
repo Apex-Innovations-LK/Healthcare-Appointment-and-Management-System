@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AppointmentsService } from '../../../service/appointment.service';
 import { CommonModule } from '@angular/common';
 import { Appointment } from '../../../models/Appointment';
-import { JwtHelperService } from '@auth0/angular-jwt';
+import { DoctorSessions } from '../../../models/DoctorSessions';
+import { UserDetails } from '../../../models/userDetails';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
@@ -10,7 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 @Component({
     selector: 'app-view-appointments',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, HttpClientModule ],
+    imports: [CommonModule, FormsModule, RouterModule, HttpClientModule],
     template: `
         <div class="min-h-screen bg-gray-50 py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,11 +40,15 @@ import { HttpClientModule } from '@angular/common/http';
                             <div class="flex items-center justify-between">
                                 <div class="flex-grow">
                                     <div class="mt-2 text-sm text-gray-500 space-y-1">
-                                        <p><strong>Patient ID:</strong> {{ appointment.patient_id }}</p>
-                                        <p><strong>Slot ID:</strong> {{ appointment.slotId }}</p>
+                                        //<p><strong>Doctor Name:</strong> Dr. {{ doctorDetails?.first_name }} {{ doctorDetails?.last_name }}</p>
+                                        //<p><strong>Speciality:</strong> {{ doctorDetails?.speciality || 'N/A' }}</p>
+                                        //<p><strong>License Number:</strong> {{ doctorDetails?.license_number || 'N/A' }}</p>
+
+                                        <p><strong>Doctor ID:</strong> {{ getDoctorDetails(appointment.slotId)?.doctor_id || 'N/A' }}</p>
+                                        <p><strong>From:</strong> {{ getDoctorDetails(appointment.slotId)?.from | date: 'shortTime' }}</p>
+                                        <p><strong>To:</strong> {{ getDoctorDetails(appointment.slotId)?.to | date: 'shortTime' }}</p>
                                         <p><strong>Status:</strong> {{ appointment.status }}</p>
                                         <p><strong>Appointment Type:</strong> {{ appointment.appointment_type }}</p>
-                                        <p><strong>Notes:</strong> {{ appointment.notes }}</p>
                                     </div>
                                 </div>
                                 <button
@@ -60,71 +65,103 @@ import { HttpClientModule } from '@angular/common/http';
         </div>
     `
 })
+
 export class ViewAppointmentComponent implements OnInit {
     bookedAppointments: Appointment[] = [];
+    doctorSessions: DoctorSessions[] = [];
+    doctorDetails: UserDetails | null = null; // Store doctor details
     loading = true;
     error: string | null = null;
-
-    constructor(
-        private appointmentsService: AppointmentsService,
-    ) {}
-
+  
+    constructor(private appointmentsService: AppointmentsService) {}
+  
     decodeToken(token: string): any {
-        try {
-          const payload = token.split('.')[1];
-          const decodedPayload = atob(payload);
-          return JSON.parse(decodedPayload);
-        } catch (error) {
-          console.error('Token decoding failed', error);
-          return null;
-        }
+      try {
+        const payload = token.split('.')[1];
+        const decodedPayload = atob(payload);
+        return JSON.parse(decodedPayload);
+      } catch (error) {
+        console.error('Token decoding failed', error);
+        return null;
       }
-
+    }
+  
     ngOnInit(): void {
-        const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       
-        if (token) {
-          const decodedToken = this.decodeToken(token);
-          const patientId = decodedToken?.id;
-      
-          if (patientId) {
-            this.fetchAppointments(patientId);
-          } else {
-            this.error = 'Unable to retrieve patient ID from token. Please log in again.';
-            this.loading = false;
-          }
+      if (token) {
+        const decodedToken = this.decodeToken(token);
+        const patientId = decodedToken?.id;
+  
+        if (patientId) {
+          this.fetchAppointments(patientId);
         } else {
-          this.error = 'No session token found. Please log in.';
+          this.error = 'Unable to retrieve patient ID from token. Please log in again.';
           this.loading = false;
         }
+      } else {
+        this.error = 'No session token found. Please log in.';
+        this.loading = false;
       }
-
-    // ngOnInit(): void {
-    //     // Temporary fix for debugging
-    //     const patientId = 'cdf3cd99-2154-44b6-bb5a-6600e894769b';
-    //     this.fetchAppointments(patientId);
-    // }
-
-    fetchAppointments(patientId: string): void {
-        this.loading = true;
-        this.error = null;
-    
-        this.appointmentsService.viewAppointments(patientId).subscribe({
-            next: (appointments) => {
-                console.log('Fetched appointments:', appointments);
-                this.bookedAppointments = appointments; 
-                this.loading = false;
-            },
-            error: (error) => {
-                console.error('Fetch error:', error);
-                this.error = 'Failed to load appointments. Please try again later.';
-                this.loading = false;
-            }
-        });
     }
 
+     // ngOnInit(): void {
+    //     const patientId = 'cdf3cd99-2154-44b6-bb5a-6600e894769b';
+    //     this.loading = true;
+  
+    fetchAppointments(patientId: string): void {
+      this.loading = true;
+  
+      // Fetch all doctor sessions first
+      this.appointmentsService.getAppointments().subscribe({
+        next: (sessions) => {
+          this.doctorSessions = sessions;
+  
+          // Then fetch patient appointments
+          this.appointmentsService.viewAppointments(patientId).subscribe({
+            next: (appointments) => {
+              this.bookedAppointments = appointments;
+  
+              // Fetch doctor details for the first appointment's doctor_id
+              const doctorId = this.getDoctorDetails(appointments[0]?.slotId)?.doctor_id;
+              if (doctorId) {
+                this.appointmentsService.getDoctorDetails(doctorId).subscribe({
+                  next: (doctor) => {
+                    this.doctorDetails = doctor;
+                    this.loading = false;
+                  },
+                  error: (error) => {
+                    console.error('Doctor details fetch error:', error);
+                    this.error = 'Failed to load doctor details.';
+                    this.loading = false;
+                  }
+                });
+              } else {
+                this.error = 'Doctor ID not found for appointment.';
+                this.loading = false;
+              }
+            },
+            error: (error) => {
+              console.error('Appointments fetch error:', error);
+              this.error = 'Failed to load appointments.';
+              this.loading = false;
+            }
+          });
+        },
+        error: (error) => {
+          console.error('Doctor sessions fetch error:', error);
+          this.error = 'Failed to load doctor session data.';
+          this.loading = false;
+        }
+      });
+    }
+  
+    getDoctorDetails(slotId: string): DoctorSessions | undefined {
+      return this.doctorSessions.find((session) => session.slot_id === slotId);
+    }
+  
     cancelAppointment(id: number): void {
-        console.log(`Cancel appointment with ID: ${id}`);
-        // Implement cancel/delete logic here if required
+      console.log(`Cancel appointment with ID: ${id}`);
+      // Implement cancellation if required
     }
 }
