@@ -1,0 +1,18 @@
+<div
+    class="calendar-session w-[94%] p-3 flex flex-col items-center justify-evenly rounded-md absolute hover:scale-105"
+    [style.top]="getTopOffset()"
+    [style.height]="height"
+    [style.overflowY]="setOverflowY()"
+    (mouseenter)="onMouseEnter($event)"
+    (mouseleave)="onMouseLeave($event)"
+    #componentRef
+>
+    <p class="time-duration text-lg m-0 font-bold">{{ fromTime | date: 'shortTime' }} - {{ toTime | date: 'shortTime' }}</p>
+    <p class="appointments-key mt-2 text-lg w-full text-left">
+        Number of patients : <span class="text-xl full-count font-semibold"> {{ availability.patientsCount }}</span>
+    </p>
+    <div class="flex w-full mb-4 items-center justify-evenly">
+        <p-button icon="pi pi-pencil" severity="info" (click)="showEdit()" rounded raised />
+        <p-button icon="pi pi-trash" severity="danger" (click)="showDelete()" rounded raised/>
+    </div>
+</div>

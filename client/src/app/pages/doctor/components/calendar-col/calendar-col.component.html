@@ -1,0 +1,28 @@
+<div class="calendar-col flex flex-1 flex-col w-full items-center justify-end border-x-[1px]">
+    <!-- Calendar Header -->
+
+    <div class="day-col w-full flex flex-col justify-between overflow-hidden relative items-center" [style.height]="calendarConfig.calendarColHeight + 'px'">
+        @for (line of lines; track $index) {
+            <div class="w-full h-[2px] calendar-divider"></div>
+        }
+        @if (type == 'schedule' && sessions && sessions.length > 0) {
+            @for (session of sessions; track $index) {
+                <app-calendar-session class="m-o p-0 w-full absolute flex flex-col items-center" [calendarConfig]="calendarConfig" [session]="session" />
+            }
+        }
+        @if (type == 'plan' && availabilities && availabilities.length > 0) {
+            @for (availability of availabilities; track $index) {
+                <app-calendar-availability
+                    [showEdit]="modalHandlers.editModalHandler"
+                    [showDelete]="modalHandlers.deleteModalHandler"
+                    class="m-o p-0 w-full absolute flex flex-col items-center"
+                    [calendarConfig]="calendarConfig"
+                    [availability]="availability"
+                />
+            }
+        }
+        @if (isToday()) {
+            <div class="z-50 now-divider w-full h-[5px] absolute" [style.top]="getNowDivTopOffset()"></div>
+        }
+    </div>
+</div>
