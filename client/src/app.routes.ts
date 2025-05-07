@@ -5,6 +5,7 @@ import { DoctorLayout } from './app/pages/doctor/doctor.layout';
 import { PatientLayout } from './app/pages/patient/patient.layout';
 import { StaffLayout } from './app/pages/staff/staff.layout';
 import { HomeComponent } from './app/pages/home/home';
+import { AuthGuard } from './app/service/auth.guard';
 
 import { VideoCallComponent } from './app/video-call/video-call.component';
 export const appRoutes: Routes = [
@@ -21,6 +22,7 @@ export const appRoutes: Routes = [
     {
         path: 'admin',
         component: AppLayout,
+ //       canActivate: [AuthGuard],
         children: [
             {
                 path: '',
@@ -31,6 +33,7 @@ export const appRoutes: Routes = [
     {
         path: 'patient',
         component: PatientLayout,
+ //       canActivate: [AuthGuard],
         children: [
             {
                 path: '',
@@ -41,6 +44,7 @@ export const appRoutes: Routes = [
     {
         path: 'doctor',
         component: DoctorLayout,
+ //       canActivate: [AuthGuard],
         children: [
             {
                 path: '',
@@ -52,6 +56,7 @@ export const appRoutes: Routes = [
     {
         path: 'staff',
         component: StaffLayout,
+//        canActivate: [AuthGuard],
         children: [
             {
                 path: '',
@@ -66,7 +71,7 @@ export const appRoutes: Routes = [
     {
         path: 'notfound',
         component: NotFound
-    },
+    }
     // {
     //     path: '**',
     //     redirectTo: '/notfound'

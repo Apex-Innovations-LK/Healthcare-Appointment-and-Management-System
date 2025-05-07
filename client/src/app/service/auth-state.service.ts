@@ -54,7 +54,7 @@ export class AuthStateService{
         const username = this.getUsername() || '';
         if (username) {
             this.authService.getUser(username).subscribe((data) => {
-                console.log(data);
+                console.log("currently logged user", data);
                 this.user = data;
             });
         }

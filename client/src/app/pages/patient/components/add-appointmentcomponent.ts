@@ -93,7 +93,7 @@ interface AppointmentSlot {
                             </div>
                             <div
                                 class="p-3 bg-green-100 text-green-800 hover:bg-green-200 rounded cursor-pointer transition duration-150"
-                                [ngClass]="{ 'bg-green-500 text-white': selectedSlot && selectedSlot.slot_id === appointment.slot_id }"
+                                [ngClass]="{ 'bg-primary text-black': selectedSlot && selectedSlot.slot_id === appointment.slot_id }"
                                 (click)="selectSlot(appointment)"
                             >
                                 {{ formatAppointmentTime(appointment.from) }} - {{ formatAppointmentTime(appointment.to) }}
@@ -144,7 +144,7 @@ export class AddAppointmentComponent implements OnInit {
         private route: ActivatedRoute,
         private appointmentService: AppointmentsService,
         private authService: AuthService,
-        private authStateService: AuthStateService // Assuming you have a service to manage authentication state
+        private authStateService: AuthStateService 
     ) {}
 
     ngOnInit() {
