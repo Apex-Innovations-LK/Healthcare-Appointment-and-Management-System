@@ -35,7 +35,7 @@ export interface RiskDistribution {
 
 @Injectable({ providedIn: 'root' })
 export class PatientService {
-    private baseUrl = '/api';
+    private baseUrl = 'http://localhost:8080/api';
     private distributionCache: RiskDistribution | null = null;
     private distributionCacheTime: number = 0;
     private readonly CACHE_KEY = 'risk_distribution_cache';
