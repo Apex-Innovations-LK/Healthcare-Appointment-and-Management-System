@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import DoctorMicroservice.dto.ScheduleSlotBySessionId;
 import DoctorMicroservice.dto.ScheduleSlotDto;
 import DoctorMicroservice.dto.ScheduleSlotSearchRequest;
 import DoctorMicroservice.entity.DoctorAvailability;
@@ -61,11 +62,21 @@ public class ScheduleSlotServiceImpl implements ScheduleSlotService {
     
 
     public List<ScheduleSlotDto> getSlotsByDoctorAndDate(ScheduleSlotSearchRequest request) {
-        List<ScheduleSlot> slots = scheduleSlotRepository.findByDoctorIdAndDate(request.getDoctorId(), request.getDate());
+        List<ScheduleSlot> slots = scheduleSlotRepository.findByDoctorIdAndDate(request.getDoctorId(),
+                request.getDate());
         return slots.stream()
-            .map(slot -> new ScheduleSlotDto(slot.getSlotId(), slot.getSession_id(), slot.getStatus()))
-            .collect(Collectors.toList());
+                .map(slot -> new ScheduleSlotDto(slot.getSlotId(), slot.getSession_id(), slot.getStatus()))
+                .collect(Collectors.toList());
     }
+
+    public List<ScheduleSlotDto> getSlotsOfSession(ScheduleSlotBySessionId request) {
+        List<ScheduleSlot> slots = scheduleSlotRepository.findBySessionId(request.getSessionId());
+        return slots.stream()
+                .map(slot -> new ScheduleSlotDto(slot.getSlotId(), slot.getSession_id(), slot.getStatus()))
+                .collect(Collectors.toList());
+        
+    }
+   
 
 
 }
