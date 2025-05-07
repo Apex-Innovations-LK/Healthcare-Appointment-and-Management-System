@@ -55,7 +55,7 @@ interface AppointmentSlot {
                             *ngFor="let doctor of filteredDoctors"
                             (click)="selectDoctor(doctor)"
                             class="border rounded-lg p-4 cursor-pointer transition duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
-                            [ngClass]="{ 'bg-blue-50 border-blue-500 shadow-md': selectedDoctorId === doctor.doctor_id }"
+                            [ngClass]="{ 'dark:bg-gray-900 bg-gray-50 border-blue-500 shadow-md': selectedDoctorId === doctor.doctor_id }"
                         >
                             <h3 class="font-medium text-lg">Dr. {{ doctor.first_name }} {{ doctor.last_name }}</h3>
                             <p class="text-gray-400">{{ doctor.speciality }}</p>

@@ -12,8 +12,6 @@ export class AuthStateService{
 
     private userInfo: JwtPayload | null = null;
     private user: UserDetails | null = null;
-    private id : string | null = null;
-
 
     constructor(
         private tokenDecoder: TokenDecoderService,
@@ -32,7 +30,6 @@ export class AuthStateService{
     }
 
     getUserDetails(): UserDetails | null {
-
         return this.user;
     }
 
@@ -42,10 +39,6 @@ export class AuthStateService{
 
     getRole(): string | null {
         return this.userInfo?.role || null;
-    }
-
-    getId(): string | null {
-        return this.id || null;
     }
 
     isAuthenticated(): boolean {

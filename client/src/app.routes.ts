@@ -7,20 +7,15 @@ import { StaffLayout } from './app/pages/staff/staff.layout';
 import { HomeComponent } from './app/pages/home/home';
 
 export const appRoutes: Routes = [
-    // {
-        
-    //     path: 'uikit',
-    //     component: AppLayout,
-    //     children: [
-    //         { path: '', component: Dashboard },
-    //         { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
-    //         { path: 'documentation', component: Documentation },
-    //         { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
-    //     ]
-    // },
     {
         path: '',
         component: HomeComponent
+        // children: [
+        //     {
+        //         path: '',
+        //         loadChildren: () => import('./app/pages/home/home.routes').then((m) => m.default)
+        //     }
+        // ]
     },
     {
         path: 'admin',
@@ -70,8 +65,8 @@ export const appRoutes: Routes = [
         path: 'notfound',
         component: NotFound
     },
-    {
-        path: '**',
-        redirectTo: '/notfound'
-    }
+    // {
+    //     path: '**',
+    //     redirectTo: '/notfound'
+    // }
 ];
