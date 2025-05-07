@@ -1,5 +1,272 @@
 [
   {
+    "record_id": "HR-250",
+    "patient_id": "PAT-45873",
+    "patient_name": "Tumasha Deshan",
+    "patient_dob": "1952-08-17",
+    "date_of_service": "2025-05-03T10:30:45.234567+0000",
+    "referring_doctor": "DR-78322",
+    "chief_complaint": [
+      "Severe headache",
+      "Blurred vision",
+      "Nausea"
+    ],
+    "allergies": [
+      "Nuts"
+    ],
+    "medications": [
+      "Albuterol"
+    ],
+    "problem_list": [
+      "Hypertension",
+      "Migraines"
+    ],
+    "patient_sex": "Male",
+    "address": "78 Pine Avenue",
+    "city": "Colombo",
+    "state": "Western",
+    "zip": "00700",
+    "patient_phone": "0771234568",
+    "lbf_data": [
+      "LBF101:8.9",
+      "LBF102:10.2",
+      "LBF103:175/95"
+    ],
+    "his_data": [
+      "HIS001",
+      "HIS005",
+      "HIS008"
+    ]
+  },
+  {
+    "record_id": "HR-251",
+    "patient_id": "PAT-45874",
+    "patient_name": "Robert Johnson",
+    "patient_dob": "1949-12-05",
+    "date_of_service": "2025-05-03T11:45:30.345678+0000",
+    "referring_doctor": "DR-78323",
+    "chief_complaint": [
+      "Chest pain",
+      "Fatigue",
+      "Swelling in ankles"
+    ],
+    "allergies": [
+      "Shellfish"
+    ],
+    "medications": [
+      "Atorvastatin"
+    ],
+    "problem_list": [
+      "Hypertension"
+    ],
+    "patient_sex": "Male",
+    "address": "125 Galle Road",
+    "city": "Colombo",
+    "state": "Western",
+    "zip": "00500",
+    "patient_phone": "0771234569",
+    "lbf_data": [
+      "LBF101:9.5",
+      "LBF102:8.7",
+      "LBF103:160/92"
+    ],
+    "his_data": [
+      "HIS003",
+      "HIS009",
+      "HIS012"
+    ]
+  },
+  {
+    "record_id": "HR-252",
+    "patient_id": "PAT-45875",
+    "patient_name": "Linda Thompson",
+    "patient_dob": "1960-04-28",
+    "date_of_service": "2025-05-04T08:15:20.456789+0000",
+    "referring_doctor": "DR-78324",
+    "chief_complaint": [
+      "Joint pain",
+      "Morning stiffness",
+      "Swollen joints"
+    ],
+    "allergies": [
+      "Latex"
+    ],
+    "medications": [
+      "Prednisone"
+    ],
+    "problem_list": [
+      "Arthritis"
+    ],
+    "patient_sex": "Female",
+    "address": "45 Lotus Lane",
+    "city": "Kandy",
+    "state": "Central",
+    "zip": "20000",
+    "patient_phone": "0771234570",
+    "lbf_data": [
+      "LBF101:9.1",
+      "LBF102:9.0",
+      "LBF103:142/88"
+    ],
+    "his_data": [
+      "HIS004",
+      "HIS006",
+      "HIS011"
+    ]
+  },
+  {
+    "record_id": "HR-253",
+    "patient_id": "PAT-45876",
+    "patient_name": "Michael Chen",
+    "patient_dob": "1955-09-12",
+    "date_of_service": "2025-05-04T09:30:15.567890+0000",
+    "referring_doctor": "DR-78325",
+    "chief_complaint": [
+      "Severe abdominal pain",
+      "Nausea",
+      "Fever"
+    ],
+    "allergies": [
+      "Eggs"
+    ],
+    "medications": [
+      "Omeprazole"
+    ],
+    "problem_list": [
+      "Hypertension"
+    ],
+    "patient_sex": "Male",
+    "address": "89 Temple Road",
+    "city": "Galle",
+    "state": "Southern",
+    "zip": "80000",
+    "patient_phone": "0771234571",
+    "lbf_data": [
+      "LBF101:10.2",
+      "LBF102:8.5",
+      "LBF103:155/90"
+    ],
+    "his_data": [
+      "HIS002",
+      "HIS007",
+      "HIS013"
+    ]
+  },
+  {
+    "record_id": "HR-254",
+    "patient_id": "PAT-45877",
+    "patient_name": "Susan Martinez",
+    "patient_dob": "1962-07-19",
+    "date_of_service": "2025-05-04T10:45:40.678901+0000",
+    "referring_doctor": "DR-78326",
+    "chief_complaint": [
+      "Seizures",
+      "Memory loss",
+      "Headaches"
+    ],
+    "allergies": [
+      "Contrast dye"
+    ],
+    "medications": [
+      "Amlodipine"
+    ],
+    "problem_list": [
+      "Hypertension"
+    ],
+    "patient_sex": "Female",
+    "address": "23 Palm Grove",
+    "city": "Negombo",
+    "state": "Western",
+    "zip": "11500",
+    "patient_phone": "0771234572",
+    "lbf_data": [
+      "LBF101:9.3",
+      "LBF102:9.5",
+      "LBF103:158/94"
+    ],
+    "his_data": [
+      "HIS005",
+      "HIS008",
+      "HIS010"
+    ]
+  },
+  {
+    "record_id": "HR-255",
+    "patient_id": "PAT-45878",
+    "patient_name": "William Davis",
+    "patient_dob": "1947-11-30",
+    "date_of_service": "2025-05-05T08:00:10.789012+0000",
+    "referring_doctor": "DR-78327",
+    "chief_complaint": [
+      "Shortness of breath",
+      "Wheezing",
+      "Cough with blood"
+    ],
+    "allergies": [
+      "Dust"
+    ],
+    "medications": [
+      "Albuterol"
+    ],
+    "problem_list": [
+      "Hypertension"
+    ],
+    "patient_sex": "Male",
+    "address": "67 Beach Road",
+    "city": "Matara",
+    "state": "Southern",
+    "zip": "81000",
+    "patient_phone": "0771234573",
+    "lbf_data": [
+      "LBF101:8.7",
+      "LBF102:9.9",
+      "LBF103:172/98"
+    ],
+    "his_data": [
+      "HIS001",
+      "HIS009",
+      "HIS014"
+    ]
+  },
+  {
+    "record_id": "HR-256",
+    "patient_id": "PAT-45879",
+    "patient_name": "Patricia Lee",
+    "patient_dob": "1965-02-14",
+    "date_of_service": "2025-05-05T09:15:35.890123+0000",
+    "referring_doctor": "DR-78328",
+    "chief_complaint": [
+      "Fatigue",
+      "Excessive thirst",
+      "Frequent urination"
+    ],
+    "allergies": [
+      "Nuts"
+    ],
+    "medications": [
+      "Metformin"
+    ],
+    "problem_list": [
+      "Diabetes"
+    ],
+    "patient_sex": "Female",
+    "address": "34 Flower Road",
+    "city": "Colombo",
+    "state": "Western",
+    "zip": "00400",
+    "patient_phone": "0771234574",
+    "lbf_data": [
+      "LBF101:9.8",
+      "LBF102:10.1",
+      "LBF103:165/95"
+    ],
+    "his_data": [
+      "HIS003",
+      "HIS006",
+      "HIS012"
+    ]
+  },
+  {
     "record_id": "HR-001",
     "patient_id": "PAT-33810",
     "patient_name": "Jesse Hatfield",
