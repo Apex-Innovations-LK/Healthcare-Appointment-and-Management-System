@@ -6,6 +6,7 @@ import { PatientLayout } from './app/pages/patient/patient.layout';
 import { StaffLayout } from './app/pages/staff/staff.layout';
 import { HomeComponent } from './app/pages/home/home';
 
+import { VideoCallComponent } from './app/video-call/video-call.component';
 export const appRoutes: Routes = [
     {
         path: '',
@@ -47,6 +48,7 @@ export const appRoutes: Routes = [
             }
         ]
     },
+    { path: 'telehealth', component: VideoCallComponent },
     {
         path: 'staff',
         component: StaffLayout,
