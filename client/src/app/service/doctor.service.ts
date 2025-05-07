@@ -13,7 +13,7 @@ export class DoctorService {
       doctor_id: doctor_id,
       date: date,
     };
-    const apiUrl = this.baseURL + '/sessionsForDate';
+    const apiUrl = this.baseURL + '/getSessionsByDateAndDocId';
 
     return this.httpClient.post<any[]>(apiUrl, body);
   }

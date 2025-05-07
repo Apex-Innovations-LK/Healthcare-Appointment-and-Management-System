@@ -76,10 +76,11 @@ export class CalendarColComponent {
     lines: number[] = Array.from({ length: 19 });
 
     loadSessions() {
-        const doctor_id = 'doctor_id'; // Replace with actual doctor ID
+        const doctor_id = 'e7b5b3b4-8c9f-4e0c-ae90-6df45cbe9d24'; // Replace with actual doctor ID
         this.doctorService.getSessionsForDate(doctor_id, this.date.toISOString()).subscribe({
             next: (response) => {
                 this.sessions = response;
+                // console.log(this.sessions);
             },
             error: (error) => {
                 console.error('Error fetching sessions for date'+this.date+': ', error);
@@ -103,6 +104,9 @@ export class CalendarColComponent {
         if (this.calendarConfig) {
             this.lines = Array.from({ length: this.calendarConfig.endTime - this.calendarConfig.startTime + 2 });
         }
+        if (this.type === 'schedule') {
+            // this.loadSessions();
+        } 
     }
 
     isToday(): boolean {
