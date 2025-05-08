@@ -46,6 +46,21 @@ export class AppMenu {
                 ]
             },
             {
+                label: 'Reporting',
+                items: [
+                    {
+                        label: 'Report Builder',
+                        icon: 'pi pi-fw pi-file',
+                        routerLink: ['/admin/report-builder']
+                    },
+                    {
+                        label: 'Visualizer',
+                        icon: 'pi pi-fw pi-chart-bar',
+                        routerLink: ['/admin/report-visualizer']
+                    }
+                ]
+            },
+            {
                 label: 'Patient Management',
                 items: [
                     {
