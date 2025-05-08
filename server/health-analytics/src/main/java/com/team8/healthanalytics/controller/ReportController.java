@@ -1,8 +1,8 @@
-package com.team8.healthanalytics.report.controller;
+package com.team8.healthanalytics.controller;
 
-import com.team8.healthanalytics.report.dto.ReportData;
-import com.team8.healthanalytics.report.dto.ReportRequest;
-import com.team8.healthanalytics.report.service.ReportGenerationService;
+import com.team8.healthanalytics.dto.ReportData;
+import com.team8.healthanalytics.dto.ReportRequest;
+import com.team8.healthanalytics.service.ReportGenerationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;

@@ -1,4 +1,4 @@
-package com.team8.healthanalytics.report.dto;
+package com.team8.healthanalytics.dto;
 
 import java.util.List;
 import java.util.Map;
