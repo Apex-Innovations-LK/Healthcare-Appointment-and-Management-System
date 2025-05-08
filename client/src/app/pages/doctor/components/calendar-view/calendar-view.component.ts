@@ -130,9 +130,9 @@ export class CalendarViewComponent {
             const sessionData = this.sessionForm.value;
 
             const sessionId = uuid();
-            //const userDetails = this.authStateService.getUserDetails();
-            //const doctorId = userDetails ? userDetails.id : '';
-            const doctorId = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
+            const userDetails = this.authStateService.getUserDetails();
+            const doctorId = userDetails ? userDetails.id : '';
+            //const doctorId = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
             const date = this.weekDates[this.addModalData.dateId];
             const startTime = new Date(date);
             const endTime = new Date(date);
