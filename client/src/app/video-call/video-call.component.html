@@ -1,9 +1,44 @@
-<div style="text-align: center">
-    <h2>Simple Video Call</h2>
-    <video id="local" autoplay playsinline muted width="300"></video>
-    <video id="remote" autoplay playsinline width="300"></video>
-    <br /><br />
-    <button (click)="createCall()">Create Call</button>
-    <button (click)="joinCall()">Join Call</button>
+<div class="telehealth-container">
+  <div class="header">
+    <h1>Telehealth Consultation</h1>
+    <div class="call-status-indicator" [ngClass]="getStatusClass()">
+      <span class="status-dot"></span>
+      <span>{{callStatus}}</span>
+    </div>
   </div>
   
+  <div class="video-grid">
+    <div class="video-card remote">
+      <video id="remote" autoplay playsinline></video>
+      <div class="video-overlay">
+        <div class="participant-name">Healthcare Provider</div>
+        <div *ngIf="!isConnected()" class="waiting-message">
+          <div class="spinner"></div>
+          <span>{{getWaitingMessage()}}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="video-card local">
+      <video id="local" autoplay muted playsinline></video>
+      <div class="video-overlay">
+        <div class="participant-name">You</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="control-panel">
+    <button (click)="handleCreateCall()" class="control-btn create">
+      <span class="icon">📞</span>
+      <span class="label">Start Call</span>
+    </button>
+    <button (click)="handleJoinCall()" class="control-btn join">
+      <span class="icon">➕</span>
+      <span class="label">Join Call</span>
+    </button>
+    <button (click)="handleEndCall()" class="control-btn end">
+      <span class="icon">✕</span>
+      <span class="label">End Call</span>
+    </button>
+  </div>
+</div>

@@ -10,38 +10,8 @@ import { WebRTCService, WebRTCCallSession } from '../service/webrtc.service';
   standalone: true,
   imports: [CommonModule, HttpClientModule],
   providers: [WebRTCService],
-  template: `
-    <div class="video-container">
-      <div class="video-box">
-        <video id="local" autoplay muted playsinline></video>
-        <div class="label">You</div>
-      </div>
-      <div class="video-box">
-        <video id="remote" autoplay playsinline></video>
-        <div class="label">Remote</div>
-      </div>
-    </div>
-    <div class="controls">
-      <button (click)="handleCreateCall()" class="call-btn">Create Call</button>
-      <button (click)="handleJoinCall()" class="join-btn">Join Call</button>
-      <button (click)="handleEndCall()" class="end-btn">End Call</button>
-    </div>
-    <div *ngIf="callStatus" class="status">
-      Call Status: {{callStatus}}
-    </div>
-  `,
-  styles: [`
-    .video-container { display: flex; gap: 10px; margin-bottom: 20px; }
-    .video-box { position: relative; width: 400px; }
-    video { width: 100%; height: auto; border: 1px solid #ccc; background: #f0f0f0; }
-    .label { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px; }
-    .controls { display: flex; gap: 10px; }
-    button { padding: 10px 20px; cursor: pointer; }
-    .call-btn { background: #4CAF50; color: white; border: none; }
-    .join-btn { background: #2196F3; color: white; border: none; }
-    .end-btn { background: #F44336; color: white; border: none; }
-    .status { margin-top: 10px; font-weight: bold; }
-  `]
+  templateUrl: './video-call.component.html',
+  styleUrls: ['./video-call.component.css']
 })
 export class VideoCallComponent implements OnInit, OnDestroy {
   // Services
@@ -63,14 +33,43 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   private callsRef: any;
   private iceCandidatesRef: any;
   private answerRef: any;
+  private connectionStatusRef: any;
   currentCallSession?: WebRTCCallSession;
   callStatus: string = 'Ready';
+
+  // Helper methods for UI
+  getStatusClass(): string {
+    if (this.isConnected()) return 'connected';
+    if (this.callStatus.includes('Error')) return 'error';
+    if (this.callStatus.includes('Creating') || 
+        this.callStatus.includes('Joining') || 
+        this.callStatus.includes('Waiting')) return 'connecting';
+    return 'ready';
+  }
+
+  isConnected(): boolean {
+    return this.callStatus === 'Connected';
+  }
+
+  getWaitingMessage(): string {
+    if (this.callStatus.includes('Error')) {
+      return 'Connection error occurred';
+    } else if (this.callStatus.includes('Creating')) {
+      return 'Creating new call...';
+    } else if (this.callStatus.includes('Joining')) {
+      return 'Joining existing call...';
+    } else if (this.callStatus.includes('Waiting')) {
+      return 'Waiting for healthcare provider...';
+    }
+    return 'Waiting for connection...';
+  }
 
   constructor() {
     // Initialize Firebase references in constructor
     this.callsRef = this.db.object(`calls/${this.roomId}`);
     this.iceCandidatesRef = this.db.list(`calls/${this.roomId}/iceCandidates`);
     this.answerRef = this.db.object(`calls/${this.roomId}/answer`);
+    this.connectionStatusRef = this.db.object(`calls/${this.roomId}/connectionStatus`);
   }
 
   ngOnInit() {
@@ -95,7 +94,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       });
     } catch (err) {
       console.error('Error accessing media devices:', err);
-      this.callStatus = 'Error accessing camera/microphone';
+      this.callStatus = 'Error: Camera/mic access denied';
       this.cdr.detectChanges();
     }
   }
@@ -118,9 +117,15 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       this.zone.run(() => {
         const remoteVideo = document.getElementById('remote') as HTMLVideoElement;
         if (remoteVideo && event.streams && event.streams[0]) {
+          console.log('Received remote track:', event.track.kind);
           this.remoteStream = event.streams[0];
           remoteVideo.srcObject = this.remoteStream;
+          
+          // Set status and update shared status in Firebase
           this.callStatus = 'Connected';
+          this.connectionStatusRef.set('connected')
+            .catch((err: Error) => console.error('Error updating connection status:', err));
+            
           this.cdr.detectChanges();
         }
       });
@@ -138,8 +143,41 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     // Connection state changes
     this.pc.onconnectionstatechange = () => {
       this.zone.run(() => {
-        this.callStatus = `Connection: ${this.pc?.connectionState}`;
+        console.log("Connection state changed:", this.pc?.connectionState);
+        
+        if (this.pc?.connectionState === 'connected') {
+          this.callStatus = 'Connected';
+          this.connectionStatusRef.set('connected')
+            .catch((err: Error) => console.error('Error updating connection status:', err));
+        } else if (this.pc?.connectionState === 'disconnected' || 
+                  this.pc?.connectionState === 'failed') {
+          this.callStatus = 'Error: Connection lost';
+          this.connectionStatusRef.set('error')
+            .catch((err: Error) => console.error('Error updating connection status:', err));
+        } else if (this.pc?.connectionState === 'connecting') {
+          this.callStatus = 'Connecting...';
+          this.connectionStatusRef.set('connecting')
+            .catch((err: Error) => console.error('Error updating connection status:', err));
+        }
+        
         this.cdr.detectChanges();
+      });
+    };
+    
+    // Also monitor ICE connection state
+    this.pc.oniceconnectionstatechange = () => {
+      this.zone.run(() => {
+        console.log("ICE connection state:", this.pc?.iceConnectionState);
+        
+        if (this.pc?.iceConnectionState === 'connected' || 
+            this.pc?.iceConnectionState === 'completed') {
+          if (this.callStatus !== 'Connected') {
+            this.callStatus = 'Connected';
+            this.connectionStatusRef.set('connected')
+              .catch((err: Error) => console.error('Error updating connection status:', err));
+            this.cdr.detectChanges();
+          }
+        }
       });
     };
   }
@@ -155,8 +193,16 @@ export class VideoCallComponent implements OnInit, OnDestroy {
                 console.log("Remote description (answer) set successfully");
                 this.remoteDescriptionSet = true;
                 this.processPendingCandidates();
+                
+                // When we receive an answer, signaling is complete but we need to wait for media
+                this.callStatus = 'Connecting media...';
+                this.cdr.detectChanges();
               })
-              .catch(e => console.error('Error setting remote description:', e));
+              .catch(e => {
+                console.error('Error setting remote description:', e);
+                this.callStatus = 'Error: Connection failed';
+                this.cdr.detectChanges();
+              });
           }
         });
       });
@@ -170,7 +216,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
               const candidate = new RTCIceCandidate(candidateData);
               if (this.remoteDescriptionSet) {
                 this.pc!.addIceCandidate(candidate)
-                  .catch(e => console.error('Error adding ICE candidate:', e));
+                  .catch((e: Error) => console.error('Error adding ICE candidate:', e));
               } else {
                 this.pendingCandidates.push(candidate);
               }
@@ -178,15 +224,31 @@ export class VideoCallComponent implements OnInit, OnDestroy {
           }
         });
       });
+      
+    // Add subscription for shared connection status
+    const connectionStatusSub = this.connectionStatusRef.valueChanges()
+      .subscribe((status: any) => {
+        this.zone.run(() => {
+          console.log('Connection status from Firebase:', status);
+          if (status === 'connected' && this.callStatus !== 'Connected') {
+            console.log('Remote side signaled connection is established');
+            this.callStatus = 'Connected';
+            this.cdr.detectChanges();
+          } else if (status === 'error' && !this.callStatus.includes('Error')) {
+            this.callStatus = 'Error: Connection issue';
+            this.cdr.detectChanges();
+          }
+        });
+      });
 
-    this.subscriptions.push(answerSub, iceSub);
+    this.subscriptions.push(answerSub, iceSub, connectionStatusSub);
   }
 
   private processPendingCandidates() {
     if (this.pc && this.remoteDescriptionSet) {
       this.pendingCandidates.forEach(candidate => {
         this.pc!.addIceCandidate(candidate)
-          .catch(e => console.error('Error adding pending ICE candidate:', e));
+          .catch((e: Error) => console.error('Error adding pending ICE candidate:', e));
       });
       this.pendingCandidates = [];
     }
@@ -218,6 +280,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       // Clear any previous call data
       await this.callsRef.set(null);
       await this.iceCandidatesRef.remove();
+      await this.connectionStatusRef.set('creating');
       await this.callsRef.set({ offer });
       
       // Get user ID - replace with your actual user identification method
@@ -232,18 +295,18 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       this.webrtcService.startCall(callData).subscribe({
         next: (session) => {
           this.currentCallSession = session;
-          this.callStatus = 'Call created - Waiting for answer';
+          this.callStatus = 'Waiting for provider to join...';
           this.cdr.detectChanges();
         },
         error: (error) => {
           console.error('Error saving call to backend:', error);
-          this.callStatus = 'Error saving call';
+          this.callStatus = 'Error: Call setup failed';
           this.cdr.detectChanges();
         }
       });
     } catch (error) {
       console.error('Error creating call:', error);
-      this.callStatus = 'Error creating call';
+      this.callStatus = 'Error: Call creation failed';
       this.cdr.detectChanges();
     }
   }
@@ -253,6 +316,8 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     
     try {
       this.callStatus = 'Joining call...';
+      this.connectionStatusRef.set('joining')
+        .catch((err: Error) => console.error('Error updating connection status:', err));
       this.cdr.detectChanges();
       
       const callData: any = await new Promise((resolve) => {
@@ -268,15 +333,20 @@ export class VideoCallComponent implements OnInit, OnDestroy {
         await this.pc.setLocalDescription(answer);
         await this.answerRef.set(answer);
         
-        this.callStatus = 'Call joined - Connected';
+        // Don't set "Connected" yet, wait for actual media connection
+        this.callStatus = 'Call joined - Connecting...';
         this.cdr.detectChanges();
       } else {
-        this.callStatus = 'No active call to join';
+        this.callStatus = 'Error: No active call found';
+        this.connectionStatusRef.set('error')
+          .catch((err: Error) => console.error('Error updating connection status:', err));
         this.cdr.detectChanges();
       }
     } catch (error) {
       console.error('Error joining call:', error);
-      this.callStatus = 'Error joining call';
+      this.callStatus = 'Error: Could not join call';
+      this.connectionStatusRef.set('error')
+        .catch((err: Error) => console.error('Error updating connection status:', err));
       this.cdr.detectChanges();
     }
   }
@@ -285,6 +355,9 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     try {
       this.callStatus = 'Ending call...';
       this.cdr.detectChanges();
+      
+      // Clear connection status first
+      await this.connectionStatusRef.remove();
       
       // End call in backend if we have a call session
       if (this.currentCallSession?.id) {
@@ -320,10 +393,14 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       this.setupSignaling();
       
       this.callStatus = 'Call ended';
+      setTimeout(() => {
+        this.callStatus = 'Ready';
+        this.cdr.detectChanges();
+      }, 3000);
       this.cdr.detectChanges();
     } catch (error) {
       console.error('Error ending call:', error);
-      this.callStatus = 'Error ending call';
+      this.callStatus = 'Error: Could not end call';
       this.cdr.detectChanges();
     }
   }
@@ -338,6 +415,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     
     // Clean up Firebase data
     this.callsRef.remove();
+    this.connectionStatusRef.remove();
     
     // Stop all media tracks and close connections
     if (this.localStream) {
