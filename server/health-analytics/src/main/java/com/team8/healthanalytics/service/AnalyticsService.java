@@ -6,7 +6,6 @@ import com.team8.healthanalytics.dto.AnalyticsData.Point;
 import com.team8.healthanalytics.model.HealthRecord;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,28 +13,20 @@ import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class AnalyticsService implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private transient final SparkSession spark;
 
     private static final String JSON_FILE_PATH = "health_records.json";
-    private static final ZoneId ZONE = ZoneId.systemDefault();
-    private static final DateTimeFormatter MONTH_FMT =
-            DateTimeFormatter.ofPattern("yyyy-MM").withZone(ZONE);
             
     // Constructor to replace @RequiredArgsConstructor
     @Autowired
-    public AnalyticsService(RestTemplate restTemplate, ObjectMapper objectMapper, SparkSession sparkSession) {
-        this.restTemplate = restTemplate;
+    public AnalyticsService(ObjectMapper objectMapper, SparkSession sparkSession) {
         this.objectMapper = objectMapper;
         this.spark = sparkSession;
     }

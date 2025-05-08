@@ -47,16 +47,16 @@ import { ChartModule } from 'primeng/chart';
                     <p-chart type="bar" [data]="chartData.diagnosis" [options]="chartOptions" class="h-64"></p-chart>
                 </div>
                 <div class="bg-white shadow-md rounded-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">Age Distribution</h3>
+                <p-chart type="bar" [data]="chartData.age" [options]="chartOptions" class="h-64"></p-chart>
+                </div>
+                <div class="bg-white shadow-md rounded-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">City Distribution</h3>
+                <p-chart type="bar" [data]="chartData.city" [options]="chartOptions" class="h-64"></p-chart>
+                </div>
+                <div class="bg-white shadow-md rounded-lg p-6">
                     <h3 class="text-xl font-semibold mb-4">Sex Distribution</h3>
                     <p-chart type="pie" [data]="chartData.sex" [options]="chartOptions" class="h-64"></p-chart>
-                </div>
-                <div class="bg-white shadow-md rounded-lg p-6">
-                    <h3 class="text-xl font-semibold mb-4">Age Distribution</h3>
-                    <p-chart type="bar" [data]="chartData.age" [options]="chartOptions" class="h-64"></p-chart>
-                </div>
-                <div class="bg-white shadow-md rounded-lg p-6">
-                    <h3 class="text-xl font-semibold mb-4">City Distribution</h3>
-                    <p-chart type="bar" [data]="chartData.city" [options]="chartOptions" class="h-64"></p-chart>
                 </div>
             </div>
         </div>
@@ -75,6 +75,14 @@ export class VisualAnalyticsComponent implements OnInit {
     filterForm: FormGroup;
     chartData: any = null;
     chartOptions: any;
+    // Array of colors for charts
+    chartColors = {
+        primary: ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD'],
+        diagnosis: ['#17BECF', '#BCBD22', '#E377C2', '#7F7F7F', '#8C564B'],
+        sex: ['#FF9896', '#98DF8A', '#C5B0D5', '#FFBB78', '#AEC7E8'],
+        age: ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD'],
+        city: ['#8C564B', '#E377C2', '#7F7F7F', '#BCBD22', '#17BECF']
+    };
 
     constructor(
         private fb: FormBuilder,
@@ -146,11 +154,11 @@ export class VisualAnalyticsComponent implements OnInit {
                     },
                     sex: {
                         labels: data.sex_labels,
-                        datasets: [{ label: 'Sex Distribution', data: data.sex_values, backgroundColor: '#F59E0B' }]
+                        datasets: [{ label: 'Sex Distribution', data: data.sex_values, backgroundColor: this.chartColors.sex }]
                     },
                     age: {
                         labels: data.age_labels,
-                        datasets: [{ label: 'Age Distribution', data: data.age_values, backgroundColor: '#EF4444' }]
+                        datasets: [{ label: 'Age Distribution', data: data.age_values, backgroundColor: this.chartColors.age }]
                     },
                     city: {
                         labels: data.city_labels,
