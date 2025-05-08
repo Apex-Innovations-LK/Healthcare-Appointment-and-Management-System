@@ -10,6 +10,7 @@ import { DialogModule } from 'primeng/dialog';
 import { DatePipe } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthStateService } from '../../../../service/auth-state.service';
 
 @Component({
     selector: 'app-calendar-col',
@@ -49,7 +50,8 @@ export class CalendarColComponent {
 
     constructor(
         private fb: FormBuilder,
-        private doctorService: DoctorService
+        private doctorService: DoctorService,
+        private authStateService: AuthStateService
     ) {
         this.sessionForm = this.fb.group({
             startTime: ['', Validators.required],
@@ -81,7 +83,8 @@ export class CalendarColComponent {
     }
 
     loadSessions(): void {
-        const doctor_id = 'e7b5b3b4-8c9f-4e0c-ae90-6df45cbe9d24'; // Replace with actual doctor ID
+        const userDetails = this.authStateService.getUserDetails();
+        const doctor_id = userDetails ? userDetails.id : '';
         this.doctorService.getSessionsForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
             next: (response) => {
                 this.sessions = response;
@@ -94,7 +97,8 @@ export class CalendarColComponent {
     }
 
     loadAvailabilities() {
-        const doctor_id = 'e7b5b3b4-8c9f-4e0c-ae90-6df45cbe9d24'; // Replace with actual doctor ID
+        const userDetails = this.authStateService.getUserDetails();
+        const doctor_id = userDetails ? userDetails.id : '';
         this.doctorService.getAvailabilityForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
             next: (response) => {
                 this.availabilities = response;
