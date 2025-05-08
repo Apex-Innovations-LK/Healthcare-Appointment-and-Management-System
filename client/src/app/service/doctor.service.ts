@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DoctorAvailability, DoctorSession } from '../models/doctor';
+import { DoctorAvailability, DoctorSession, SessionSlot } from '../models/doctor';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -46,6 +46,11 @@ export class DoctorService {
   addAvailability(availability:DoctorAvailability){
     const apiUrl = this.baseURL + '/addAvailability';
     return this.httpClient.post(apiUrl, availability);
+  }
+
+  getSlotsForSession(session_id:string) {
+    const apiUrl = this.baseURL + '/getScheduleSlotsBySessionId';
+    return this.httpClient.post<SessionSlot[]>(apiUrl, { sessionId: session_id });
   }
 
 }

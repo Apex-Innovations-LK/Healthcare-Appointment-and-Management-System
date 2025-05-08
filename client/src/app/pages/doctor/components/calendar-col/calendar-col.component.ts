@@ -29,7 +29,7 @@ export class CalendarColComponent {
         // }
     ];
 
-    availabilities: any[] = [];
+    availabilities: DoctorAvailability[] = [];
 
     displayEditModal = false;
     displayDeleteModal = false;
@@ -83,8 +83,9 @@ export class CalendarColComponent {
     }
 
     loadSessions(): void {
-        const userDetails = this.authStateService.getUserDetails();
-        const doctor_id = userDetails ? userDetails.id : '';
+        //const userDetails = this.authStateService.getUserDetails();
+        //const doctor_id = userDetails ? userDetails.id : '';
+        const doctor_id = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
         this.doctorService.getSessionsForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
             next: (response) => {
                 this.sessions = response;
@@ -97,8 +98,9 @@ export class CalendarColComponent {
     }
 
     loadAvailabilities() {
-        const userDetails = this.authStateService.getUserDetails();
-        const doctor_id = userDetails ? userDetails.id : '';
+        //const userDetails = this.authStateService.getUserDetails();
+        //const doctor_id = userDetails ? userDetails.id : '';
+        const doctor_id = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
         this.doctorService.getAvailabilityForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
             next: (response) => {
                 this.availabilities = response;
