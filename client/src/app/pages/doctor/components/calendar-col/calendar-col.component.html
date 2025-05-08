@@ -29,7 +29,11 @@
 @if (type == 'plan') {
 
     <!-- edit session modal -->
-    <p-dialog header="Edit Session" [(visible)]="displayEditModal" [modal]="true" [closable]="true" [style]="{ width: '400px' }">
+    <p-dialog header="Edit Availability" [(visible)]="displayEditModal" [modal]="true" [closable]="true" [style]="{ width: '400px' }">
+        <div class="flex items-center my-5 gap-5">
+            <label for="daySelect">Day</label>
+            <p-chip label="{{date | date: 'EEEE, MMM d'}}" class="ml-4 mt-2 cursor-pointer value-staff text-large"></p-chip>
+        </div>
         <form [formGroup]="sessionForm" (ngSubmit)="submitEditForm()" class="p-fluid">
             <div class="field items-center flex my-5 gap-5">
                 <label for="startTime">Start Time</label>
