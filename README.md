@@ -27,11 +27,17 @@ Notification-Micro-Service/
 
 Make sure you have **Docker Desktop** running.
 
-### 🔥 Run the whole stack
+### Step-by-step:
 
 ```bash
-docker compose up --build
+# Navigate into the server directory
+cd server
 
+# Build all services
+docker-compose build --no-cache
+
+# Start all containers
+docker-compose up -d
 ```
 
 This will:
