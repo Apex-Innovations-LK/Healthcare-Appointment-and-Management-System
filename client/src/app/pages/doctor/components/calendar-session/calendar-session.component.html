@@ -17,13 +17,15 @@
     </p>
 
     @if (expanded) {
-        <div class="ml-5 flex flex-row flex-wrap gap-1 w-full">
-            <!-- @for (slot of session.slots; track $index) {
-                <div [class]="'text-gray-600 font-semibold w-[25px] h-[30px] ' + (slot === true ? 'bg-lime-400 border-lime-700' : 'bg-gray-400 border-gray-600') + ' border-2 rounded-md border-solid flex items-center justify-center'">
-                    {{ $index + 1 }}
-                </div>
-            } -->
-        </div>
+        @if (slots.length>0) {
+            <div class="ml-5 flex flex-row flex-wrap gap-1 w-full">
+                @for (slot of slots; track $index) {
+                    <div [class]="'text-gray-600 font-semibold w-[25px] h-[30px] ' + (slot.status === 'booked' ? 'bg-lime-400 border-lime-700' : (slot.status === 'available') ? 'bg-gray-400 border-gray-600' : 'bg-orange-500 border-red-700') + ' border-2 rounded-md border-solid flex items-center justify-center'">
+                        {{ $index + 1 }}
+                    </div>
+                }
+            </div>
+        }
         <p-button class="mt-4" label="View HRs" severity="info" raised />
         @if (!isExpired()) {
             <p-button class="mt-2" label="Reject Appointments" severity="warn" raised />

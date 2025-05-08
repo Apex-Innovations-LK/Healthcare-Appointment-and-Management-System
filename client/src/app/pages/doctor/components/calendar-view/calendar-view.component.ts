@@ -56,7 +56,7 @@ export class CalendarViewComponent {
 
     ngOnInit() {
         if (this.type === 'schedule') {
-            this.generateCurrentWeek();
+            this.generateNextWeek();
         } else if (this.type === 'plan') {
             this.generateNextWeek();
         }
@@ -132,6 +132,7 @@ export class CalendarViewComponent {
             const sessionId = uuid();
             const userDetails = this.authStateService.getUserDetails();
             const doctorId = userDetails ? userDetails.id : '';
+            //const doctorId = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
             const date = this.weekDates[this.addModalData.dateId];
             const startTime = new Date(date);
             const endTime = new Date(date);

@@ -3,11 +3,13 @@ import { Component, ElementRef, Input, SimpleChanges, ViewChild } from '@angular
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
-import { DoctorSession } from '../../../../models/doctor';
+import { DoctorSession, SessionSlot } from '../../../../models/doctor';
+import { DoctorService } from '../../../../service/doctor.service';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
 
 @Component({
     selector: 'app-calendar-session',
-    imports: [DatePipe, ButtonModule, ChipModule],
+    imports: [DatePipe, ButtonModule, ChipModule, OverlayBadgeModule],
     templateUrl: './calendar-session.component.html',
     styleUrl: './calendar-session.component.scss'
 })
@@ -24,20 +26,23 @@ export class CalendarSessionComponent {
 
     @ViewChild('componentRef2') componentRef!: ElementRef;
 
+    slots!: SessionSlot[];
+
     fromTime!: Date;
     toTime!: Date;
     appointments: any[] = [];
     height!:string;
-    items: MenuItem[] = [];
     expanded = false;
 
-    ngOnChanges(changes: SimpleChanges): void {
+    constructor(private doctorService: DoctorService) {}
+
+    ngOnInit(): void {
         if (this.session) {
             this.fromTime = new Date(this.session.from);
             this.toTime = new Date(this.session.to);
             this.setHeight();
+            this.loadSessionSlots();
         }
-        this.items = [{ label: 'Update', icon: 'pi pi-refresh' }, { label: 'Delete', icon: 'pi pi-times' }, { label: 'Angular.io', icon: 'pi pi-info', url: 'http://angular.io' }, { separator: true }, { label: 'Setup', icon: 'pi pi-cog' }];
     }
 
     getTopOffset(): string {
@@ -48,6 +53,18 @@ export class CalendarSessionComponent {
         const linesCount = fromHour - this.calendarConfig.startTime + 1;
 
         return `${totalMinutes + this.calendarConfig.calendarLineHeight * linesCount}px`;
+    }
+
+    loadSessionSlots(): void {
+        this.doctorService.getSlotsForSession(this.session.session_id).subscribe({
+            next: (response) => {
+                this.slots = response;
+                console.log('Session slots for session ' + this.session.session_id + ': ', this.slots);
+            },
+            error: (error) => {
+                console.error('Error fetching session slots for session' + this.session.session_id + ': ', error);
+            }
+        });
     }
 
     setHeight(): void {
@@ -67,18 +84,18 @@ export class CalendarSessionComponent {
     }
 
     getBookedCount(): number {
-        let count = 5;
-        // for (let i = 0; i < this.session.slots.length; i++) {
-        //     if (this.session.slots[i] === true) {
-        //         count++;
-        //     }
-        // }
+        let count = 0;
+        for (let i = 0; i < this.slots.length; i++) {
+            if (this.slots[i].status === 'booked') {
+                count++;
+            }
+        }
         return count;
     }
 
     isExpired(): boolean {
         const currentDate = new Date();
-        const sessionDate = new Date(this.session.to);
+        const sessionDate = new Date(this.session.from);
         return sessionDate < currentDate;
     }
 }
