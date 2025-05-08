@@ -2,40 +2,38 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-<<<<<<< HEAD
 import { CalendarViewComponent } from './components/calenderView';
+import { CardModule } from 'primeng/card';
+import { CommonModule } from '@angular/common';
+import { StaffScheduleViewerComponent } from './components/staffSchedularView';
 
-@Component({
-    selector: 'app-doctor-schedule',
-    imports: [CalendarViewComponent, ButtonModule, RippleModule, RouterModule, ButtonModule,],
-    standalone: true,
-    template: `<div class="bg-surface-0 dark:bg-surface-900">
-        <div id="home" class="landing-wrapper overflow-hidden">
-        <app-calendar-view type='plan' [calendarConfig]="calendarConfig" class="w-full my-5" />
-=======
-import { CalendarViewComponent } from './components/calendar-view/calendar-view.component';
 
 @Component({
     selector: 'app-staff-schedule',
-    imports: [CalendarViewComponent, ButtonModule, RippleModule, RouterModule, ButtonModule],
     standalone: true,
-    template: `<div class="bg-surface-0 dark:bg-surface-900">
-        <div id="home" class="landing-wrapper overflow-hidden">
-            <app-calendar-view type="staff" [calendarConfig]="calendarConfig" class="w-full my-5" />
->>>>>>> c6fa563fbd688936b76394b7f2e3ba54b5e58e80
+    imports: [StaffScheduleViewerComponent, ButtonModule, RippleModule, RouterModule, CardModule, CommonModule],
+    template: `
+        <div class="bg-surface-0 dark:bg-surface-900 p-4">
+            <div class="flex flex-col gap-4 max-w-screen-2xl mx-auto">
+                <!-- Header Section -->
+                <div class="flex flex-wrap justify-center items-center gap-3">
+                    <h1 class="text-2xl font-bold m-0">Staff Schedule</h1>
+                    <p class="text-gray-500 dark:text-gray-400 mt-1">View your weekly schedule</p>
+                </div>
+
+                <!-- Calendar View -->
+                <app-staff-schedule-viewer></app-staff-schedule-viewer>
+            </div>
         </div>
-    </div> `
+    `
 })
 export class Schedule {
-    startTime = 6;
-    endTime = 23;
+    // Calendar configuration
+    startTime = 6; // 6 AM
+    endTime = 23; // 11 PM
     hourHeight = 60;
     calendarLineHeight = 2;
-<<<<<<< HEAD
-    calendarColHeight = (this.endTime - this.startTime + 1) * this.hourHeight + this.calendarLineHeight*(this.endTime - this.startTime + 2); 
-=======
     calendarColHeight = (this.endTime - this.startTime + 1) * this.hourHeight + this.calendarLineHeight * (this.endTime - this.startTime + 2);
->>>>>>> c6fa563fbd688936b76394b7f2e3ba54b5e58e80
 
     calendarConfig = {
         startTime: this.startTime,

@@ -129,7 +129,6 @@ export class Login {
     }
 
     login() {
-        console.log('user', this.user);
         this.authService.loginUser(this.user).subscribe({
             next: (data) => {
                 console.log(data);

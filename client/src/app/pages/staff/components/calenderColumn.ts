@@ -1,49 +1,41 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { CalendarAvailabilityComponent } from './calenderAvailability';
-import { SchedularService } from '../../../service/schedular.service';
-import { AuthStateService } from '../../../service/auth-state.service';
+import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
+import { CalendarSessionComponent } from './calenderSession';
+import { Schedule } from '../../../models/schedule';
 
 @Component({
     selector: 'app-calendar-col',
     standalone: true,
-    imports: [ButtonModule, CalendarAvailabilityComponent],
+    imports: [CommonModule, CalendarSessionComponent],
     template: `
-        <div class="calendar-col flex flex-1 flex-col w-full items-center justify-end border-x-[1px]">
-            <div class="day-col w-full flex flex-col justify-between overflow-hidden relative items-center" [style.height]="calendarConfig.calendarColHeight + 'px'">
-                @for (line of lines; track $index) {
-                    <div class="w-full h-[2px] calendar-divider"></div>
-                }
-
-                @if (type === 'plan' && availabilities.length > 0) {
-                    @for (availability of availabilities; track $index) {
-                        <app-calendar-availability class="m-0 p-0 w-full absolute flex flex-col items-center" [calendarConfig]="calendarConfig" [availability]="availability" />
-                    }
-                }
-
-                @if (isToday()) {
-                    <div class="z-50 now-divider w-full h-[5px] absolute" [style.top]="getNowDivTopOffset()"></div>
+        <div
+            class="calendar-col flex-1 relative border-r border-gray-200 dark:border-gray-700 
+            {{ isToday ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-white dark:bg-gray-800' }}"
+        >
+            <!-- Hour grid lines -->
+            <div class="grid-lines absolute top-0 left-0 w-full h-full">
+                @for (hour of hours; track $index) {
+                    <div class="hour-line w-full border-t border-gray-200 dark:border-gray-700" [style.height]="calendarConfig.hourHeight + 'px'"></div>
                 }
             </div>
+
+            <!-- Sessions -->
+            @for (session of filteredSessions; track $index) {
+                <app-calendar-session [calendarConfig]="calendarConfig" [sessionData]="session"></app-calendar-session>
+            }
+
+            <!-- Current time indicator -->
+            @if (isToday && showCurrentTimeIndicator) {
+                <div class="current-time-indicator absolute w-full border-t-2 border-red-500 z-30" [style.top]="currentTimePosition + 'px'">
+                    <div class="h-2 w-2 rounded-full bg-red-500 -mt-1 -ml-1"></div>
+                </div>
+            }
         </div>
     `
 })
 export class CalendarColComponent implements OnInit {
-    availabilities: {
-        from: string;
-        to: string;
-        doctorName: string;
-    }[] = [];
-
     @Input() date!: Date;
-    @Input() type!: 'schedule' | 'plan';
-
-    @Input() modalHandlers!: {
-        addModalHandler: () => void;
-        editModalHandler: () => void;
-        deleteModalHandler: () => void;
-    };
-
     @Input() calendarConfig!: {
         startTime: number;
         endTime: number;
@@ -51,50 +43,75 @@ export class CalendarColComponent implements OnInit {
         calendarLineHeight: number;
         calendarColHeight: number;
     };
+    @Input() sessionData: Schedule[] = [];
 
-    lines: number[] = [];
-
-    constructor(private schedularService: SchedularService, private authStateService : AuthStateService) {}
+    hours: number[] = [];
+    isToday = false;
+    showCurrentTimeIndicator = false;
+    currentTimePosition = 0;
+    filteredSessions: Schedule[] = [];
 
     ngOnInit(): void {
-        const staff_id = this.authStateService.getUserDetails()?.id || '';
-        // if (staff_id) {
-            this.schedularService.getSchedule(staff_id).subscribe({
-                next: (response: any[]) => {
-                console.log("debug",response)
-                    const flatList = Array.isArray(response[0]) ? response.flat() : response;
+        this.setupHours();
+        this.checkIfToday();
+        this.updateCurrentTimePosition();
+        this.filterSessionsForDate();
 
-                    this.availabilities = flatList.map((item) => ({
-                        from: item.from,
-                        to: item.to,
-                        doctorName: item.doctor_id || 'Unknown'
-                    }));
-                },
-                error: (err) => {
-                    console.error('Failed to load schedule:', err);
-                }
-            });
-        }
-        // else {
-        //     console.error('Staff ID is not available');
-        // }
-   // }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        if (this.calendarConfig) {
-            this.lines = Array.from({ length: this.calendarConfig.endTime - this.calendarConfig.startTime + 2 });
+        // Update time indicator every minute
+        if (this.isToday) {
+            setInterval(() => this.updateCurrentTimePosition(), 60000);
         }
     }
 
-    isToday(): boolean {
+    setupHours(): void {
+        this.hours = Array.from({ length: this.calendarConfig.endTime - this.calendarConfig.startTime + 1 }, (_, i) => this.calendarConfig.startTime + i);
+    }
+
+    checkIfToday(): void {
         const today = new Date();
-        return this.date.getDate() === today.getDate() && this.date.getMonth() === today.getMonth() && this.date.getFullYear() === today.getFullYear();
+        this.isToday = this.date.getDate() === today.getDate() && this.date.getMonth() === today.getMonth() && this.date.getFullYear() === today.getFullYear();
     }
 
-    getNowDivTopOffset(): string {
+    updateCurrentTimePosition(): void {
+        if (!this.isToday) return;
+
         const now = new Date();
-        const totalMinutes = (now.getHours() - this.calendarConfig.startTime) * 60 + now.getMinutes();
-        const linesCount = now.getHours() - this.calendarConfig.startTime + 1;
-        return `${totalMinutes + this.calendarConfig.calendarLineHeight * linesCount}px`;
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+
+        if (hours < this.calendarConfig.startTime || hours > this.calendarConfig.endTime) {
+            this.showCurrentTimeIndicator = false;
+            return;
+        }
+
+        this.showCurrentTimeIndicator = true;
+
+        // Calculate position based on hours and minutes
+        const hourPosition = (hours - this.calendarConfig.startTime) * this.calendarConfig.hourHeight;
+        const minutePosition = (minutes / 60) * this.calendarConfig.hourHeight;
+
+        // Add additional height for grid lines
+        const gridLineOffset = (hours - this.calendarConfig.startTime + 1) * this.calendarConfig.calendarLineHeight;
+
+        this.currentTimePosition = hourPosition + minutePosition + gridLineOffset;
+    }
+
+    filterSessionsForDate(): void {
+        if (!this.sessionData || !this.sessionData.length) {
+            this.filteredSessions = [];
+            return;
+        }
+
+        // Filter sessions for the current date column
+        this.filteredSessions = this.sessionData.filter((session) => {
+            if (!session.from && !session.to) return false;
+
+            const sessionDate = new Date(session.from || session.to);
+            return this.isSameDay(sessionDate, this.date);
+        });
+    }
+
+    isSameDay(date1: Date, date2: Date): boolean {
+        return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
     }
 }

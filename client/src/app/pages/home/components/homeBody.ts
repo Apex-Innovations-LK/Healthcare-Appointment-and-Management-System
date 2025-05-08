@@ -125,7 +125,7 @@ import { AuthStateService } from '../../../service/auth-state.service';
                         <div class="text-left p-4">
                             <p class="text-lg italic text-gray-800 dark:text-gray-100 mb-4">"This system has transformed how we manage appointments. No more paperwork or scheduling conflicts!"</p>
                             <div class="text-gray-600 dark:text-gray-300">
-                                <strong>Dr. Sarah Johnson</strong>
+                                <strong>Dr. Anil Subhasinghe</strong>
                                 <span class="block">Cardiologist</span>
                             </div>
                         </div>
@@ -135,7 +135,7 @@ import { AuthStateService } from '../../../service/auth-state.service';
                         <div class="text-left p-4">
                             <p class="text-lg italic text-gray-800 dark:text-gray-100 mb-4">"I love how easy it is to book appointments and get reminders. Has made managing my healthcare so much simpler."</p>
                             <div class="text-gray-600 dark:text-gray-300">
-                                <strong>Michael Chen</strong>
+                                <strong>John Smith</strong>
                                 <span class="block">Patient</span>
                             </div>
                         </div>
