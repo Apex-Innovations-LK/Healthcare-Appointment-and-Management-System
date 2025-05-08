@@ -12,6 +12,7 @@ import DoctorMicroservice.dto.ScheduleSlotDto;
 import DoctorMicroservice.dto.ScheduleSlotSearchRequest;
 import DoctorMicroservice.entity.DoctorAvailability;
 import DoctorMicroservice.entity.ScheduleSlot;
+import DoctorMicroservice.kafka.AvailabilityDeletedKafkaProducer;
 import DoctorMicroservice.kafka.DoctorAvailabilityKafkaProducer;
 import DoctorMicroservice.kafka.ScheduleSlotKafkaProducer;
 import DoctorMicroservice.mapper.DoctorAvailabilityMapper;
@@ -21,6 +22,7 @@ import DoctorMicroservice.repository.ScheduleSlotRepository;
 import DoctorMicroservice.service.DoctorSessionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import DoctorMicroservice.dto.SessionIdDto;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class DoctorSessionServiceImpl implements DoctorSessionService {
     private final DoctorSessionRepository doctorSessionRepository;
     private final DoctorAvailabilityMapper availabilityMapper;
     private final DoctorAvailabilityKafkaProducer DoctorAvailabilityKafkaProducer;
+    private final AvailabilityDeletedKafkaProducer availabilityDeletedKafkaProducer;
     private final ScheduleSlotRepository scheduleSlotRepository;
     private final ScheduleSlotKafkaProducer scheduleSlotKafkaProducer;
     private final ScheduleSlotMapper scheduleSlotMapper;
@@ -83,66 +86,34 @@ public class DoctorSessionServiceImpl implements DoctorSessionService {
                         slot.getFrom(), slot.getNumber_of_patients()))
                 .collect(Collectors.toList());
     }
-
     
-    // public DoctorAvailabilityDto updateSessionTime(UpdateTimeRequest request) {
-    //     DoctorAvailability session = doctorSessionRepository.findBySessionId(request.getSessionId())
+    public DoctorAvailabilityDto updateAvailability(DoctorAvailabilityDto dto) {
+    //     DoctorAvailability existing = doctorSessionRepository.findBySessionId(dto.getSession_id())
     //             .orElseThrow(() -> new RuntimeException("Session not found"));
 
-    //     session.setFrom(request.getFrom());
-    //     session.setTo(request.getTo());
-
-    //     DoctorAvailability updated = doctorSessionRepository.save(session);
-    //     return availabilityMapper.mapToDoctorAvailabilityDto(updated);
-    // }
-    
-    // public DoctorAvailabilityDto updateAvailability(DoctorAvailabilityDto dto) {
-    //     System.out.println("DTO received:");
-    //     System.out.println("Session ID: " + dto.getSession_id());
-    //     System.out.println("Doctor ID: " + dto.getDoctor_id());
-    //     System.out.println("Start Time: " + dto.getFrom());
-    //     System.out.println("End Time: " + dto.getTo());
-    //     System.out.println("Count: " + dto.getNumber_of_patients());
-    
-    //     UUID sessionId = dto.getSession_id();
-    //     Optional<DoctorAvailability> optional = doctorSessionRepository.findBySessionId(sessionId);
-    
-    //     if (optional.isEmpty()) {
-    //         System.out.println("Session ID not found in DB: " + sessionId);
-    //         throw new RuntimeException("Session not found");
-    //     }
-    
-    //     DoctorAvailability existing = optional.get();
-    
+    //     // Update fields
     //     existing.setDoctor_id(dto.getDoctor_id());
     //     existing.setFrom(dto.getFrom());
     //     existing.setTo(dto.getTo());
     //     existing.setNumber_of_patients(dto.getNumber_of_patients());
-    
-    //     DoctorAvailability updated = doctorSessionRepository.save(existing);
-    //     return availabilityMapper.mapToDoctorAvailabilityDto(updated);
-    // }
-    
-    public DoctorAvailabilityDto updateAvailability(DoctorAvailabilityDto dto) {
-        DoctorAvailability existing = doctorSessionRepository.findBySessionId(dto.getSession_id())
-                .orElseThrow(() -> new RuntimeException("Session not found"));
 
-        // Update fields
-        existing.setDoctor_id(dto.getDoctor_id());
-        existing.setFrom(dto.getFrom());
-        existing.setTo(dto.getTo());
-        existing.setNumber_of_patients(dto.getNumber_of_patients());
+    //     DoctorAvailability saved = doctorSessionRepository.save(existing);
+        
+    //     return availabilityMapper.mapToDoctorAvailabilityDto(saved);
+    deleteDoctorSession(dto.getSession_id());
 
-        DoctorAvailability saved = doctorSessionRepository.save(existing);
-        return availabilityMapper.mapToDoctorAvailabilityDto(saved);
-    }
+    // Add a new session
+    return addDoctorSession(dto);
+
+}
     
     @Override
     @Transactional
     public void deleteDoctorSession(UUID sessionId) {
         doctorSessionRepository.deleteBySessionId(sessionId);
+        SessionIdDto sessionIdDto = new SessionIdDto(sessionId);
+        availabilityDeletedKafkaProducer.deleteDoctorAvailability(sessionIdDto);
+        scheduleSlotRepository.deleteBySessionId(sessionId);
     }
     
-    
-
 }
