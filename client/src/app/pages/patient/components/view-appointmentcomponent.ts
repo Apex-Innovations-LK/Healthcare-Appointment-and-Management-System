@@ -7,6 +7,9 @@ import { UserDetails } from '../../../models/userDetails';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { AuthService } from '../../../service/auth.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-view-appointments',
@@ -40,13 +43,12 @@ import { HttpClientModule } from '@angular/common/http';
                             <div class="flex items-center justify-between">
                                 <div class="flex-grow">
                                     <div class="mt-2 text-sm text-gray-500 space-y-1">
-                                        //<p><strong>Doctor Name:</strong> Dr. {{ doctorDetails?.first_name }} {{ doctorDetails?.last_name }}</p>
-                                        //<p><strong>Speciality:</strong> {{ doctorDetails?.speciality || 'N/A' }}</p>
-                                        //<p><strong>License Number:</strong> {{ doctorDetails?.license_number || 'N/A' }}</p>
-
-                                        <p><strong>Doctor ID:</strong> {{ getDoctorDetails(appointment.slotId)?.doctor_id || 'N/A' }}</p>
-                                        <p><strong>From:</strong> {{ getDoctorDetails(appointment.slotId)?.from | date: 'shortTime' }}</p>
-                                        <p><strong>To:</strong> {{ getDoctorDetails(appointment.slotId)?.to | date: 'shortTime' }}</p>
+                                        <p><strong>Doctor Name:</strong> Dr. {{ getDoctorInfo(appointment.session_id)?.first_name }} {{ getDoctorInfo(appointment.session_id)?.last_name }}</p>
+                                        <p><strong>Speciality:</strong> {{ getDoctorInfo(appointment.session_id)?.speciality || 'N/A' }}</p>
+                                        <p><strong>License Number:</strong> {{ getDoctorInfo(appointment.session_id)?.license_number || 'N/A' }}</p>
+                                        <p><strong>Doctor ID:</strong> {{ getDoctorDetails(appointment.session_id)?.doctor_id || 'N/A' }}</p>
+                                        <p><strong>From:</strong> {{ getDoctorDetails(appointment.session_id)?.from | date: 'shortTime' }}</p>
+                                        <p><strong>To:</strong> {{ getDoctorDetails(appointment.session_id)?.to | date: 'shortTime' }}</p>
                                         <p><strong>Status:</strong> {{ appointment.status }}</p>
                                         <p><strong>Appointment Type:</strong> {{ appointment.appointment_type }}</p>
                                     </div>
@@ -69,17 +71,22 @@ import { HttpClientModule } from '@angular/common/http';
 export class ViewAppointmentComponent implements OnInit {
     bookedAppointments: Appointment[] = [];
     doctorSessions: DoctorSessions[] = [];
-    doctorDetails: UserDetails | null = null; // Store doctor details
+    doctorDetailsMap: Map<string, UserDetails> = new Map();
     loading = true;
     error: string | null = null;
   
-    constructor(private appointmentsService: AppointmentsService) {}
+    constructor(
+        private appointmentsService: AppointmentsService,
+        private authService: AuthService
+    ) {}
   
     decodeToken(token: string): any {
       try {
         const payload = token.split('.')[1];
         const decodedPayload = atob(payload);
-        return JSON.parse(decodedPayload);
+        const decoded = JSON.parse(decodedPayload);
+        console.log('Decoded token:', decoded);
+        return decoded;
       } catch (error) {
         console.error('Token decoding failed', error);
         return null;
@@ -87,16 +94,31 @@ export class ViewAppointmentComponent implements OnInit {
     }
   
     ngOnInit(): void {
-      const token = sessionStorage.getItem('token');
+      const token = localStorage.getItem('token');
       
       if (token) {
         const decodedToken = this.decodeToken(token);
-        const patientId = decodedToken?.id;
+        const username = decodedToken?.sub;
   
-        if (patientId) {
-          this.fetchAppointments(patientId);
+        if (username) {
+          // Get user details from auth service
+          this.authService.getUser(username).subscribe({
+            next: (userDetails: UserDetails) => {
+              if (userDetails && userDetails.id) {
+                this.fetchAppointments(userDetails.id);
+              } else {
+                this.error = 'Unable to retrieve patient details. Please log in again.';
+                this.loading = false;
+              }
+            },
+            error: (error: any) => {
+              console.error('Error fetching user details:', error);
+              this.error = 'Failed to load user details. Please try again.';
+              this.loading = false;
+            }
+          });
         } else {
-          this.error = 'Unable to retrieve patient ID from token. Please log in again.';
+          this.error = 'Unable to retrieve username from token. Please log in again.';
           this.loading = false;
         }
       } else {
@@ -105,63 +127,97 @@ export class ViewAppointmentComponent implements OnInit {
       }
     }
 
-     // ngOnInit(): void {
-    //     const patientId = 'cdf3cd99-2154-44b6-bb5a-6600e894769b';
-    //     this.loading = true;
-  
     fetchAppointments(patientId: string): void {
       this.loading = true;
+      this.error = null;
   
-      // Fetch all doctor sessions first
-      this.appointmentsService.getAppointments().subscribe({
-        next: (sessions) => {
-          this.doctorSessions = sessions;
+      // Fetch patient appointments first
+      this.appointmentsService.viewAppointments(patientId).pipe(
+        switchMap(appointments => {
+          console.log('Patient appointments:', appointments);
+          this.bookedAppointments = appointments;
+          console.log('Loaded appointments:', this.bookedAppointments);
   
-          // Then fetch patient appointments
-          this.appointmentsService.viewAppointments(patientId).subscribe({
-            next: (appointments) => {
-              this.bookedAppointments = appointments;
+          if (appointments.length === 0) {
+            console.log('No appointments found');
+            return of([]);
+          }
   
-              // Fetch doctor details for the first appointment's doctor_id
-              const doctorId = this.getDoctorDetails(appointments[0]?.slotId)?.doctor_id;
-              if (doctorId) {
-                this.appointmentsService.getDoctorDetails(doctorId).subscribe({
-                  next: (doctor) => {
-                    this.doctorDetails = doctor;
-                    this.loading = false;
-                  },
-                  error: (error) => {
-                    console.error('Doctor details fetch error:', error);
-                    this.error = 'Failed to load doctor details.';
-                    this.loading = false;
-                  }
-                });
-              } else {
-                this.error = 'Doctor ID not found for appointment.';
-                this.loading = false;
-              }
-            },
-            error: (error) => {
-              console.error('Appointments fetch error:', error);
-              this.error = 'Failed to load appointments.';
-              this.loading = false;
+          // For each appointment, get the session details
+          const sessionObservables = appointments.map(appointment =>
+            this.appointmentsService.getSessionDetails(appointment.session_id).pipe(
+              catchError(error => {
+                console.error(`Error fetching session ${appointment.session_id}:`, error);
+                return of(null);
+              })
+            )
+          );
+  
+          return forkJoin(sessionObservables);
+        }),
+        switchMap(sessions => {
+          console.log('All session details:', sessions);
+          this.doctorSessions = sessions.filter(session => session !== null) as DoctorSessions[];
+  
+          if (this.doctorSessions.length === 0) {
+            this.error = 'No session details found for appointments.';
+            return of([]);
+          }
+  
+          // Get doctor details for each session
+          const doctorObservables = this.doctorSessions.map(session =>
+            this.appointmentsService.getDoctorDetails(session.doctor_id).pipe(
+              catchError(error => {
+                console.error(`Error fetching doctor ${session.doctor_id}:`, error);
+                return of(null);
+              })
+            )
+          );
+  
+          return forkJoin(doctorObservables);
+        })
+      ).subscribe({
+        next: (doctors) => {
+          console.log('All doctor details:', doctors);
+          // Store doctor details in map
+          this.doctorSessions.forEach((session, index) => {
+            if (doctors[index]) {
+              this.doctorDetailsMap.set(session.doctor_id, doctors[index] as UserDetails);
             }
           });
+          this.loading = false;
         },
         error: (error) => {
-          console.error('Doctor sessions fetch error:', error);
-          this.error = 'Failed to load doctor session data.';
+          console.error('Error in appointment fetch flow:', error);
+          this.error = 'Failed to load appointment details.';
           this.loading = false;
         }
       });
     }
-  
-    getDoctorDetails(slotId: string): DoctorSessions | undefined {
-      return this.doctorSessions.find((session) => session.slot_id === slotId);
+
+    getDoctorDetails(sessionId: string): DoctorSessions | undefined {
+        return this.doctorSessions.find(session => session.session_id === sessionId);
     }
-  
+
+    getDoctorInfo(sessionId: string): UserDetails | undefined {
+        const session = this.getDoctorDetails(sessionId);
+        return session ? this.doctorDetailsMap.get(session.doctor_id) : undefined;
+    }
+
     cancelAppointment(id: number): void {
-      console.log(`Cancel appointment with ID: ${id}`);
-      // Implement cancellation if required
+        console.log('Attempting to delete appointment with id:', id);
+        if (!confirm('Are you sure you want to delete this appointment?')) {
+            return;
+        }
+        this.appointmentsService.deleteAppointment(id).subscribe({
+            next: () => {
+                this.bookedAppointments = this.bookedAppointments.filter(app => app.appointment_id !== id);
+                alert('Appointment deleted successfully.');
+            },
+            error: (err) => {
+                console.error('Error deleting appointment:', err);
+                alert('Failed to delete appointment. Please try again.');
+            }
+        });
     }
 }

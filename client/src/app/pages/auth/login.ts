@@ -132,7 +132,12 @@ export class Login {
         console.log('user', this.user);
         this.authService.loginUser(this.user).subscribe({
             next: (data) => {
-                console.log(data);
+                console.log('Login response:', data);
+                // Store token in localStorage
+                localStorage.setItem('token', data.token);
+                // Store user details in localStorage
+                localStorage.setItem('user', JSON.stringify(data));
+                
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',
