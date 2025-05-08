@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { DoctorAvailability, DoctorSession } from '../models/doctor';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,22 +12,37 @@ export class DoctorService {
 
   getSessionsForDate(doctor_id:string, date: string) {
     const body = {
-      doctor_id: doctor_id,
+      doctorId: doctor_id,
       date: date,
     };
     const apiUrl = this.baseURL + '/getSessionsByDateAndDocId';
 
-    return this.httpClient.post<any[]>(apiUrl, body);
+    return this.httpClient.post<DoctorSession[]>(apiUrl, body);
   }
 
   getAvailabilityForDate(doctor_id:string, date: string) {
     const body = {
-      doctor_id: doctor_id,
+      doctorId: doctor_id,
       date: date,
     };
-    const apiUrl = this.baseURL + '/availabilityForDate';
+    const apiUrl = this.baseURL + '/getSessionsByDateAndDocId';
 
-    return this.httpClient.post<any[]>(apiUrl, body);
+    return this.httpClient.post<DoctorAvailability[]>(apiUrl, body);
+  }
+
+  deleteAvailability(availability:DoctorAvailability){
+    const apiUrl = this.baseURL + '/deleteSession';
+    return this.httpClient.post(apiUrl, availability);
+  }
+
+  updateAvailability(availability:DoctorAvailability){
+    const apiUrl = this.baseURL + '/updateAvailability';
+    return this.httpClient.post(apiUrl, availability);
+  }
+
+  addAvailability(availability:DoctorAvailability){
+    const apiUrl = this.baseURL + '/addAvailability';
+    return this.httpClient.post(apiUrl, availability);
   }
 
 }

@@ -13,16 +13,16 @@
     </div>
     <p class="appointments-key mt-2 text-md w-full text-left">
         Appointments <span class="text-lime-500 ml-5 text-2xl font-semibold">{{ getBookedCount() }}</span
-        ><span class="full-count"> /{{ session.patientsCount }}</span>
+        ><span class="full-count"> /{{ session.number_of_patients }}</span>
     </p>
 
     @if (expanded) {
         <div class="ml-5 flex flex-row flex-wrap gap-1 w-full">
-            @for (slot of session.slots; track $index) {
+            <!-- @for (slot of session.slots; track $index) {
                 <div [class]="'text-gray-600 font-semibold w-[25px] h-[30px] ' + (slot === true ? 'bg-lime-400 border-lime-700' : 'bg-gray-400 border-gray-600') + ' border-2 rounded-md border-solid flex items-center justify-center'">
                     {{ $index + 1 }}
                 </div>
-            }
+            } -->
         </div>
         <p-button class="mt-4" label="View HRs" severity="info" raised />
         @if (!isExpired()) {

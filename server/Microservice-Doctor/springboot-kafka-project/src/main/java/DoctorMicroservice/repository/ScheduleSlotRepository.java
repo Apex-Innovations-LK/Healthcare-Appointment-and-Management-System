@@ -23,6 +23,12 @@ public interface ScheduleSlotRepository extends JpaRepository<ScheduleSlot, UUID
     """)
     List<ScheduleSlot> findByDoctorIdAndDate(@Param("doctorId") UUID doctorId, @Param("date") Date date);
 
+    @Query("""
+    SELECT s FROM ScheduleSlot s
+    WHERE session_id = :sessionId
+    """)
+    List<ScheduleSlot> findBySessionId(@Param("sessionId") UUID sessionId);
+
     
 
 }
