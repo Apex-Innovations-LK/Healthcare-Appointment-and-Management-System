@@ -3,6 +3,7 @@ package com.healthcare.chat.service;
 import com.healthcare.chat.model.ChatMessage;
 import com.healthcare.chat.model.ChatSession;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -19,6 +20,9 @@ public class ChatService {
 
     private final WebClient webClient;
     private final Map<String, ChatSession> sessionMap = new ConcurrentHashMap<>();
+    
+    @Autowired
+    private ChatKafkaProducer kafkaProducer;
 
     public ChatService(WebClient.Builder builder) {
         this.webClient = builder
@@ -28,7 +32,13 @@ public class ChatService {
 
     public ChatMessage sendMessage(String sessionId, String userMessage, MultipartFile imageFile) {
         ChatSession session = sessionMap.computeIfAbsent(sessionId, ChatSession::new);
-        session.getMessages().add(new ChatMessage("user", userMessage));
+        
+        // Create and add user message
+        ChatMessage userChatMessage = new ChatMessage("user", userMessage);
+        session.getMessages().add(userChatMessage);
+        
+        // Send user message to Kafka
+        kafkaProducer.sendChatMessage(sessionId, userChatMessage);
 
         // Conversation trimming if needed
         if (session.getMessages().size() > 20) {
@@ -39,6 +49,9 @@ public class ChatService {
         String aiResponse = callAIModel(userMessage, imageFile);
         ChatMessage assistantReply = new ChatMessage("assistant", aiResponse);
         session.getMessages().add(assistantReply);
+        
+        // Send assistant reply to Kafka
+        kafkaProducer.sendChatMessage(sessionId, assistantReply);
 
         return assistantReply;
     }

@@ -9,6 +9,19 @@ spring:
     show-sql: true
   kafka:
     bootstrap-servers: kafka:9092
+    consumer:
+      group-id: chat-history-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 
 server:
   port: 8081
+
+logging:
+  level:
+    root: INFO
+    com.example.chat_history_service: DEBUG
+    org.springframework.kafka: INFO
