@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import { DoctorService } from '../../../../service/doctor.service';
 import { SelectModule } from 'primeng/select';
 import { ChipModule } from 'primeng/chip';
+import { AuthStateService } from '../../../../service/auth-state.service';
 
 @Component({
     selector: 'app-calendar-view',
@@ -43,7 +44,8 @@ export class CalendarViewComponent {
 
     constructor(
         private fb: FormBuilder,
-        private doctorService: DoctorService
+        private doctorService: DoctorService,
+        private authStateService: AuthStateService,
     ) {
         this.sessionForm = this.fb.group({
             startTime: ['', Validators.required],
@@ -128,7 +130,7 @@ export class CalendarViewComponent {
             const sessionData = this.sessionForm.value;
 
             const sessionId = uuid();
-            const doctorId = 'e7b5b3b4-8c9f-4e0c-ae90-6df45cbe9d24'; // Replace with actual doctor ID
+            const doctorId = this.authStateService.getUserDetails()?.id || ''; // Replace with actual doctor ID
             const date = this.weekDates[this.addModalData.dateId];
             const startTime = new Date(date);
             const endTime = new Date(date);

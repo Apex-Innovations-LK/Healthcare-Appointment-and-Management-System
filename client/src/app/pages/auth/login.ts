@@ -11,6 +11,7 @@ import { User } from '../../models/user';
 import { AuthService } from '../../service/auth.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { AuthStateService } from '../../service/auth-state.service';
 
 @Component({
     selector: 'app-login',
@@ -100,7 +101,8 @@ export class Login {
     constructor(
         private router: Router,
         private authService: AuthService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private authStateService : AuthStateService
     ) {}
 
     email: string = '';
@@ -118,6 +120,7 @@ export class Login {
 
     private redirectUserBasedOnRole(token: string, username: string, role: string, status: string): void {
         localStorage.setItem('token', token);
+        this.authStateService.getUserDetails();
         const routesByRole: Record<string, string> = {
             PATIENT: '/patient',
             ADMIN: '/admin',

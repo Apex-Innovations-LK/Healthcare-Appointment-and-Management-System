@@ -44,5 +44,4 @@ export class DoctorService {
     const apiUrl = this.baseURL + '/addAvailability';
     return this.httpClient.post(apiUrl, availability);
   }
-
 }

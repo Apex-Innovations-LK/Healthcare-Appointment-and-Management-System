@@ -6,10 +6,6 @@ import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScroll
 import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { ToastModule } from 'primeng/toast';
-<<<<<<< HEAD
-
-=======
->>>>>>> 16e095d0588a6854bae8ef79c808de0a69796444
 import { authInterceptor } from './app/service/auth.interceptor';
 
 // Import AngularFire modules

@@ -172,6 +172,7 @@ export class AddAppointmentComponent implements OnInit {
         this.isLoading = true;
         this.appointmentService.getAppointments().subscribe({
             next: (data: any) => {
+                console.log("slots",data);
                 // Parse the appointment data from the backend format
                 this.allAppointments = this.parseAppointmentData(data);
                 this.isLoading = false;
@@ -263,6 +264,7 @@ export class AddAppointmentComponent implements OnInit {
         }
 
         const patientId = this.authStateService.getUserDetails()?.id;
+        console.log("patientId",patientId);
         if (!patientId) {
             alert('User not authenticated. Please log in again.');
             return;
