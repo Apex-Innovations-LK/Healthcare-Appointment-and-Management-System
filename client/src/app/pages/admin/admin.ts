@@ -9,11 +9,12 @@ import { PatientService } from './service/patient.service';
 import { AnalyticsService, AnalyticsData } from './service/admin.patient.analytics';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
     selector: 'app-admin',
     standalone: true,
-    imports: [CommonModule, CardModule, ChartModule, ButtonModule, TableModule, TabViewModule],
+    imports: [CommonModule, CardModule, ChartModule, ButtonModule, TableModule, TabViewModule, ProgressSpinnerModule],
     template: `
         <div class="grid">
             <div class="col-12">
@@ -28,7 +29,10 @@ import { HttpClient } from '@angular/common/http';
                                 <div class="flex justify-content-between mb-3">
                                     <div>
                                         <span class="block text-500 font-medium mb-3">Total Patients</span>
-                                        <div class="text-900 font-medium text-xl">{{stats.totalPatients}}</div>
+                                        <div *ngIf="loading" class="flex justify-content-center">
+                                            <p-progressSpinner [style]="{width: '30px', height: '30px'}" styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+                                        </div>
+                                        <div *ngIf="!loading" class="text-900 font-medium text-xl">{{stats.totalPatients}}</div>
                                     </div>
                                     <div class="flex pl-4 align-items-center justify-content-center border-round">
                                         <i class="pi pi-users text-blue-500 text-xl"></i>
@@ -42,14 +46,17 @@ import { HttpClient } from '@angular/common/http';
                                 <div class="flex justify-content-between mb-3">
                                     <div>
                                         <span class="block text-500 font-medium mb-3">High Risk Patients</span>
-                                        <div class="text-900 font-medium text-xl">{{stats.highRiskCount}}</div>
+                                        <div *ngIf="loading" class="flex justify-content-center">
+                                            <p-progressSpinner [style]="{width: '30px', height: '30px'}" styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+                                        </div>
+                                        <div *ngIf="!loading" class="text-900 font-medium text-xl">{{stats.highRiskCount}}</div>
                                     </div>
                                     <div class="flex pl-4 align-items-center justify-content-center">
                                         <i class="pi pi-exclamation-circle text-red-500 text-xl"></i>
                                     </div>
                                 </div>
-                                <span class="text-red-500 font-medium">{{stats.highRiskPercentage}}% </span>
-                                <span class="text-500">of patients</span>
+                                <span *ngIf="!loading" class="text-red-500 font-medium">{{stats.highRiskPercentage}}% </span>
+                                <span *ngIf="!loading" class="text-500">of patients</span>
                             </div>
                         </div>
                         
@@ -58,14 +65,17 @@ import { HttpClient } from '@angular/common/http';
                                 <div class="flex justify-content-between mb-3">
                                     <div>
                                         <span class="block text-500 font-medium mb-3">Moderate Risk Patients</span>
-                                        <div class="text-900 font-medium text-xl">{{stats.moderateRiskCount}}</div>
+                                        <div *ngIf="loading" class="flex justify-content-center">
+                                            <p-progressSpinner [style]="{width: '30px', height: '30px'}" styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+                                        </div>
+                                        <div *ngIf="!loading" class="text-900 font-medium text-xl">{{stats.moderateRiskCount}}</div>
                                     </div>
                                     <div class="flex pl-4 align-items-center justify-content-center" >
                                         <i class="pi pi-exclamation-triangle text-yellow-500 text-xl"></i>
                                     </div>
                                 </div>
-                                <span class="text-yellow-500 font-medium">{{stats.moderateRiskPercentage}}% </span>
-                                <span class="text-500">of patients</span>
+                                <span *ngIf="!loading" class="text-yellow-500 font-medium">{{stats.moderateRiskPercentage}}% </span>
+                                <span *ngIf="!loading" class="text-500">of patients</span>
                             </div>
                         </div>
                         
@@ -74,14 +84,17 @@ import { HttpClient } from '@angular/common/http';
                                 <div class="flex justify-content-between mb-3">
                                     <div>
                                         <span class="block text-500 font-medium mb-3">Low Risk Patients</span>
-                                        <div class="text-900 font-medium text-xl">{{stats.lowRiskCount}}</div>
+                                        <div *ngIf="loading" class="flex justify-content-center">
+                                            <p-progressSpinner [style]="{width: '30px', height: '30px'}" styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+                                        </div>
+                                        <div *ngIf="!loading" class="text-900 font-medium text-xl">{{stats.lowRiskCount}}</div>
                                     </div>
                                     <div class="flex pl-4 align-items-center justify-content-center">
                                         <i class="pi pi-check-circle text-green-500 text-xl"></i>
                                     </div>
                                 </div>
-                                <span class="text-green-500 font-medium">{{stats.lowRiskPercentage}}% </span>
-                                <span class="text-500">of patients</span>
+                                <span *ngIf="!loading" class="text-green-500 font-medium">{{stats.lowRiskPercentage}}% </span>
+                                <span *ngIf="!loading" class="text-500">of patients</span>
                             </div>
                         </div>
                     </div>
@@ -166,6 +179,9 @@ import { HttpClient } from '@angular/common/http';
     `
 })
 export class Admin implements OnInit {
+    // Loading state
+    loading = true;
+    
     // Risk stats
     stats = {
         totalPatients: 0,
@@ -176,16 +192,6 @@ export class Admin implements OnInit {
         lowRiskCount: 0,
         lowRiskPercentage: 0
     };
-
-    // Chart data
-    barData: any;
-    barOptions: any;
-    pieData: any;
-    pieOptions: any;
-    radarData: any;
-    radarOptions: any;
-    riskDistributionData: any;
-    riskChartOptions: any;
 
     // Table data
     riskFactors = [
@@ -205,184 +211,39 @@ export class Admin implements OnInit {
 
     ngOnInit() {
         this.loadRiskDistribution();
-        this.loadAnalyticsData();
     }
 
     loadRiskDistribution() {
+        this.loading = true;
         // Use the PatientService's caching mechanism instead of direct HTTP call
-        this.patientService.getRiskDistribution().subscribe(distribution => {
-            // Calculate total patients and percentages
-            let total = 0;
-            Object.values(distribution).forEach(count => total += count);
-            
-            this.stats.totalPatients = total;
-            
-            const highCount = distribution['High'] || 0;
-            const moderateCount = distribution['Moderate'] || 0;
-            const lowCount = distribution['Low'] || 0;
-            
-            this.stats.highRiskCount = highCount;
-            this.stats.highRiskPercentage = Math.round((highCount / total) * 100);
-            
-            this.stats.moderateRiskCount = moderateCount;
-            this.stats.moderateRiskPercentage = Math.round((moderateCount / total) * 100);
-            
-            this.stats.lowRiskCount = lowCount;
-            this.stats.lowRiskPercentage = Math.round((lowCount / total) * 100);
-            
-            // Create pie chart data for risk distribution
-            this.riskDistributionData = {
-                labels: ['High Risk', 'Moderate Risk', 'Low Risk'],
-                datasets: [
-                    {
-                        data: [highCount, moderateCount, lowCount],
-                        backgroundColor: ['#e53935', '#fbc02d', '#43a047'],
-                        hoverBackgroundColor: ['#c62828', '#f9a825', '#2e7d32']
-                    }
-                ]
-            };
-            
-            this.riskChartOptions = {
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx: any) => {
-                                const label = ctx.label || '';
-                                const value = ctx.parsed || 0;
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return `${label}: ${value} (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            };
-        });
-    }
-    
-    loadAnalyticsData() {
-        this.analyticsService.getAnalyticsData().subscribe({
-            next: (data: AnalyticsData) => {
-                this.initCharts(data);
+        this.patientService.getRiskDistribution().subscribe({
+            next: distribution => {
+                // Calculate total patients and percentages
+                let total = 0;
+                Object.values(distribution).forEach(count => total += count);
+                
+                this.stats.totalPatients = total;
+                
+                const highCount = distribution['High'] || 0;
+                const moderateCount = distribution['Moderate'] || 0;
+                const lowCount = distribution['Low'] || 0;
+                
+                this.stats.highRiskCount = highCount;
+                this.stats.highRiskPercentage = Math.round((highCount / total) * 100);
+                
+                this.stats.moderateRiskCount = moderateCount;
+                this.stats.moderateRiskPercentage = Math.round((moderateCount / total) * 100);
+                
+                this.stats.lowRiskCount = lowCount;
+                this.stats.lowRiskPercentage = Math.round((lowCount / total) * 100);
+                
+                this.loading = false;
             },
-            error: (err) => {
-                console.error('Error loading analytics data:', err);
-                // Initialize with empty data if there's an error
-                this.initCharts({
-                    patientCountTimeline: [],
-                    allergiesDistribution: {},
-                    problemListCounts: {},
-                    problemListBySex: {}
-                });
+            error: error => {
+                console.error('Error loading risk distribution:', error);
+                this.loading = false;
             }
         });
-    }
-    
-    initCharts(data: AnalyticsData) {
-        // Get chart colors from CSS variables
-        const css = getComputedStyle(document.documentElement);
-        const txt = css.getPropertyValue('--text-color');
-        const txt2 = css.getPropertyValue('--text-color-secondary');
-        const border = css.getPropertyValue('--surface-border');
-        
-        // Bar chart - Top 10 health problems
-        const probEntries = Object.entries(data.problemListCounts)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5);
-        
-        this.barData = {
-            labels: probEntries.map(e => e[0]),
-            datasets: [
-                {
-                    label: 'Patient Count',
-                    data: probEntries.map(e => e[1]),
-                    backgroundColor: '#42A5F5'
-                }
-            ]
-        };
-        
-        this.barOptions = {
-            indexAxis: 'y',
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                x: { 
-                    grid: { display: false },
-                    ticks: { color: txt2 }
-                },
-                y: { 
-                    grid: { display: false },
-                    ticks: { color: txt2 }
-                }
-            }
-        };
-        
-        // Pie chart - Allergies distribution
-        const allergyEntries = Object.entries(data.allergiesDistribution)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5);
-            
-        this.pieData = {
-            labels: allergyEntries.map(e => e[0]),
-            datasets: [
-                {
-                    data: allergyEntries.map(e => e[1]),
-                    backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726', '#26C6DA', '#7E57C2']
-                }
-            ]
-        };
-        
-        this.pieOptions = {
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { 
-                    position: 'right',
-                    labels: { color: txt }
-                }
-            }
-        };
-        
-        // Radar chart - Health problems by gender
-        const sexes = Object.keys(data.problemListBySex);
-        const problems = Object.keys(data.problemListCounts)
-            .sort((a, b) => data.problemListCounts[b] - data.problemListCounts[a])
-            .slice(0, 5);
-            
-        const datasets = sexes.map((sex, index) => {
-            const colors = ['#42A5F5', '#FFA726', '#66BB6A'];
-            return {
-                label: sex,
-                data: problems.map(p => data.problemListBySex[sex]?.[p] || 0),
-                borderColor: colors[index % colors.length],
-                backgroundColor: colors[index % colors.length] + '40'
-            };
-        });
-        
-        this.radarData = {
-            labels: problems,
-            datasets
-        };
-        
-        this.radarOptions = {
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { 
-                    position: 'bottom',
-                    labels: { color: txt }
-                }
-            },
-            scales: {
-                r: {
-                    grid: { color: border + '80' },
-                    angleLines: { color: border + '80' },
-                    pointLabels: { color: txt }
-                }
-            }
-        };
     }
     
     navigateToPatients() {
