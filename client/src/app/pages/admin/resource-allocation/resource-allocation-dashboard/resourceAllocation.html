@@ -1,0 +1,286 @@
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; margin: auto; background-color: #ffffff; border-radius: 12px;" >
+    <!-- Header -->
+    <div style="text-align: start; margin-bottom: 30px;">
+        <h1 style="font-size: 2.5em; color: #000000; margin-bottom: 5px;">Resource Allocation Dashboard</h1>
+        <p style="font-size: 1.2em; color: #555;">Manage and allocate resources to sessions</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
+        <!-- Card 1 -->
+        <div style="background-color: #eeeeee5d; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
+            <p style="color: #777; font-weight: 500; margin-bottom: 6px;">Total Sessions Today</p>
+            <p style="font-size: 2.2em; font-weight: bold; color: #222;">24</p>
+            <p style="color: #4CAF50; font-weight: 500;">+5% from yesterday</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div style="background-color: #eeeeee5d; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
+            <p style="color: #777; font-weight: 500; margin-bottom: 6px;">Available Resources</p>
+            <p style="font-size: 2.2em; font-weight: bold; color: #222;">42</p>
+            <p style="color: #2196F3; font-weight: 500;">18 rooms, 24 equipments</p>
+        </div>
+
+        <!-- Card 3 -->
+        <!-- <div style="background-color: #eeeeee5d; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
+            <p style="color: #777; font-weight: 500; margin-bottom: 6px;">Unallocated Slots</p>
+            <p style="font-size: 2.2em; font-weight: bold; color: #222;">6</p>
+            <p style="color: #f44336; font-weight: 500;">-2% from yesterday</p>
+        </div> -->
+    </div>
+    <div style="margin-top: 30px; margin-bottom: 30px;">
+        <p-button label="See All Resources" class="p-button-link" (click)="navigateToAddNewResource()"></p-button>
+    </div>
+    <div>
+        <p-table
+            #dt1
+            [value]="resourceAllocations"
+            dataKey="id"
+            [rows]="10"
+            [loading]="loading"
+            [rowHover]="true"
+            [showGridlines]="true"
+            [paginator]="true"
+            [globalFilterFields]="['sessionId', 'resourceIds']"
+            responsiveLayout="scroll"
+        >
+            
+            <ng-template #header>
+                <tr>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Session ID
+                            <p-columnFilter type="text" field="sessionId" display="menu" placeholder="Search by name"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 10rem">
+                        <div class="flex justify-between items-center">
+                            Start Time
+                            <p-columnFilter type="date" field="from" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 10rem">
+                        <div class="flex justify-between items-center">
+                            End Time
+                            <p-columnFilter type="date" field="to" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Allocated Resources
+                        </div>
+                    </th>
+                    <!-- <th style="min-width: 14rem">
+                        <div class="flex justify-between items-center">
+                            Type
+                            <p-columnFilter field="role" matchMode="in" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                                <ng-template #header>
+                                    <div class="px-3 pt-3 pb-0">
+                                        <span class="font-bold">Type Picker</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template #filter let-value let-filter="filterCallback">
+                                    <p-multiselect [ngModel]="value" [options]="typeItems" placeholder="Any" (onChange)="filter($event.value)" optionLabel="name" styleClass="w-full">
+                                        <ng-template let-option #item>
+                                            <div class="flex items-center gap-2 w-44">
+                                                <span>{{ option.name }}</span>
+                                            </div>
+                                        </ng-template>
+                                    </p-multiselect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </div>
+                    </th> -->
+                    <!-- <th style="min-width: 14rem">
+                        <div class="flex justify-between items-center">
+                            Department
+                            <p-columnFilter field="role" matchMode="in" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                                <ng-template #header>
+                                    <div class="px-3 pt-3 pb-0">
+                                        <span class="font-bold">Department Picker</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template #filter let-value let-filter="filterCallback">
+                                    <p-multiselect [ngModel]="value" [options]="departmentItems" placeholder="Any" (onChange)="filter($event.value)" optionLabel="name" styleClass="w-full">
+                                        <ng-template let-option #item>
+                                            <div class="flex items-center gap-2 w-44">
+                                                <span>{{ option.name }}</span>
+                                            </div>
+                                        </ng-template>
+                                    </p-multiselect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </div>
+                    </th> -->
+                    <!-- <th style="min-width: 14rem">
+                        <div class="flex justify-between items-center">
+                            Status
+                            <p-columnFilter field="roles" matchMode="in" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                                <ng-template #header>
+                                    <div class="px-3 pt-3 pb-0">
+                                        <span class="font-bold">Status picker</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template #filter let-value let-filter="filterCallback">
+                                    <p-multiselect [ngModel]="value" [options]="statusItems" placeholder="Any" (onChange)="filter($event.value)" optionLabel="name" styleClass="w-full">
+                                        <ng-template let-option #item>
+                                            <div class="flex items-center gap-2 w-44">
+                                                <span>{{ option.name }}</span>
+                                            </div>
+                                        </ng-template>
+                                    </p-multiselect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </div>
+                    </th> -->
+                    <!-- <th style="min-width: 10rem">
+                        <div class="flex justify-between items-center">
+                            Date
+                            <p-columnFilter type="date" field="date" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Scheduled Time
+                            <p-columnFilter type="numeric" field="scheduled_hours" display="menu" currency="USD"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Active Time
+                            <p-columnFilter type="numeric" field="active_hours" display="menu"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Utilization
+                            <p-columnFilter type="numeric" field="utilization" display="menu"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Idle Time
+                            <p-columnFilter type="numeric" field="idle_time" display="menu"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Overtime
+                            <p-columnFilter type="numeric" field="overtime" display="menu"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 14rem">
+                        <div class="flex justify-between items-center">
+                            Status
+                            <p-columnFilter field="roles" matchMode="in" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                                <ng-template #header>
+                                    <div class="px-3 pt-3 pb-0">
+                                        <span class="font-bold">Status picker</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template #filter let-value let-filter="filterCallback">
+                                    <p-multiselect [ngModel]="value" [options]="roles" placeholder="Any" (onChange)="filter($event.value)" optionLabel="name" styleClass="w-full">
+                                        <ng-template let-option #item>
+                                            <div class="flex items-center gap-2 w-44">
+                                                <span>{{ option.name }}</span>
+                                            </div>
+                                        </ng-template>
+                                    </p-multiselect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </div>
+                    </th> -->
+                </tr>
+            </ng-template>
+            <ng-template #body let-record>
+                <tr (click)="goToResourceAllocationDetail(record)">
+                    <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.sessionId }}
+                    </td>
+                    <td>
+                        {{ record.from | date: 'MM/dd/yyyy' }}
+                    </td>
+                    <td>
+                        {{ record.to | date: 'MM/dd/yyyy' }}
+                    </td>
+                    <td class="flex flex-row justify-between items-center">
+                        {{ record.resourceIds }}
+                        <p-button label="See Details" class="p-button-link" (click)="goToResourceAllocationDetail(record)"></p-button>
+                    </td>
+                    <!-- <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.from | date: 'MM/dd/yyyy' }}
+                    </td> -->
+                    <!-- <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.name }}
+                    </td> -->
+                    <!-- <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.id }}
+                    </td> -->
+                    <!-- <td class="text-center">
+                        <p-tag 
+                            [value]="record.type" 
+                            [style]="{ 
+                                'background-color': record.type === 'Room' ? 'rgba(156, 39, 176, 0.2)' : record.type === 'Equipment' ? 'rgba(33, 150, 243, 0.2)' : 'rgba(158, 158, 158, 0.2)', 
+                                'color': record.type === 'Room' ? '#9C27B0' : record.type === 'Equipment' ? '#2196F3' : '#9E9E9E' 
+                            }" 
+                            styleClass="dark:!bg-surface-900" 
+                        />
+                    </td>
+                    <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.department }}
+                    </td>
+                    <td class="text-center" [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        <p-tag 
+                            [value]="record.status" 
+                            [style]="{ 
+                                'background-color': 
+                                record.status === 'Available' ? 'rgba(76, 175, 80, 0.2)' : 
+                                record.status === 'Busy' ? 'rgba(255, 193, 7, 0.2)' : 
+                                record.status === 'Under Maintenance' ? 'rgba(255, 152, 0, 0.2)' : 
+                                record.status === 'Out of Service' ? 'rgba(244, 67, 54, 0.2)' : 
+                                'rgba(158, 158, 158, 0.2)',
+
+                                'color': 
+                                record.status === 'Available' ? '#4CAF50' : 
+                                record.status === 'Busy' ? '#FFC107' : 
+                                record.status === 'Under Maintenance' ? '#FF9800' : 
+                                record.status === 'Out of Service' ? '#F44336' : 
+                                '#9E9E9E'
+                            }" 
+                            styleClass="dark:!bg-surface-900" 
+                        />
+
+                    </td> -->
+                    <!-- <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.date | date: 'MM/dd/yyyy' }}
+                    </td> -->
+                    <!-- <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.scheduled_hours }} hours
+                    </td> -->
+                    <!-- <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.active_hours }} hours
+                    </td>
+                    <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.utilization }}
+                    </td>
+                    <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.idle_time }} hours
+                    </td>
+                    <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.overtime }} hours
+                    </td> -->
+                    <!-- <td class="text-center" [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        <p-tag 
+                            [value]="record.status" 
+                            [style]="{ 
+                                'background-color': record.status === 'High' ? 'rgba(255, 87, 34, 0.2)' : record.status === 'Normal' ? 'rgba(76, 175, 80, 0.2)' : record.status === 'Low' ? 'rgba(255, 193, 7, 0.2)' : 'rgba(158, 158, 158, 0.2)', 
+                                'color': record.status === 'High' ? '#FF5722' : record.status === 'Normal' ? '#4CAF50' : record.status === 'Low' ? '#FFC107' : '#9E9E9E' 
+                            }" 
+                            styleClass="dark:!bg-surface-900" 
+                        />
+                    </td> -->
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>

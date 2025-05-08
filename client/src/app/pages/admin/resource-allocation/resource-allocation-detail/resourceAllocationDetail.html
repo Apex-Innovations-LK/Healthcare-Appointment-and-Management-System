@@ -1,0 +1,100 @@
+<div class="card mx-auto shadow-lg rounded-xl p-6 text-gray-800 font-sans">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold text-gray-900 mb-4">Session Details: Resource Allocation</h1>
+        <p-button label="Go Back" class="p-button-link" (click)="handleGoBack()"></p-button>
+    </div>
+    
+
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold text-gray-700">Session ID: <span class="font-normal text-gray-600">{{sessionId}}</span></h2>
+        <p class="text-sm text-gray-500">View and manage session details & resources</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-500 font-medium">Doctor:</p>
+            <p class="text-base text-gray-800">(Doctor Name) </p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-500 font-medium">Staff:</p>
+            <p class="text-base text-gray-800">(Staff Name)</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-500 font-medium">Start Time:</p>
+            <p class="text-base text-gray-800">{{sessionResourceDetail.from | date: 'medium'}}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-500 font-medium">Duration:</p>
+            <p class="text-base text-gray-800">{{sessionResourceDetail.duration}} hrs</p>
+        </div>
+    </div>
+    <hr class="mt-10">
+    <div class="mt-10">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h4 class="text-lg font-semibold" >Allocated Resources</h4>
+            </div>
+            <p-button label="+ Allocate New Resource" class="p-button-link" (click)="allocateNewResource()"></p-button>
+        </div>
+        <p-table
+            #dt1
+            [value]="resources"
+            dataKey="id"
+            [rows]="10"
+            [loading]="loading"
+            [rowHover]="true"
+            [showGridlines]="true"
+            [paginator]="true"
+            [globalFilterFields]="['sessionId', 'resourceIds']"
+            responsiveLayout="scroll"
+        >
+            
+            <ng-template #header>
+                <tr>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Resource ID
+                            <!-- <p-columnFilter type="text" field="sessionId" display="menu" placeholder="Search by name"></p-columnFilter> -->
+                        </div>
+                    </th>
+                    <th style="min-width: 10rem">
+                        <div class="flex justify-between items-center">
+                            Name
+                            <!-- <p-columnFilter type="date" field="from" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter> -->
+                        </div>
+                    </th>
+                    <th style="min-width: 10rem">
+                        <div class="flex justify-between items-center">
+                            Type
+                            <!-- <p-columnFilter type="date" field="to" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter> -->
+                        </div>
+                    </th>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Department
+                        </div>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template #body let-record>
+                <tr>
+                    <td >
+                        {{ record.resourceId }}
+                    </td>
+                    <td>
+                        {{ record.name }}
+                    </td>
+                    <td>
+                        {{ record.type }}
+                    </td>
+                    <td>
+                        {{ record.department }}
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
