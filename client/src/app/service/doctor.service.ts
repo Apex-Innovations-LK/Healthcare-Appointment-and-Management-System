@@ -32,12 +32,15 @@ export class DoctorService {
 
   deleteAvailability(availability:DoctorAvailability){
     const apiUrl = this.baseURL + '/deleteSession';
-    return this.httpClient.post(apiUrl, availability);
+    return this.httpClient.request('delete', apiUrl, {
+      body: availability,
+      responseType: 'text'
+    });
   }
 
   updateAvailability(availability:DoctorAvailability){
     const apiUrl = this.baseURL + '/updateAvailability';
-    return this.httpClient.post(apiUrl, availability);
+    return this.httpClient.put(apiUrl, availability);
   }
 
   addAvailability(availability:DoctorAvailability){

@@ -14,7 +14,7 @@ import { AuthStateService } from '../../../../service/auth-state.service';
 
 @Component({
     selector: 'app-calendar-col',
-    imports: [ChipModule, SelectModule, DialogModule, ButtonModule, InputTextModule, ReactiveFormsModule, CalendarAvailabilityComponent, CalendarSessionComponent],
+    imports: [ChipModule, SelectModule, DialogModule, ButtonModule, InputTextModule, ReactiveFormsModule, CalendarAvailabilityComponent, CalendarSessionComponent, DatePipe],
     templateUrl: './calendar-col.component.html',
     styleUrl: './calendar-col.component.scss'
 })
@@ -50,8 +50,13 @@ export class CalendarColComponent {
 
     constructor(
         private fb: FormBuilder,
+<<<<<<< HEAD
         private doctorService: DoctorService, 
         private authStateService: AuthStateService,
+=======
+        private doctorService: DoctorService,
+        private authStateService: AuthStateService
+>>>>>>> c2d72e6e68fd2c5f03971ff496c720326f0d7b6a
     ) {
         this.sessionForm = this.fb.group({
             startTime: ['', Validators.required],
@@ -83,6 +88,7 @@ export class CalendarColComponent {
     }
 
     loadSessions(): void {
+<<<<<<< HEAD
         const doctor_id = this.authStateService.getUserDetails()?.id || '';
         if (doctor_id) {// Replace with actual doctor ID
             this.doctorService.getSessionsForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
@@ -113,6 +119,32 @@ export class CalendarColComponent {
         } else {
             console.log('Please log again.');
         }
+=======
+        const userDetails = this.authStateService.getUserDetails();
+        const doctor_id = userDetails ? userDetails.id : '';
+        this.doctorService.getSessionsForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
+            next: (response) => {
+                this.sessions = response;
+                console.log(this.toLocalISOString(this.date), this.sessions);
+            },
+            error: (error) => {
+                console.error('Error fetching sessions for date' + this.date + ': ', error);
+            }
+        });
+    }
+
+    loadAvailabilities() {
+        const userDetails = this.authStateService.getUserDetails();
+        const doctor_id = userDetails ? userDetails.id : '';
+        this.doctorService.getAvailabilityForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
+            next: (response) => {
+                this.availabilities = response;
+            },
+            error: (error) => {
+                console.error('Error fetching availabilities for date' + this.date + ': ', error);
+            }
+        });
+>>>>>>> c2d72e6e68fd2c5f03971ff496c720326f0d7b6a
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -155,21 +187,75 @@ export class CalendarColComponent {
         if (this.sessionForm.valid) {
             const sessionData = this.sessionForm.value;
 
+            const sessionId = this.activeAvailability.session_id;
+            const doctorId = this.activeAvailability.doctor_id;
+            const originalDate = new Date(this.activeAvailability.from);
+            const date = new Date(originalDate.getFullYear(), originalDate.getMonth(), originalDate.getDate());
             // TODO: Send this to backend or update your data model
+            const startTime = new Date(date);
+            const endTime = new Date(date);
 
-            this.displayEditModal = false;
-            this.sessionForm.reset({
-                startTime: '',
-                endTime: '',
-                numPatients: 1
+            const [startHour, startMinute] = sessionData.startTime.split(':').map(Number);
+            const [endHour, endMinute] = sessionData.endTime.split(':').map(Number);
+
+            startTime.setHours(startHour, startMinute, 0, 0);
+            endTime.setHours(endHour, endMinute, 0, 0);
+
+            const availability: DoctorAvailability = {
+                session_id: sessionId,
+                doctor_id: doctorId,
+                from: startTime.toISOString(),
+                to: endTime.toISOString(),
+                number_of_patients: sessionData.numPatients
+            };
+
+            console.log('Availability:', availability);
+
+            this.doctorService.updateAvailability(availability).subscribe({
+                next: (response) => {
+                    console.log('Availability updated successfully', response);
+                    this.loadAvailabilities(); // Refresh the availabilities after update
+
+                    this.sessionForm.reset({
+                        startTime: '',
+                        endTime: '',
+                        numPatients: 1
+                    });
+                    this.displayEditModal = false;
+                },
+                error: (error) => {
+                    console.error('Error updating availability', error);
+                }
             });
         }
     }
 
-    deleteSession() {}
+    deleteSession() {
+        this.doctorService.deleteAvailability(this.activeAvailability).subscribe({
+            next: (response) => {
+                console.log('Availability deleted successfully', response);
+                this.loadAvailabilities(); // Refresh the availabilities after deletion
+                this.displayDeleteModal = false;
+            },
+            error: (error) => {
+                console.error('Error deleting availability', error);
+            }
+        });
+    }
 
     showEditModal(availability: DoctorAvailability) {
         this.activeAvailability = availability;
+
+        const formatTime = (date: Date): string => {
+            return this.toLocalISOString(date).substring(11, 16); // "HH:mm"
+        };
+
+        this.sessionForm.patchValue({
+            startTime: formatTime(new Date(availability.from)),
+            endTime: formatTime(new Date(availability.to)),
+            numPatients: availability.number_of_patients
+        });
+
         this.displayEditModal = true;
     }
 
