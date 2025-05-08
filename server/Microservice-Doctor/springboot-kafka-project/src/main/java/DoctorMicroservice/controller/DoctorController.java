@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import DoctorMicroservice.dto.ScheduleSlotBySessionId;
-
 import DoctorMicroservice.dto.DoctorAvailabilityDto;
+import DoctorMicroservice.dto.ScheduleSlotBySessionId;
 import DoctorMicroservice.dto.ScheduleSlotDto;
 import DoctorMicroservice.dto.ScheduleSlotSearchRequest;
 import DoctorMicroservice.service.DoctorSessionService;
@@ -60,13 +59,13 @@ public class DoctorController {
     //     return new ResponseEntity<>(updated, HttpStatus.OK);
     // }
 
-    // getScheduleSlots for a date REST API
-    @PostMapping("/getScheduleSlotsByDate")
-    public ResponseEntity<List<ScheduleSlotDto>> getScheduleSlotsByDate(
-            @RequestBody ScheduleSlotSearchRequest request) {
-        List<ScheduleSlotDto> slots = scheduleSlotService.getSlotsByDoctorAndDate(request);
-        return new ResponseEntity<>(slots, HttpStatus.OK);
-    }
+    // // getScheduleSlots for a date REST API
+    // @PostMapping("/getScheduleSlotsByDate")
+    // public ResponseEntity<List<ScheduleSlotDto>> getScheduleSlotsByDate(
+    //         @RequestBody ScheduleSlotSearchRequest request) {
+    //     List<ScheduleSlotDto> slots = scheduleSlotService.getSlotsByDoctorAndDate(request);
+    //     return new ResponseEntity<>(slots, HttpStatus.OK);
+    // }
 
     // getSessionsByDate for a date REST API
     @PostMapping("/getSessionsByDateAndDocId")

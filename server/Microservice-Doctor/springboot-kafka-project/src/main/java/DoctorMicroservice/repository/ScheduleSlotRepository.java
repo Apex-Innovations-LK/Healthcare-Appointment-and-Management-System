@@ -25,7 +25,7 @@ public interface ScheduleSlotRepository extends JpaRepository<ScheduleSlot, UUID
 
     @Query("""
     SELECT s FROM ScheduleSlot s
-    WHERE da.session_id = :sessionId
+    WHERE session_id = :sessionId
     """)
     List<ScheduleSlot> findBySessionId(@Param("sessionId") UUID sessionId);
 

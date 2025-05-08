@@ -61,13 +61,13 @@ public class ScheduleSlotServiceImpl implements ScheduleSlotService {
     
     
 
-    public List<ScheduleSlotDto> getSlotsByDoctorAndDate(ScheduleSlotSearchRequest request) {
-        List<ScheduleSlot> slots = scheduleSlotRepository.findByDoctorIdAndDate(request.getDoctorId(),
-                request.getDate());
-        return slots.stream()
-                .map(slot -> new ScheduleSlotDto(slot.getSlotId(), slot.getSession_id(), slot.getStatus()))
-                .collect(Collectors.toList());
-    }
+    // public List<ScheduleSlotDto> getSlotsByDoctorAndDate(ScheduleSlotSearchRequest request) {
+    //     List<ScheduleSlot> slots = scheduleSlotRepository.findByDoctorIdAndDate(request.getDoctorId(),
+    //             request.getDate());
+    //     return slots.stream()
+    //             .map(slot -> new ScheduleSlotDto(slot.getSlotId(), slot.getSession_id(), slot.getStatus()))
+    //             .collect(Collectors.toList());
+    // }
 
     public List<ScheduleSlotDto> getSlotsOfSession(ScheduleSlotBySessionId request) {
         List<ScheduleSlot> slots = scheduleSlotRepository.findBySessionId(request.getSessionId());

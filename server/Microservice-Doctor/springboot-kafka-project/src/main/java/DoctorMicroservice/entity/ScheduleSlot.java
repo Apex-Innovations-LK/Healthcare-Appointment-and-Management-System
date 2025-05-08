@@ -51,7 +51,7 @@ public class ScheduleSlot {
     private UUID slotId; // assigned at time of setting doctorAvailability
 
     //@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DoctorSession_id", referencedColumnName = "DoctorSession_id", nullable = false)
+    @JoinColumn(name = "session_id", referencedColumnName = "session_id", nullable = false)
     private UUID session_id;
 
     @Column(name = "status")
