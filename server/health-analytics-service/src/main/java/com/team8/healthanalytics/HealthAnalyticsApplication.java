@@ -1,4 +1,4 @@
-package com.team8.healthanalytics.report;
+package com.team8.healthanalytics;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
