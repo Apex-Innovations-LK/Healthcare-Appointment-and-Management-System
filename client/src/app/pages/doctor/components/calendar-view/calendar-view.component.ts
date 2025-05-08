@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import { DoctorService } from '../../../../service/doctor.service';
 import { SelectModule } from 'primeng/select';
 import { ChipModule } from 'primeng/chip';
+import { AuthStateService } from '../../../../service/auth-state.service';
 
 @Component({
     selector: 'app-calendar-view',
@@ -29,8 +30,8 @@ export class CalendarViewComponent {
     };
 
     @Input() type!: 'schedule' | 'plan';
-    
-    refreshColIndex:number = 10;
+
+    refreshColIndex: number = 10;
     displayAddModal = false;
     addDate!: Date;
     sessionForm!: FormGroup;
@@ -43,7 +44,8 @@ export class CalendarViewComponent {
 
     constructor(
         private fb: FormBuilder,
-        private doctorService: DoctorService
+        private doctorService: DoctorService,
+        private authStateService: AuthStateService
     ) {
         this.sessionForm = this.fb.group({
             startTime: ['', Validators.required],
@@ -128,7 +130,8 @@ export class CalendarViewComponent {
             const sessionData = this.sessionForm.value;
 
             const sessionId = uuid();
-            const doctorId = 'e7b5b3b4-8c9f-4e0c-ae90-6df45cbe9d24'; // Replace with actual doctor ID
+            const userDetails = this.authStateService.getUserDetails();
+            const doctorId = userDetails ? userDetails.id : '';
             const date = this.weekDates[this.addModalData.dateId];
             const startTime = new Date(date);
             const endTime = new Date(date);
@@ -160,14 +163,14 @@ export class CalendarViewComponent {
                     this.refreshColIndex = this.addModalData.dateId;
 
                     // Optional: Reset the trigger if you want to allow retriggering the same action
-                    setTimeout(() => this.refreshColIndex = 10, 0);
+                    setTimeout(() => (this.refreshColIndex = 10), 0);
                 },
                 error: (error) => {
                     console.error('Error adding availability:', error);
                 }
             });
         }
-    } 
+    }
 
     showAddModal(dateId: number) {
         this.addModalData.dateId = dateId;
