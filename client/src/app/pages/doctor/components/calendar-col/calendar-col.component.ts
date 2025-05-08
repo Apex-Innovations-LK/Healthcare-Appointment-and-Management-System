@@ -3,11 +3,17 @@ import { CalendarSessionComponent } from '../calendar-session/calendar-session.c
 import { ButtonModule } from 'primeng/button';
 import { CalendarAvailabilityComponent } from '../calendar-availability/calendar-availability.component';
 import { DoctorService } from '../../../../service/doctor.service';
-import { DoctorSession } from '../../../../models/doctor';
+import { DoctorAvailability, DoctorSession, DoctorViewModalHandlers } from '../../../../models/doctor';
+import { ChipModule } from 'primeng/chip';
+import { SelectModule } from 'primeng/select';
+import { DialogModule } from 'primeng/dialog';
+import { DatePipe } from '@angular/common';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-calendar-col',
-    imports: [ButtonModule, CalendarAvailabilityComponent, CalendarSessionComponent],
+    imports: [ChipModule, SelectModule, DialogModule, ButtonModule, InputTextModule, ReactiveFormsModule, CalendarAvailabilityComponent, CalendarSessionComponent],
     templateUrl: './calendar-col.component.html',
     styleUrl: './calendar-col.component.scss'
 })
@@ -22,31 +28,39 @@ export class CalendarColComponent {
         // }
     ];
 
-    availabilities: any[] = [
-        {
-            from: '2025-05-03T08:30:00',
-            to: '2025-05-03T10:00:00',
-            patientsCount: 8,
-            slots: [true, true, true, true, true, false, false, false]
-        },
-        {
-            from: '2025-05-08T17:00:00',
-            to: '2025-05-08T22:00:00',
-            patientsCount: 12,
-            slots: [true, true, true, false, false, true, false, true, true, false, false, false]
-        }
-    ];
+    availabilities: any[] = [];
 
-    constructor(private doctorService: DoctorService) {}
+    displayEditModal = false;
+    displayDeleteModal = false;
+
+    activeAvailability: DoctorAvailability = {
+        session_id: '',
+        doctor_id: '',
+        from: '',
+        to: '',
+        number_of_patients: 0
+    };
+
+    sessionForm!: FormGroup;
+    modalHandlers: DoctorViewModalHandlers = {
+        editModalHandler: this.showEditModal.bind(this),
+        deleteModalHandler: this.showDeleteModal.bind(this)
+    };
+
+    constructor(
+        private fb: FormBuilder,
+        private doctorService: DoctorService
+    ) {
+        this.sessionForm = this.fb.group({
+            startTime: ['', Validators.required],
+            endTime: ['', Validators.required],
+            numPatients: [1, [Validators.required, Validators.min(1)]]
+        });
+    }
 
     @Input() date!: Date;
 
-    @Input() modalHandlers!: {
-        addModalHandler: () => void;
-        editModalHandler: () => void;
-        deleteModalHandler: () => void;
-        //rejectModalHandler: () => void;
-    };
+    @Input() refreshCol!: boolean;
 
     @Input() calendarConfig!: {
         startTime: number;
@@ -80,8 +94,8 @@ export class CalendarColComponent {
     }
 
     loadAvailabilities() {
-        const doctor_id = 'doctor_id'; // Replace with actual doctor ID
-        this.doctorService.getAvailabilityForDate(doctor_id, this.date.toISOString()).subscribe({
+        const doctor_id = 'e7b5b3b4-8c9f-4e0c-ae90-6df45cbe9d24'; // Replace with actual doctor ID
+        this.doctorService.getAvailabilityForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
             next: (response) => {
                 this.availabilities = response;
             },
@@ -92,11 +106,22 @@ export class CalendarColComponent {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        if (changes['refreshCol'] && this.refreshCol) {
+            if (this.type === 'plan') {
+                // console.log('Refreshing calendar column for plan view...');
+                this.loadAvailabilities();
+            }
+        }
+    }
+
+    ngOnInit(): void {
         if (this.calendarConfig) {
             this.lines = Array.from({ length: this.calendarConfig.endTime - this.calendarConfig.startTime + 2 });
         }
         if (this.type === 'schedule') {
             this.loadSessions();
+        } else if (this.type === 'plan') {
+            this.loadAvailabilities();
         }
     }
 
@@ -114,5 +139,32 @@ export class CalendarColComponent {
         const linesCount = nowHour - this.calendarConfig.startTime + 1;
 
         return `${totalMinutes + this.calendarConfig.calendarLineHeight * linesCount}px`;
+    }
+
+    submitEditForm() {
+        if (this.sessionForm.valid) {
+            const sessionData = this.sessionForm.value;
+
+            // TODO: Send this to backend or update your data model
+
+            this.displayEditModal = false;
+            this.sessionForm.reset({
+                startTime: '',
+                endTime: '',
+                numPatients: 1
+            });
+        }
+    }
+
+    deleteSession() {}
+
+    showEditModal(availability: DoctorAvailability) {
+        this.activeAvailability = availability;
+        this.displayEditModal = true;
+    }
+
+    showDeleteModal(availability: DoctorAvailability) {
+        this.activeAvailability = availability;
+        this.displayDeleteModal = true;
     }
 }

@@ -29,3 +29,9 @@ export interface DoctorAvailability {
     to: string;
     number_of_patients: number;
 }
+
+export interface DoctorViewModalHandlers {
+    editModalHandler: (availability: DoctorAvailability) => void;
+    deleteModalHandler: (availability: DoctorAvailability) => void;
+    //rejectModalHandler: () => void;
+}

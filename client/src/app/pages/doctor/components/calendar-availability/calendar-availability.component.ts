@@ -4,6 +4,8 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { DoctorAvailability, DoctorViewModalHandlers } from '../../../../models/doctor';
+import { Doctor } from '../../doctor';
 
 @Component({
     selector: 'app-calendar-availability',
@@ -30,14 +32,9 @@ export class CalendarAvailabilityComponent {
         calendarColHeight: number;
     };
 
-    @Input() availability!: {
-        from: string;
-        to: string;
-        patientsCount: number;
-    };
-
-    @Input() showEdit!: () => void;
-    @Input() showDelete!: () => void;
+    @Input() availability!: DoctorAvailability;
+    @Input() showEdit!: DoctorViewModalHandlers["editModalHandler"];
+    @Input() showDelete!: DoctorViewModalHandlers["deleteModalHandler"];
 
     @ViewChild('componentRef') componentRef!: ElementRef;
 

@@ -5,10 +5,15 @@ import { DatePipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DoctorAvailability, DoctorViewModalHandlers } from '../../../../models/doctor';
+import { v4 as uuid } from 'uuid';
+import { DoctorService } from '../../../../service/doctor.service';
+import { SelectModule } from 'primeng/select';
+import { ChipModule } from 'primeng/chip';
 
 @Component({
     selector: 'app-calendar-view',
-    imports: [DialogModule, DatePipe, ButtonModule, InputTextModule, ReactiveFormsModule, CalendarColComponent],
+    imports: [ChipModule, SelectModule, DialogModule, DatePipe, ButtonModule, InputTextModule, ReactiveFormsModule, CalendarColComponent],
     templateUrl: './calendar-view.component.html',
     styleUrl: './calendar-view.component.scss'
 })
@@ -24,25 +29,22 @@ export class CalendarViewComponent {
     };
 
     @Input() type!: 'schedule' | 'plan';
-
+    
+    refreshColIndex:number = 10;
     displayAddModal = false;
-    displayEditModal = false;
-    displayDeleteModal = false;
-    sessionForm: FormGroup;
     addDate!: Date;
-    actionSessionId!: string;
-    modalHandlers:{
-      addModalHandler: () => void;
-      editModalHandler: () => void;
-      deleteModalHandler: () => void;
-      //rejectModalHandler: () => void;
+    sessionForm!: FormGroup;
+
+    addModalData: {
+        dateId: number;
     } = {
-      addModalHandler: this.showAddModal.bind(this),
-      editModalHandler: this.showEditModal.bind(this),
-      deleteModalHandler: this.showDeleteModal.bind(this),
+        dateId: 0
     };
 
-    constructor(private fb: FormBuilder) {
+    constructor(
+        private fb: FormBuilder,
+        private doctorService: DoctorService
+    ) {
         this.sessionForm = this.fb.group({
             startTime: ['', Validators.required],
             endTime: ['', Validators.required],
@@ -110,49 +112,65 @@ export class CalendarViewComponent {
         });
     }
 
+    toLocalISOString(date: Date): string {
+        const offsetMs = date.getTimezoneOffset() * 60000;
+        const localDate = new Date(date.getTime() - offsetMs);
+        return localDate.toISOString().slice(0, -1); // remove trailing 'Z'
+    }
+
+    get selectedDateLabel(): string {
+        const date = this.weekDates?.[this.addModalData?.dateId];
+        return date ? new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) : '';
+    }
+
     submitAddForm() {
-      if (this.sessionForm.valid) {
-        const sessionData = this.sessionForm.value;
-        console.log('Session data:', sessionData);
-  
-        // TODO: Send this to backend or update your data model
-  
-        this.displayAddModal = false;
-        this.sessionForm.reset({
-          startTime: '',
-          endTime: '',
-          numPatients: 1,
-        });
-      }
-    }
+        if (this.sessionForm.valid) {
+            const sessionData = this.sessionForm.value;
 
-    submitEditForm() {
-      if (this.sessionForm.valid) {
-        const sessionData = this.sessionForm.value;
-  
-        // TODO: Send this to backend or update your data model
-  
-        this.displayEditModal = false;
-        this.sessionForm.reset({
-          startTime: '',
-          endTime: '',
-          numPatients: 1,
-        });
-      }
-    }
+            const sessionId = uuid();
+            const doctorId = 'e7b5b3b4-8c9f-4e0c-ae90-6df45cbe9d24'; // Replace with actual doctor ID
+            const date = this.weekDates[this.addModalData.dateId];
+            const startTime = new Date(date);
+            const endTime = new Date(date);
 
-    deleteSession() {
-    }
+            const [startHour, startMinute] = sessionData.startTime.split(':').map(Number);
+            const [endHour, endMinute] = sessionData.endTime.split(':').map(Number);
 
-    showAddModal() {
-      this.displayAddModal = true;
-    }
+            startTime.setHours(startHour, startMinute, 0, 0);
+            endTime.setHours(endHour, endMinute, 0, 0);
 
-    showEditModal() {
-      this.displayEditModal = true;
-    }
+            const availability: DoctorAvailability = {
+                session_id: sessionId,
+                doctor_id: doctorId,
+                from: startTime.toISOString(),
+                to: endTime.toISOString(),
+                number_of_patients: sessionData.numPatients
+            };
 
-    showDeleteModal() {
-      this.displayDeleteModal = true;
+            console.log('Availability:', availability);
+
+            this.doctorService.addAvailability(availability).subscribe({
+                next: (response) => {
+                    console.log('Availability added successfully', response);
+                    this.sessionForm.reset({
+                        startTime: '',
+                        endTime: '',
+                        numPatients: 1
+                    });
+                    this.refreshColIndex = this.addModalData.dateId;
+
+                    // Optional: Reset the trigger if you want to allow retriggering the same action
+                    setTimeout(() => this.refreshColIndex = 10, 0);
+                },
+                error: (error) => {
+                    console.error('Error adding availability:', error);
+                }
+            });
+        }
+    } 
+
+    showAddModal(dateId: number) {
+        this.addModalData.dateId = dateId;
+        this.displayAddModal = true;
     }
 }
