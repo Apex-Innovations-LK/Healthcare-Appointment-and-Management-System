@@ -73,7 +73,7 @@ import { ToastModule } from 'primeng/toast';
                                 weakLabel="Weak"
                                 mediumLabel="Medium"
                                 strongLabel="Strong"
-                                class="w-full md:w-[30rem] mb-8"
+                                styleClass="w-full md:w-[30rem] mb-8"
                             ></p-password>
 
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Signup As</label>
@@ -102,10 +102,12 @@ import { ToastModule } from 'primeng/toast';
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Email</label>
                             <input pInputText id="email1" type="text" placeholder="Email" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.email" />
 
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Phone</label>
-                            <input pInputText id="phone_number1" type="text" placeholder="Phone Number" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.phone_number" />
+                            <div class="flex flex-col">
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Phone</label>
+                                <input pInputText id="phone_number1" type="text" placeholder="Phone Number" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.phone_number" />
 
-                            <p-button label="Sign Up" styleClass="w-full" (click)="registerUser()"></p-button>
+                                <p-button label="Sign Up" styleClass="w-full md:w-[30rem] mb-8" (click)="registerUser()"></p-button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -165,7 +167,6 @@ export class Signup {
 
         const route = routesByRole[role] || '/auth/access';
         this.router.navigate([route]);
-    
     }
 
     registerUser() {
