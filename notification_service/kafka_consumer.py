@@ -18,7 +18,7 @@ logging.basicConfig(
 async def consume():
     consumer = AIOKafkaConsumer(
         *KAFKA_TOPICS,
-        bootstrap_servers='localhost:9092',
+        bootstrap_servers='kafka:9092',
         group_id="email-group"
     )
     await consumer.start()
