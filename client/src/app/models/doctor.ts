@@ -35,3 +35,9 @@ export interface DoctorViewModalHandlers {
     deleteModalHandler: (availability: DoctorAvailability) => void;
     //rejectModalHandler: () => void;
 }
+
+export interface SessionSlot {
+    slot_id: string;
+    session_id: string;
+    status: 'booked' | 'available' | 'rejected';
+}
