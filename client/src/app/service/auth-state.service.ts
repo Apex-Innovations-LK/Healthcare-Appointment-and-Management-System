@@ -8,7 +8,11 @@ import { UserDetails } from '../models/userDetails';
 @Injectable({
     providedIn: 'root'
 })
-export class AuthStateService{
+export class AuthStateService implements OnInit {
+    ngOnInit(): void { 
+        this.loadUserFromToken();
+        this.fetchUserInfo();
+    }
 
     private userInfo: JwtPayload | null = null;
     private user: UserDetails | null = null;
@@ -21,7 +25,7 @@ export class AuthStateService{
         this.fetchUserInfo();
     }
 
-    private loadUserFromToken() {
+    loadUserFromToken() {
         this.userInfo = this.tokenDecoder.getDecodedToken();
     }
 

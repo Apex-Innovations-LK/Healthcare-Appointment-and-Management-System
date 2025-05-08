@@ -50,13 +50,8 @@ export class CalendarColComponent {
 
     constructor(
         private fb: FormBuilder,
-<<<<<<< HEAD
-        private doctorService: DoctorService, 
-        private authStateService: AuthStateService,
-=======
         private doctorService: DoctorService,
         private authStateService: AuthStateService
->>>>>>> c2d72e6e68fd2c5f03971ff496c720326f0d7b6a
     ) {
         this.sessionForm = this.fb.group({
             startTime: ['', Validators.required],
@@ -88,38 +83,6 @@ export class CalendarColComponent {
     }
 
     loadSessions(): void {
-<<<<<<< HEAD
-        const doctor_id = this.authStateService.getUserDetails()?.id || '';
-        if (doctor_id) {// Replace with actual doctor ID
-            this.doctorService.getSessionsForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
-                next: (response) => {
-                    this.sessions = response;
-                    console.log(this.toLocalISOString(this.date), this.sessions);
-                },
-                error: (error) => {
-                    console.error('Error fetching sessions for date' + this.date + ': ', error);
-                }
-            });
-        } else {
-            console.log('Please log again.');
-        }
-    }
-
-    loadAvailabilities() {
-        const doctor_id = this.authStateService.getUserDetails()?.id || '';
-        if (doctor_id) {// Replace with actual doctor ID
-            this.doctorService.getAvailabilityForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
-                next: (response) => {
-                    this.availabilities = response;
-                },
-                error: (error) => {
-                    console.error('Error fetching availabilities for date' + this.date + ': ', error);
-                }
-            });
-        } else {
-            console.log('Please log again.');
-        }
-=======
         const userDetails = this.authStateService.getUserDetails();
         const doctor_id = userDetails ? userDetails.id : '';
         this.doctorService.getSessionsForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
@@ -144,7 +107,6 @@ export class CalendarColComponent {
                 console.error('Error fetching availabilities for date' + this.date + ': ', error);
             }
         });
->>>>>>> c2d72e6e68fd2c5f03971ff496c720326f0d7b6a
     }
 
     ngOnChanges(changes: SimpleChanges): void {

@@ -12,6 +12,7 @@ import { AuthService } from '../../service/auth.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { AuthStateService } from '../../service/auth-state.service';
+import { NotificationService } from '../../service/notification.service';
 
 @Component({
     selector: 'app-login',
@@ -102,7 +103,8 @@ export class Login {
         private router: Router,
         private authService: AuthService,
         private messageService: MessageService,
-        private authStateService : AuthStateService
+        private authStateService: AuthStateService,
+        private notificationService: NotificationService
     ) {}
 
     email: string = '';
@@ -120,7 +122,7 @@ export class Login {
 
     private redirectUserBasedOnRole(token: string, username: string, role: string, status: string): void {
         localStorage.setItem('token', token);
-        this.authStateService.getUserDetails();
+        this.authStateService.fetchUserInfo();
         const routesByRole: Record<string, string> = {
             PATIENT: '/patient',
             ADMIN: '/admin',
@@ -135,11 +137,7 @@ export class Login {
         this.authService.loginUser(this.user).subscribe({
             next: (data) => {
                 console.log(data);
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: 'Login successful!'
-                });
+                this.notificationService.showSuccess('Login successful!');
                 this.redirectUserBasedOnRole(data.token, data.username, data.role, data.status);
             },
             error: (error) => {

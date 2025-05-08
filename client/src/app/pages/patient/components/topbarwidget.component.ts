@@ -8,6 +8,7 @@ import { AuthStateService } from '../../../service/auth-state.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
     selector: 'patient-topbar-widget',
@@ -52,12 +53,12 @@ import { MenubarModule } from 'primeng/menubar';
                 </li>
                 <li>
                     <a (click)="router.navigate(['/patient'], { fragment: 'aboutus' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>About Us</span>
+                        <span>AboutUs</span>
                     </a>
                 </li>
                 <li>
                     <a (click)="router.navigate(['/patient'], { fragment: 'contactus' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>Contact Us</span>
+                        <span>ContactUs</span>
                     </a>
                 </li>
                 <li>
@@ -79,12 +80,13 @@ export class TopbarWidget {
     constructor(
         public router: Router,
         private authStateService: AuthStateService,
-        private messageService: MessageService
+        private messageService: MessageService,
+         private notificationService: NotificationService
     ) {}
 
     logout() {
         this.authStateService.clear();
-        this.messageService.add({ severity: 'success', summary: 'Logout', detail: 'Logged out successfully' });
+        this.notificationService.showSuccess('Logout successful', 'Success');
         setTimeout(() => {
             this.router.navigate(['/auth/login']);
         }, 2000);
