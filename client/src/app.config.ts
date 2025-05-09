@@ -7,7 +7,7 @@ import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { ToastModule } from 'primeng/toast';
 
-import { importProvidersFrom } from '@angular/core';
+
 import { authInterceptor } from './app/service/auth.interceptor';
 
 // Import AngularFire modules

@@ -5,6 +5,9 @@
       <span class="status-dot"></span>
       <span>{{callStatus}}</span>
     </div>
+    <div *ngIf="isConnected()" class="call-timer">
+      <span>Call Duration: {{callDuration}}</span>
+    </div>
   </div>
   
   <div class="video-grid">
@@ -28,11 +31,11 @@
   </div>
   
   <div class="control-panel">
-    <button (click)="handleCreateCall()" class="control-btn create">
+    <button *ngIf="!isConnected()" (click)="handleCreateCall()" class="control-btn create">
       <span class="icon">📞</span>
       <span class="label">Start Call</span>
     </button>
-    <button (click)="handleJoinCall()" class="control-btn join">
+    <button *ngIf="!isConnected()" (click)="handleJoinCall()" class="control-btn join">
       <span class="icon">➕</span>
       <span class="label">Join Call</span>
     </button>

@@ -19,6 +19,8 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
   private webrtcService = inject(WebRTCService);
+  private callTimerInterval?: any;
+  callDuration: string = '00:00:00';
   
   // Class properties
   private localStream?: MediaStream;
@@ -99,6 +101,27 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     }
   }
 
+  private startCallTimer() {
+    let seconds = 0;
+    this.callTimerInterval = setInterval(() => {
+      seconds++;
+      const hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
+      const mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+      const secs = (seconds % 60).toString().padStart(2, '0');
+      this.callDuration = `${hrs}:${mins}:${secs}`;
+      this.cdr.detectChanges();
+    }, 1000);
+  }
+
+  private stopCallTimer() {
+    if (this.callTimerInterval) {
+      clearInterval(this.callTimerInterval);
+      this.callTimerInterval = undefined;
+    }
+    this.callDuration = '00:00:00';
+  }
+
+
   private initializePeerConnection() {
     this.pc = new RTCPeerConnection({
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
@@ -147,11 +170,13 @@ export class VideoCallComponent implements OnInit, OnDestroy {
         
         if (this.pc?.connectionState === 'connected') {
           this.callStatus = 'Connected';
+          this.startCallTimer();
           this.connectionStatusRef.set('connected')
             .catch((err: Error) => console.error('Error updating connection status:', err));
         } else if (this.pc?.connectionState === 'disconnected' || 
                   this.pc?.connectionState === 'failed') {
           this.callStatus = 'Error: Connection lost';
+          this.stopCallTimer();
           this.connectionStatusRef.set('error')
             .catch((err: Error) => console.error('Error updating connection status:', err));
         } else if (this.pc?.connectionState === 'connecting') {
@@ -237,11 +262,49 @@ export class VideoCallComponent implements OnInit, OnDestroy {
           } else if (status === 'error' && !this.callStatus.includes('Error')) {
             this.callStatus = 'Error: Connection issue';
             this.cdr.detectChanges();
+          } else if (status === 'ended') {
+            // Handle remote call termination
+            console.log('Remote side ended the call');
+            if (this.callStatus !== 'Call ended' && this.callStatus !== 'Ready') {
+              this.handleRemoteCallEnded();
+            }
           }
         });
       });
 
     this.subscriptions.push(answerSub, iceSub, connectionStatusSub);
+  }
+
+  // Add this new method to handle when the remote side ends the call
+  private handleRemoteCallEnded() {
+    console.log('Handling remote call end');
+    this.stopCallTimer();
+    
+    // Clean up remote video
+    const remoteVideo = document.getElementById('remote') as HTMLVideoElement;
+    if (remoteVideo) {
+      remoteVideo.srcObject = null;
+    }
+    
+    // Close peer connection
+    if (this.pc) {
+      this.pc.close();
+    }
+    
+    // Reset WebRTC state
+    this.remoteDescriptionSet = false;
+    this.pendingCandidates = [];
+    
+    // Reinitialize for potential future calls
+    this.initializePeerConnection();
+    this.setupSignaling();
+    
+    this.callStatus = 'Call ended';
+    setTimeout(() => {
+      this.callStatus = 'Ready';
+      this.cdr.detectChanges();
+    }, 3000);
+    this.cdr.detectChanges();
   }
 
   private processPendingCandidates() {
@@ -354,10 +417,11 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   private async endCall() {
     try {
       this.callStatus = 'Ending call...';
+      this.stopCallTimer();
       this.cdr.detectChanges();
       
-      // Clear connection status first
-      await this.connectionStatusRef.remove();
+      // Signal to other participants that the call is ending
+      await this.connectionStatusRef.set('ended');
       
       // End call in backend if we have a call session
       if (this.currentCallSession?.id) {
@@ -369,6 +433,9 @@ export class VideoCallComponent implements OnInit, OnDestroy {
           error: (error) => console.error('Error ending call in backend:', error)
         });
       }
+      
+      // Wait briefly to ensure the 'ended' status is propagated
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Clear Firebase data
       await this.callsRef.set(null);
@@ -406,6 +473,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.stopCallTimer();
     this.subscriptions.forEach(sub => sub.unsubscribe());
     
     // End call in backend if necessary
