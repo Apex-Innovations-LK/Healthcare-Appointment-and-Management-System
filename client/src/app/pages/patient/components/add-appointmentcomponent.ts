@@ -105,8 +105,12 @@ interface AppointmentSlot {
                             </div>
                         </div>
                     </div>
-
-                    <!-- Booking action buttons -->
+                    <div class="flex justify-end space-x-4 mt-6">
+                        <!-- Booking action buttons --><label for="diagnosisType" class="border p-2 ">Diagnosis Type</label>
+                        <select id="diagnosisType" [(ngModel)]="selectedDiagnosisType" name="diagnosisType" class="form-control border p-2 bg-primary-100 text-black" >
+                            <option *ngFor="let type of diagnosisTypes" [value]="type">{{ type }}</option>
+                        </select>
+                    </div>
                     <div class="flex justify-end space-x-4 mt-6">
                         <button (click)="onCancel()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
                         <button (click)="bookAppointment()" [disabled]="!selectedSlot" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">Book Appointment</button>
@@ -141,6 +145,8 @@ export class AddAppointmentComponent implements OnInit {
     selectedSlot: AppointmentSlot | null = null;
     isLoading: boolean = false;
     searchTerm: string = '';
+    diagnosisTypes: string[] = ['IN_PERSON', 'VIRTUAL'];
+    selectedDiagnosisType: string = 'IN_PERSON';
 
     private http = inject(HttpClient);
 
@@ -279,7 +285,7 @@ export class AddAppointmentComponent implements OnInit {
         const makeAppointment: MakeAppointment = {
             slotId: this.selectedSlot.slot_id,
             patient_id: patientId,
-            appointment_type: 'General'
+            appointment_type: this.selectedDiagnosisType
         };
 
         this.isBooking = true;

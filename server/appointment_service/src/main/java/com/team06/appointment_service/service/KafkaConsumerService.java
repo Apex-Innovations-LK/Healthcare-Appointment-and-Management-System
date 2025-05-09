@@ -3,6 +3,7 @@ package com.team06.appointment_service.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team06.appointment_service.dto.DoctorKafkaEvent;
 import com.team06.appointment_service.dto.ScheduleSlotDto;
+import com.team06.appointment_service.dto.SessionIdDto;
 import com.team06.appointment_service.model.Appointment;
 import com.team06.appointment_service.model.Availibility;
 import com.team06.appointment_service.repo.AppointmentRepo;
@@ -53,6 +54,7 @@ public class KafkaConsumerService {
         }
     }
 
+
     @KafkaListener(topics = "${kafka.topic.schedule-slot}", groupId ="${spring.kafka.consumer.group-id}")
     public void consumeScheduleSlot(String message, Acknowledgment acknowledgment) {
         try {
@@ -91,6 +93,32 @@ public class KafkaConsumerService {
             // For now, we'll still acknowledge to prevent endless retries
             acknowledgment.acknowledge();
         }
+    }
+
+    @KafkaListener(topics = "${kafka.topic.availability-deleted}", groupId ="${spring.kafka.consumer.group-id}")
+    public void consumeAvailabilityDeletedEvent(String message, Acknowledgment acknowledgment) {
+        try {
+            logger.info("Received message: {}", message);
+            SessionIdDto sessionIdDto = objectMapper.readValue(message, SessionIdDto.class);
+
+            processAvailabilityDeletedEvent(sessionIdDto);
+
+            // Acknowledge the message after successful processing
+            acknowledgment.acknowledge();
+            logger.info("User event processed successfully: {}", sessionIdDto);
+
+        } catch (Exception e) {
+            logger.error("Error processing Kafka message: {}", e.getMessage(), e);
+            // In case of error, we could implement retry logic here or send to DLQ
+            // For now, we'll still acknowledge to prevent endless retries
+            acknowledgment.acknowledge();
+        }
+    }
+
+    private void processAvailabilityDeletedEvent(SessionIdDto sessionIdDto) {
+        appointmentRepo.deleteAvailability(sessionIdDto.getSession_id());
+        availibilityRepo.deleteAvailability(sessionIdDto.getSession_id());
+        logger.info("Availability deleted in the session with session ID: {}", sessionIdDto.getSession_id());
     }
 
     private void processAppointmentRejectedEvent(ScheduleSlotDto scheduleSlotDto) {

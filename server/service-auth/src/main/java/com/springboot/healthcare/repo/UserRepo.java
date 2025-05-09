@@ -1,9 +1,11 @@
 package com.springboot.healthcare.repo;
 
 import com.springboot.healthcare.dto.DoctorDetails;
+import com.springboot.healthcare.dto.UserDetailsDto;
 import com.springboot.healthcare.model.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -33,5 +35,17 @@ public interface UserRepo extends JpaRepository<Users, UUID> {
                 """, nativeQuery = true)
     List<DoctorDetails> findAllDoctors();
 
+    @Query(value = """
+    SELECT
+            u.id,
+            u.first_name,
+            u.last_name,
+            u.date_of_birth,
+            u.gender,
+            u.phone_number
+    FROM authservice.users u 
+    WHERE u.id = :patient_id
+    """, nativeQuery = true)
+    UserDetailsDto fetchUserDetails(@Param("patient_id") UUID patient_id);
 }
 

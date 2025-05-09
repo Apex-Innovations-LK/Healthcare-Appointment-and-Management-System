@@ -1,6 +1,7 @@
 package com.team06.serviceschedule.service;
 
 import com.team06.serviceschedule.dto.ScheduleDto;
+import com.team06.serviceschedule.dto.ScheduleInfoDto;
 import com.team06.serviceschedule.model.Availibility;
 import com.team06.serviceschedule.model.SessionAssignment;
 import com.team06.serviceschedule.model.Users;
@@ -23,6 +24,7 @@ public class SchedularService {
     private final AvailibilityRepo availibilityRepo;
     private final UserRepo userRepo;
     private final SessionAssignmentRepo sessionAssignmentRepo;
+    private final KafkaProducerService kafkaProducerService;
 
     public ResponseEntity<Map<String, String>> runScheduler() {
         List<Availibility> sessions = availibilityRepo.findAll();
@@ -57,6 +59,14 @@ public class SchedularService {
                     assignment.setTo(session.getTo());
                     assignment.setNumber_of_patients(session.getNumber_of_patients());
 
+            ScheduleInfoDto scheduleInfoDto = new ScheduleInfoDto();
+                scheduleInfoDto.setSession_id(session.getSession_id());
+                scheduleInfoDto.setDoctor_id(session.getDoctor_id());
+                scheduleInfoDto.setStaff_id(gene.getStaff_id());
+                scheduleInfoDto.setFrom(session.getFrom());
+                scheduleInfoDto.setTo(session.getTo());
+
+            kafkaProducerService.sendScheduleDetailsTopic(scheduleInfoDto);
 
             sessionAssignmentRepo.save(assignment);
         }

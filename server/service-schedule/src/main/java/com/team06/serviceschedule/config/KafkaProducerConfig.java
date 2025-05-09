@@ -1,4 +1,4 @@
-package com.team06.appointment_service.config;
+package com.team06.serviceschedule.config;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -21,11 +21,8 @@ public class KafkaProducerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${kafka.topic.appointment-booked}")
-    private String appointmentBooked;
-
-    @Value("${kafka.topic.notification}")
-    private String notificationTopic;
+    @Value("${kafka.topic.schedule-details}")
+    private String scheduleDetailsSTopic;
 
     @Bean
     public KafkaAdmin kafkaAdmin() {
@@ -35,14 +32,9 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public NewTopic appointmentBookedTopic() {
+    public NewTopic scheduleTopic() {
         // Creating the topic with 1 partition and replication factor of 1
-        return new NewTopic(appointmentBooked, 1, (short) 1);
-    }
-
-    @Bean
-    public NewTopic patient() {
-        return new NewTopic(notificationTopic, 1, (short) 1);
+        return new NewTopic(scheduleDetailsSTopic, 1, (short) 1);
     }
 
     @Bean
