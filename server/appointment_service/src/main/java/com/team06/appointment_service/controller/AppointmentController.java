@@ -3,6 +3,7 @@ package com.team06.appointment_service.controller;
 import com.team06.appointment_service.dto.BookingResponse;
 import com.team06.appointment_service.dto.MakeAppointment;
 import com.team06.appointment_service.model.Appointment;
+import com.team06.appointment_service.model.Availibility;
 import com.team06.appointment_service.service.AppointmentService;
 // import com.springboot.healthcare.dto.DoctorDetails;
 import org.apache.catalina.connector.Response;
@@ -28,9 +29,8 @@ public class AppointmentController {
     // @Autowired
     // private RestTemplate restTemplate;
 
-    private final String AUTH_SERVICE_URL = "http://localhost:8081/api/auth/get-doctor-details/";
-
-    
+    // private final String AUTH_SERVICE_URL =
+    // "http://localhost:8081/api/auth/get-doctor-details/";
 
     @GetMapping("/get-slots")
     public List<Object> findSlots() {
@@ -61,28 +61,25 @@ public class AppointmentController {
     }
 
     @DeleteMapping("/delete-appointment/{slotId}")
-public ResponseEntity<?> deleteAppointment(@PathVariable UUID slotId) {
-    if (!appointmentService.existsById(slotId)) {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<?> deleteAppointment(@PathVariable UUID slotId) {
+        if (!appointmentService.existsById(slotId)) {
+            return ResponseEntity.notFound().build();
+        }
+        appointmentService.deleteById(slotId);
+        return ResponseEntity.ok().build();
     }
-    appointmentService.deleteById(slotId);
-    return ResponseEntity.ok().build();
-}
 
-    // // Fetch doctor details by doctorId from the auth-service
-    // @GetMapping("/get-doctor-details/{doctorId}")
-    // public ResponseEntity<DoctorDetails> getDoctorDetails(@PathVariable UUID doctorId) {
-    //     try {
-    //         // Make a REST call to the auth-service to get doctor details
-    //         DoctorDetails doctorDetails = restTemplate.getForObject(AUTH_SERVICE_URL + doctorId, DoctorDetails.class);
-
-    //         if (doctorDetails != null) {
-    //             return ResponseEntity.ok(doctorDetails);
-    //         } else {
-    //             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    //         }
-    //     } catch (Exception e) {
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    //     }
-    // }
+    @GetMapping("/get-session/{sessionId}")
+    public ResponseEntity<Availibility> getSessionDetails(@PathVariable UUID sessionId) {
+        try {
+            Availibility session = appointmentService.getSession(sessionId);
+            if (session != null) {
+                return ResponseEntity.ok(session);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }

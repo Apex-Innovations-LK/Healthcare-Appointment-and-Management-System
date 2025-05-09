@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -161,5 +162,9 @@ public class UserService {
 
     public List<DoctorDetails> fetchAllDoctors() {
         return userRepo.findAllDoctors();
+    }
+
+    public DoctorDetails getDoctorById(UUID doctorId) {
+        return userRepo.findDoctorById(doctorId);
     }
 }

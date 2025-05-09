@@ -7,6 +7,8 @@ import { MakeAppointment } from '../models/makeAppointment';
 import { BookingResponse } from '../models/BookingResponse';
 import { Appointment } from '../models/Appointment';
 import { UserDetails } from '../models/userDetails';
+import { AuthService } from './auth.service';
+import { Doctor } from '../models/doctor';
 
 interface Appointments {
     patient_id: string;
@@ -20,7 +22,10 @@ interface Appointments {
 export class AppointmentsService {
     private backendUrl = 'http://localhost:8080/api/appointment';
 
-    constructor(private httpClient: HttpClient) {}
+    constructor(
+        private httpClient: HttpClient,
+        private authService: AuthService
+    ) {}
 
     getAppointments(): Observable<DoctorSessions[]> {
         return this.httpClient.get<any[]>(`${this.backendUrl}/get-slots`).pipe(
@@ -46,7 +51,26 @@ export class AppointmentsService {
 
     // Fetch doctor details using doctor_id
     getDoctorDetails(doctorId: string): Observable<UserDetails> {
-        return this.httpClient.get<UserDetails>(`${this.backendUrl}/get-doctor-details/${doctorId}`);
+        return this.authService.getDoctorById(doctorId).pipe(
+            map((doctor: Doctor) => {
+                // Create a UserDetails object with the doctor information
+                return new UserDetails(
+                    doctor.doctor_id,  // id
+                    '',               // username (not needed for display)
+                    doctor.first_name,
+                    doctor.last_name,
+                    new Date(),       // date_of_birth (not needed for display)
+                    '',              // gender (not needed for display)
+                    'DOCTOR',        // role
+                    '',              // email (not needed for display)
+                    '',              // phone_number (not needed for display)
+                    'ACTIVE',        // status
+                    '',              // password (not needed for display)
+                    doctor.speciality,
+                    doctor.license_number
+                );
+            })
+        );
     }
 
     getUserDetails(username: string): Observable<UserDetails> {

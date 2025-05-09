@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.team06.appointment_service.model.Appointment;
 import com.team06.appointment_service.repo.AppointmentRepo;
+import com.team06.appointment_service.model.Availibility;
+import com.team06.appointment_service.repo.AvailibilityRepo;
 
 @Service
 public class AppointmentService {
@@ -20,6 +22,9 @@ public class AppointmentService {
 
     @Autowired
     private KafkaProducerService kafkaProducerService;
+
+    @Autowired
+    AvailibilityRepo availibilityRepo;
 
     public List<Object> findSlots() {
         return appointmentRepo.findAvailableSlotsForCurrentWeek();
@@ -43,5 +48,9 @@ public class AppointmentService {
 
     public void deleteById(UUID slotId) {
         appointmentRepo.deleteById(slotId);
+    }
+
+    public Availibility getSession(UUID sessionId) {
+        return availibilityRepo.findById(sessionId).orElse(null);
     }
 }
