@@ -8,12 +8,14 @@ import { UserDetails } from '../models/userDetails';
 @Injectable({
     providedIn: 'root'
 })
-export class AuthStateService{
+export class AuthStateService implements OnInit {
+    ngOnInit(): void { 
+        this.loadUserFromToken();
+        this.fetchUserInfo();
+    }
 
     private userInfo: JwtPayload | null = null;
     private user: UserDetails | null = null;
-    private id : string | null = null;
-
 
     constructor(
         private tokenDecoder: TokenDecoderService,
@@ -23,7 +25,7 @@ export class AuthStateService{
         this.fetchUserInfo();
     }
 
-    private loadUserFromToken() {
+    loadUserFromToken() {
         this.userInfo = this.tokenDecoder.getDecodedToken();
     }
 
@@ -32,7 +34,6 @@ export class AuthStateService{
     }
 
     getUserDetails(): UserDetails | null {
-
         return this.user;
     }
 
@@ -41,11 +42,7 @@ export class AuthStateService{
     }
 
     getRole(): string | null {
-        return this.userInfo?.role || null;
-    }
-
-    getId(): string | null {
-        return this.id || null;
+        return this.getUserDetails()?.role || null;
     }
 
     isAuthenticated(): boolean {
@@ -61,7 +58,7 @@ export class AuthStateService{
         const username = this.getUsername() || '';
         if (username) {
             this.authService.getUser(username).subscribe((data) => {
-                console.log(data);
+                console.log("currently logged user", data);
                 this.user = data;
             });
         }

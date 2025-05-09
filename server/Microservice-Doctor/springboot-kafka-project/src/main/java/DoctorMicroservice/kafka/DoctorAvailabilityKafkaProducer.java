@@ -14,7 +14,7 @@ import DoctorMicroservice.dto.DoctorAvailabilityDto;
 public class DoctorAvailabilityKafkaProducer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoctorAvailabilityKafkaProducer.class);
-    private static final String TOPIC = "AVAILABILITY_SETTLED";
+    private static final String TOPIC = "availability_settled";
 
     private final KafkaTemplate<String, DoctorAvailabilityDto> kafkaTemplate;
 

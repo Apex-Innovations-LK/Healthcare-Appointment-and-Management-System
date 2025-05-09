@@ -11,6 +11,7 @@ import { DoctorService } from '../../../../service/doctor.service';
 import { SelectModule } from 'primeng/select';
 import { ChipModule } from 'primeng/chip';
 import { AuthStateService } from '../../../../service/auth-state.service';
+import { NotificationService } from '../../../../service/notification.service';
 
 @Component({
     selector: 'app-calendar-view',
@@ -45,7 +46,8 @@ export class CalendarViewComponent {
     constructor(
         private fb: FormBuilder,
         private doctorService: DoctorService,
-        private authStateService: AuthStateService
+        private authStateService: AuthStateService,
+        private notificationService: NotificationService
     ) {
         this.sessionForm = this.fb.group({
             startTime: ['', Validators.required],
@@ -156,6 +158,7 @@ export class CalendarViewComponent {
             this.doctorService.addAvailability(availability).subscribe({
                 next: (response) => {
                     console.log('Availability added successfully', response);
+                    this.notificationService.showSuccess('Availability added successfully', 'Success');
                     this.sessionForm.reset({
                         startTime: '',
                         endTime: '',
@@ -167,7 +170,7 @@ export class CalendarViewComponent {
                     setTimeout(() => (this.refreshColIndex = 10), 0);
                 },
                 error: (error) => {
-                    console.error('Error adding availability:', error);
+                    this.notificationService.showError('Failed to add availability', 'Error');
                 }
             });
         }

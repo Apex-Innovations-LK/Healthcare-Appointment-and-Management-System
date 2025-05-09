@@ -5,29 +5,27 @@ import { DoctorLayout } from './app/pages/doctor/doctor.layout';
 import { PatientLayout } from './app/pages/patient/patient.layout';
 import { StaffLayout } from './app/pages/staff/staff.layout';
 import { HomeComponent } from './app/pages/home/home';
-import { Documentation } from './app/pages/documentation/documentation';
-import { Dashboard } from './app/pages/dashboard/dashboard';
+import { AdminAuthGuard } from './app/service/AuthGuards/adminAuth.guard';
+import { PatientAuthGuard } from './app/service/AuthGuards/patientAuth.guard';
+import { DoctorAuthGuard } from './app/service/AuthGuards/doctorAuth.guard';
+import { StaffAuthGuard } from './app/service/AuthGuards/staffAuth.guard';
 
 import { VideoCallComponent } from './app/video-call/video-call.component';
 export const appRoutes: Routes = [
-    // {
-        
-    //     path: 'uikit',
-    //     component: AppLayout,
-    //     children: [
-    //         { path: '', component: Dashboard },
-    //         { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
-    //         { path: 'documentation', component: Documentation },
-    //         { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
-    //     ]
-    // },
     {
         path: '',
         component: HomeComponent
+        // children: [
+        //     {
+        //         path: '',
+        //         loadChildren: () => import('./app/pages/home/home.routes').then((m) => m.default)
+        //     }
+        // ]
     },
     {
         path: 'admin',
         component: AppLayout,
+ //       canActivate: [AdminAuthGuard],
         children: [
             {
                 path: '',
@@ -38,6 +36,7 @@ export const appRoutes: Routes = [
     {
         path: 'patient',
         component: PatientLayout,
+//        canActivate: [PatientAuthGuard],
         children: [
             {
                 path: '',
@@ -48,6 +47,7 @@ export const appRoutes: Routes = [
     {
         path: 'doctor',
         component: DoctorLayout,
+ //       canActivate: [DoctorAuthGuard],
         children: [
             {
                 path: '',
@@ -59,6 +59,7 @@ export const appRoutes: Routes = [
     {
         path: 'staff',
         component: StaffLayout,
+//        canActivate: [StaffAuthGuard],
         children: [
             {
                 path: '',
@@ -73,9 +74,9 @@ export const appRoutes: Routes = [
     {
         path: 'notfound',
         component: NotFound
-    },
-    {
-        path: '**',
-        redirectTo: '/notfound'
     }
+    // {
+    //     path: '**',
+    //     redirectTo: '/notfound'
+    // }
 ];

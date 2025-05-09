@@ -1,9 +1,12 @@
 package com.springboot.healthcare.repo;
 
+import com.springboot.healthcare.dto.DoctorDetails;
 import com.springboot.healthcare.model.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,5 +20,18 @@ public interface UserRepo extends JpaRepository<Users, UUID> {
     boolean existsByEmail(String email);
 
     Long countByRole(String role);
-    }
+
+    @Query( value = """
+        SELECT 
+                users.id, 
+                users.first_name,
+                users.last_name,
+                doctor.speciality,
+                doctor.license_number 
+        FROM 
+                authservice.users JOIN authservice.doctor ON users.id = doctor.id
+                """, nativeQuery = true)
+    List<DoctorDetails> findAllDoctors();
+
+}
 

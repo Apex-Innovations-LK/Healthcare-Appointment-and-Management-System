@@ -68,10 +68,16 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
   constructor() {
     // Initialize Firebase references in constructor
+<<<<<<< HEAD
+    // this.callsRef = this.db.object(`calls/${this.roomId}`);
+    // this.iceCandidatesRef = this.db.list(`calls/${this.roomId}/iceCandidates`);
+    // this.answerRef = this.db.object(`calls/${this.roomId}/answer`);
+=======
     this.callsRef = this.db.object(`calls/${this.roomId}`);
     this.iceCandidatesRef = this.db.list(`calls/${this.roomId}/iceCandidates`);
     this.answerRef = this.db.object(`calls/${this.roomId}/answer`);
     this.connectionStatusRef = this.db.object(`calls/${this.roomId}/connectionStatus`);
+>>>>>>> a7dd1e6a1d11ca13e4ab8682bf59a3492819a760
   }
 
   ngOnInit() {

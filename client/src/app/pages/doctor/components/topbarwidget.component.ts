@@ -7,6 +7,7 @@ import { AppFloatingConfigurator } from "../../admin/components/app.floatingconf
 import { AuthStateService } from '../../../service/auth-state.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
     selector: 'doctor-topbar-widget',
@@ -70,12 +71,13 @@ export class TopbarWidget {
     constructor(
         public router: Router,
         private authStateService: AuthStateService,
-        private messageService: MessageService
+        private messageService: MessageService,
+         private notificationService: NotificationService
     ) {}
 
     logout() {
         this.authStateService.clear();
-        this.messageService.add({ severity: 'success', summary: 'Logout', detail: 'Logged out successfully' });
+        this.notificationService.showSuccess('Logout successful', 'Success');
         setTimeout(() => {
             this.router.navigate(['/auth/login']);
         }, 2000);

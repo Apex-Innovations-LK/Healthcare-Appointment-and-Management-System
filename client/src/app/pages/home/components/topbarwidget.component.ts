@@ -8,11 +8,12 @@ import { AuthStateService } from '../../../service/auth-state.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
+import { AppConfigurator } from "../../admin/components/app.configurator";
 
 @Component({
     selector: 'home-topbar-widget',
     providers: [MessageService],
-    imports: [MenubarModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, ToastModule],
+    imports: [MenubarModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, ToastModule, AppFloatingConfigurator],
     template: `<a class="flex items-center" href="/patient">
             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 mr-2">
                 <path
@@ -39,6 +40,7 @@ import { MenubarModule } from 'primeng/menubar';
         </a>
 
         <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0">
+            <app-floating-configurator class="z-50"/>
             <button pButton pRipple label="Login" [rounded]="true" (click)="gotoLogin()"></button>
         </div> `
 })
@@ -52,5 +54,4 @@ export class TopbarWidget {
     gotoLogin() {
         this.router.navigate(['/auth/login']);
     }
-
 }

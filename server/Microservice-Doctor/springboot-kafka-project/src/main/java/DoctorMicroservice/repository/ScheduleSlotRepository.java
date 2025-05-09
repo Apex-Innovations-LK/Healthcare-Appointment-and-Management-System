@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import DoctorMicroservice.entity.ScheduleSlot;
+import jakarta.transaction.Transactional;
 
 public interface ScheduleSlotRepository extends JpaRepository<ScheduleSlot, UUID> {
     // Custom query methods can be defined here if needed

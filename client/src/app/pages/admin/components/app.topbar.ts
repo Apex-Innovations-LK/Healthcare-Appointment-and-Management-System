@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { AuthStateService } from '../../../service/auth-state.service';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
     selector: 'app-topbar',
@@ -98,13 +99,13 @@ export class AppTopbar {
     constructor(
         public router: Router,
         private authStateService: AuthStateService,
-        private messageService: MessageService,
+        private notificationService: NotificationService,
         public layoutService: LayoutService
     ) {}
 
     logout() {
         this.authStateService.clear();
-        this.messageService.add({ severity: 'success', summary: 'Logout', detail: 'Logged out successfully' });
+        this.notificationService.showSuccess('Logout successful', 'Success');
         setTimeout(() => {
             this.router.navigate(['/auth/login']);
         }, 2000);

@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "session_assignment")
+@Table(name = "session_assignment", schema = "schedulaservice")
 public class SessionAssignment {
 
 

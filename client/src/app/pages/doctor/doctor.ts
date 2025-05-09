@@ -17,7 +17,7 @@ import { FeatureWidget } from './components/featurewidget';
         <div class="bg-surface-0 dark:bg-surface-900">
             <div id="home" class="landing-wrapper overflow-hidden">
                  <doctor-hero-widget />
-                <doctor-feature-widget />
+                 <doctor-feature-widget />
             </div>
         </div>
     `
