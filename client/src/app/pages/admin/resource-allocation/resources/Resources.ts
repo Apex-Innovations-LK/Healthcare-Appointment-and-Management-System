@@ -102,7 +102,7 @@ export class Resources implements OnInit {
 
         this.resourceService.addResource(newResource).subscribe(
             (response) => {
-                console.log("Resource added successfully:", response);
+                // console.log("Resource added successfully:", response);
 
                 this.resources = [...this.resources, {
                     ...response,

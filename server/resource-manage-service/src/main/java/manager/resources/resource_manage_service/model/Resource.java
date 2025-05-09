@@ -97,4 +97,18 @@ public class Resource implements Serializable {
         this.createdTime = createdTime;
     }
 
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "resourceId=" + resourceId +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", department='" + department + '\'' +
+                ", description='" + description + '\'' +
+                ", status='" + status + '\'' +
+                ", createdTime=" + createdTime +
+                '}';
+    }
+
+
 }
