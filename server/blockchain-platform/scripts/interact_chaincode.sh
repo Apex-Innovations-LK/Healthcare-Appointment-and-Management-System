@@ -1,31 +1,38 @@
 #!/bin/bash
 set -e
 
-cd ~/Desktop/blockchain-platform/fabric-samples/test-network
+# Resolve script location and switch to test-network directory
+SCRIPT_DIR=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P)
+TEST_NETWORK_DIR="${SCRIPT_DIR}/../fabric-samples/test-network"
+cd "$TEST_NETWORK_DIR"
 
+# Environment setup
 export PATH=${PWD}/../bin:$PATH
 export FABRIC_CFG_PATH=${PWD}/../config/
 export CORE_PEER_TLS_ENABLED=true
 
-# Default to Org1 (Hospital)
+# Org1 (Hospital) config
 export CORE_PEER_LOCALMSPID="Org1MSP"
 export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
 export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=localhost:7051
+
+# Use Docker container names (or network aliases) instead of localhost
+export CORE_PEER_ADDRESS=peer0.org1.example.com:7051
+export ORDERER_ADDRESS=orderer.example.com:7050
 
 # --- Function Definitions ---
 
 register_health_record() {
   peer chaincode invoke \
-    -o localhost:7050 \
+    -o $ORDERER_ADDRESS \
     --ordererTLSHostnameOverride orderer.example.com \
     --tls \
     --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \
     -C mychannel \
     -n mycc \
-    --peerAddresses localhost:7051 \
+    --peerAddresses peer0.org1.example.com:7051 \
     --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-    --peerAddresses localhost:9051 \
+    --peerAddresses peer0.org2.example.com:9051 \
     --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
     -c "{\"function\":\"registerHealthRecord\",\"Args\":[\"$record_id\",\"$patient_id\",\"$doctor_id\",\"$ipfs_hash\"]}"
   echo "✅ Health record registered."
@@ -40,15 +47,15 @@ query_health_record() {
 
 update_health_record() {
   peer chaincode invoke \
-    -o localhost:7050 \
+    -o $ORDERER_ADDRESS \
     --ordererTLSHostnameOverride orderer.example.com \
     --tls \
     --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \
     -C mychannel \
     -n mycc \
-    --peerAddresses localhost:7051 \
+    --peerAddresses peer0.org1.example.com:7051 \
     --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-    --peerAddresses localhost:9051 \
+    --peerAddresses peer0.org2.example.com:9051 \
     --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
     -c "{\"function\":\"updateHealthRecord\",\"Args\":[\"$record_id\",\"$patient_id\",\"$doctor_id\",\"$ipfs_hash\"]}"
   echo "🔄 Health record updated."
@@ -56,18 +63,18 @@ update_health_record() {
 
 delete_health_record() {
   peer chaincode invoke \
-    -o localhost:7050 \
+    -o $ORDERER_ADDRESS \
     --ordererTLSHostnameOverride orderer.example.com \
     --tls \
     --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \
     -C mychannel \
     -n mycc \
-    --peerAddresses localhost:7051 \
+    --peerAddresses peer0.org1.example.com:7051 \
     --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-    --peerAddresses localhost:9051 \
+    --peerAddresses peer0.org2.example.com:9051 \
     --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
     -c "{\"function\":\"deleteHealthRecord\",\"Args\":[\"$record_id\"]}"
-  echo "🗑️ Record deleted (but history is preserved)."
+  echo "🗑️ Health record deleted (history preserved)."
 }
 
 query_audit_trail() {
@@ -84,7 +91,7 @@ query_by_patient() {
     -c "{\"function\":\"queryRecordsByPatient\",\"Args\":[\"$patient_id\"]}"
 }
 
-# --- CLI Mode (for Java calls) ---
+# --- CLI Mode (for Java/other programs) ---
 if [ $# -gt 0 ]; then
   case "$1" in
     register)
@@ -118,15 +125,14 @@ if [ $# -gt 0 ]; then
       query_by_patient
       ;;
     *)
-      echo "❌ Invalid CLI command."
+      echo "❌ Invalid command: $1"
       exit 1
       ;;
   esac
   exit 0
 fi
 
-# --- Interactive Mode (for manual use) ---
-
+# --- Interactive Mode ---
 echo "Choose an action:"
 echo "1) Register Health Record"
 echo "2) Query Health Record"
@@ -134,7 +140,6 @@ echo "3) Update Health Record"
 echo "4) Delete Health Record"
 echo "5) Query Audit Trail"
 echo "6) Query Records by Patient ID"
-
 read -p "Enter your choice (1-6): " choice
 
 case "$choice" in
@@ -146,7 +151,7 @@ case "$choice" in
     register_health_record
     ;;
   2)
-    read -p "Enter Record ID: " record_id
+    read -p "Record ID: " record_id
     query_health_record
     ;;
   3)
@@ -157,18 +162,18 @@ case "$choice" in
     update_health_record
     ;;
   4)
-    read -p "Enter Record ID to delete: " record_id
+    read -p "Record ID: " record_id
     delete_health_record
     ;;
   5)
-    read -p "Enter Record ID to get history: " record_id
+    read -p "Record ID: " record_id
     query_audit_trail
     ;;
   6)
-    read -p "Enter Patient ID: " patient_id
+    read -p "Patient ID: " patient_id
     query_by_patient
     ;;
   *)
-    echo "❌ Invalid choice."
+    echo "❌ Invalid selection."
     ;;
 esac

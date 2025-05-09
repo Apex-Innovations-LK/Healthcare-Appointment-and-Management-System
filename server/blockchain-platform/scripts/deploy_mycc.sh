@@ -38,7 +38,7 @@ echo "=== 📥 Installing on Org1 ==="
 export CORE_PEER_LOCALMSPID="Org1MSP"
 export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
 export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=localhost:7051
+export CORE_PEER_ADDRESS=peer0.org1.example.com:7051  # Docker service name
 
 peer lifecycle chaincode install ${CHAINCODE_NAME}.tar.gz
 
@@ -49,7 +49,7 @@ echo "=== 📥 Installing on Org2 ==="
 export CORE_PEER_LOCALMSPID="Org2MSP"
 export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
 export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-export CORE_PEER_ADDRESS=localhost:9051
+export CORE_PEER_ADDRESS=peer0.org2.example.com:9051  # Docker service name
 
 peer lifecycle chaincode install ${CHAINCODE_NAME}.tar.gz
 
@@ -57,10 +57,10 @@ echo "=== ✅ Approving for Org1 ==="
 export CORE_PEER_LOCALMSPID="Org1MSP"
 export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
 export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=localhost:7051
+export CORE_PEER_ADDRESS=peer0.org1.example.com:7051  # Docker service name
 
 peer lifecycle chaincode approveformyorg \
-  --orderer localhost:7050 \
+  --orderer orderer.example.com:7050  # Docker service name \
   --channelID mychannel \
   --name "$CHAINCODE_NAME" \
   --version "$CHAINCODE_VERSION" \
@@ -74,10 +74,10 @@ echo "=== ✅ Approving for Org2 ==="
 export CORE_PEER_LOCALMSPID="Org2MSP"
 export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
 export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-export CORE_PEER_ADDRESS=localhost:9051
+export CORE_PEER_ADDRESS=peer0.org2.example.com:9051  # Docker service name
 
 peer lifecycle chaincode approveformyorg \
-  --orderer localhost:7050 \
+  --orderer orderer.example.com:7050  # Docker service name \
   --channelID mychannel \
   --name "$CHAINCODE_NAME" \
   --version "$CHAINCODE_VERSION" \
@@ -91,10 +91,10 @@ echo "=== 🚀 Committing Chaincode ==="
 export CORE_PEER_LOCALMSPID="Org1MSP"
 export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
 export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=localhost:7051
+export CORE_PEER_ADDRESS=peer0.org1.example.com:7051  # Docker service name
 
 peer lifecycle chaincode commit \
-  --orderer localhost:7050 \
+  --orderer orderer.example.com:7050  # Docker service name \
   --channelID mychannel \
   --name "$CHAINCODE_NAME" \
   --version "$CHAINCODE_VERSION" \
@@ -102,9 +102,9 @@ peer lifecycle chaincode commit \
   --signature-policy "AND('Org1MSP.member', 'Org2MSP.member')" \
   --tls \
   --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \
-  --peerAddresses localhost:7051 \
+  --peerAddresses peer0.org1.example.com:7051  # Docker service name \
   --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-  --peerAddresses localhost:9051 \
+  --peerAddresses peer0.org2.example.com:9051  # Docker service name \
   --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
 
 echo "=== 🔍 Querying Committed Chaincode ==="
