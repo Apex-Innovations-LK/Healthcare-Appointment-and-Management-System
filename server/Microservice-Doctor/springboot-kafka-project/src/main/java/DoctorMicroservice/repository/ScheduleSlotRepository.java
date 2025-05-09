@@ -6,10 +6,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import DoctorMicroservice.entity.ScheduleSlot;
+import jakarta.transaction.Transactional;
 
 public interface ScheduleSlotRepository extends JpaRepository<ScheduleSlot, UUID> {
     // Custom query methods can be defined here if needed
@@ -29,6 +31,10 @@ public interface ScheduleSlotRepository extends JpaRepository<ScheduleSlot, UUID
     """)
     List<ScheduleSlot> findBySessionId(@Param("sessionId") UUID sessionId);
 
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM ScheduleSlot ss WHERE ss.session_id = :sessionId")
+    void deleteBySessionId(@Param("sessionId") UUID sessionId);
     
 
 }
