@@ -40,6 +40,7 @@
     "typescript": "~5.7.2"
   }
 }
+<<<<<<< HEAD
 {
     "name": "sakai-ng",
     "version": "19.0.1",
@@ -95,3 +96,5 @@
         "typescript": "~5.6.2"
     }
 }
+=======
+>>>>>>> 854da2fe9565f52bb541b5ca2fb37b7b3d497d0c

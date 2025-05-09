@@ -94,6 +94,7 @@
     }
   }
 }
+<<<<<<< HEAD
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
@@ -281,3 +282,5 @@
         "analytics": false
     }
 }
+=======
+>>>>>>> 854da2fe9565f52bb541b5ca2fb37b7b3d497d0c
