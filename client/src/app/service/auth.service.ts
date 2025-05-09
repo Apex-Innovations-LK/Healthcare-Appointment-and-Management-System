@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../models/user';
 import { AuthResponse } from '../models/auth-response';
+import { Doctor } from '../models/doctor';
+import { UserDetails } from '../models/userDetails';
 
 @Injectable({
     providedIn: 'root'
@@ -18,5 +20,23 @@ export class AuthService {
 
     loginUser(user: User): Observable<AuthResponse> {
         return this.httpClient.post<AuthResponse>(`${this.baseURL}/login`, user);
+    }
+
+
+    getUser(username: String): Observable<UserDetails> {
+        return this.httpClient.post<UserDetails>(`${this.baseURL}/get-user`, username);
+    }
+
+    getCount(): Observable<Object> {
+        return this.httpClient.get<Object>(`${this.baseURL}/get-count`);
+    }
+
+
+    getDoctors(): Observable<Doctor[]> {
+        return this.httpClient.get<Doctor[]>(`${this.baseURL}/fetch-doctors`);
+    }
+
+    getDoctorById(doctorId: string): Observable<Doctor> {
+        return this.httpClient.get<Doctor>(`${this.baseURL}/doctor/${doctorId}`);
     }
 }
