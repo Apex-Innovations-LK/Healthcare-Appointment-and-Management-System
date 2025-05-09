@@ -35,7 +35,7 @@ public class IPFSController {
         return ResponseEntity.status(HttpStatus.OK).headers(httpHeaders).body(file);
     }
 
-    @GetMapping(value = "files/batch")
+    @PostMapping(value = "files/batch")
     public ResponseEntity<Map<String, String>> loadMultipleFiles(@RequestBody List<String> hashes) {
         System.out.println("Received batch file request for " + hashes.size() + " files");
         
