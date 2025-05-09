@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.springboot.healthcare.dto.AuthResponse;
 import com.springboot.healthcare.dto.DoctorDetails;
 import com.springboot.healthcare.dto.RegisterRequest;
+import com.springboot.healthcare.dto.UserDetailsDto;
 import com.springboot.healthcare.model.Users;
 import com.springboot.healthcare.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,8 +54,12 @@ public class UserController {
         return userService.fetchAllDoctors();
     }
 
-    @GetMapping("/doctor/{doctorId}")
-    public DoctorDetails getDoctorById(@PathVariable UUID doctorId) {
-        return userService.getDoctorById(doctorId);
+    @PostMapping("/fetch-userInfo")
+    public UserDetailsDto fetchUserInfo(@RequestBody String id) {
+        String cleanId = id.replace("\"", "").trim();
+        System.out.println("id: " + cleanId);
+        UUID patient_id = UUID.fromString(cleanId);
+        System.out.println("slotId: " + patient_id);
+        return userService.fetchUserInfo(patient_id);
     }
 }

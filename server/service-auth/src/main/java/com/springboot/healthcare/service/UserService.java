@@ -2,10 +2,7 @@ package com.springboot.healthcare.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springboot.healthcare.dto.AuthResponse;
-import com.springboot.healthcare.dto.DoctorDetails;
-import com.springboot.healthcare.dto.RegisterRequest;
-import com.springboot.healthcare.dto.UserKafkaEvent;
+import com.springboot.healthcare.dto.*;
 import com.springboot.healthcare.exception.EmailAlreadyExistsException;
 import com.springboot.healthcare.exception.UsernameAlreadyExistsException;
 import com.springboot.healthcare.model.Doctor;
@@ -24,11 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -164,7 +157,7 @@ public class UserService {
         return userRepo.findAllDoctors();
     }
 
-    public DoctorDetails getDoctorById(UUID doctorId) {
-        return userRepo.findDoctorById(doctorId);
+    public UserDetailsDto fetchUserInfo(UUID patientId) {
+        return userRepo.fetchUserDetails(patientId);
     }
 }

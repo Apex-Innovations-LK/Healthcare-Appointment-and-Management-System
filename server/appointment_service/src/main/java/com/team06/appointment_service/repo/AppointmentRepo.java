@@ -1,14 +1,17 @@
 package com.team06.appointment_service.repo;
 
 import com.team06.appointment_service.dto.MakeAppointment;
+import com.team06.appointment_service.dto.PatientDto;
 import com.team06.appointment_service.model.Appointment;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface AppointmentRepo extends JpaRepository<Appointment, UUID> {
@@ -50,14 +53,26 @@ public interface AppointmentRepo extends JpaRepository<Appointment, UUID> {
     @Transactional
     @Query(value = """
         UPDATE appointmentservice.appointment
-        SET appointment.status = 'rejected'
-        WHERE appointment.slot_id = :slotId
+        SET status = 'rejected'
+        WHERE slot_id = :slotId
         """, nativeQuery = true)
     void updateAppointmentTable(@Param("slotId") UUID slotId);
 
+    @Query(value = """
+    SELECT a.patient_id, a.appointment_type
+    FROM appointmentservice.appointment a
+    where a.slot_id = :slotId
+    """, nativeQuery = true)
+    PatientDto findPatientBySlotId(@Param("slotId") UUID slotId);
 
-    @Query("SELECT a FROM Appointment a WHERE a.patient_id = :patientId")
-    List<Appointment> findByPatientId(@Param("patientId") UUID patientId);
+    @Modifying
+    @Transactional
+    @Query(value = """
+        DELETE FROM appointmentservice.appointment
+        WHERE session_id = :session_id
+    """, nativeQuery = true)
+    void deleteAvailability(@Param("session_id") UUID session_id);
+
 }
 //@Modifying
 //@Transactional
