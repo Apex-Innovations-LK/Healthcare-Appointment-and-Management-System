@@ -41,3 +41,37 @@ export interface SessionSlot {
     session_id: string;
     status: 'booked' | 'available' | 'rejected';
 }
+
+export interface PatientGeneralInfo {
+        patient_id: string;
+        name: string;
+        dob: string;
+        sex: string;
+        phone: string;
+}
+
+export interface HealthRecord {
+    record_id: string;
+    patient_id: string;
+    patient_name: string;
+    patient_dob: string;
+    date_of_service: string;
+    referring_doctor: string;
+    chief_complaint: string[];
+    allergies: string[];
+    medications: string[];
+    problem_list: string[];
+    patient_sex: string;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+    patient_phone: string;
+    lbf_data: string[];
+    his_data: string[];
+}
+
+export interface ExtraSlotInfo {
+    patient_id: string;
+    appoinment_type: 'IN_PERSON' | 'VIRTUAL';
+}

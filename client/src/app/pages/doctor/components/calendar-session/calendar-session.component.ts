@@ -6,6 +6,7 @@ import { ChipModule } from 'primeng/chip';
 import { DoctorSession, SessionSlot } from '../../../../models/doctor';
 import { DoctorService } from '../../../../service/doctor.service';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-calendar-session',
@@ -34,7 +35,7 @@ export class CalendarSessionComponent {
     height!:string;
     expanded = false;
 
-    constructor(private doctorService: DoctorService) {}
+    constructor(private doctorService: DoctorService, private router: Router) {}
 
     ngOnInit(): void {
         if (this.session) {
@@ -43,6 +44,14 @@ export class CalendarSessionComponent {
             this.setHeight();
             this.loadSessionSlots();
         }
+    }
+
+    goToConsult(){
+        this.router.navigate(['/doctor/consult'], {
+            state: {
+                sessionData: this.session,
+            }
+        })
     }
 
     getTopOffset(): string {

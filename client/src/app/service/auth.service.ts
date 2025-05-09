@@ -35,4 +35,8 @@ export class AuthService {
     getDoctors(): Observable<Doctor[]> {
         return this.httpClient.get<Doctor[]>(`${this.baseURL}/fetch-doctors`);
     }
+
+    getDoctorById(doctorId: string): Observable<Doctor> {
+        return this.httpClient.get<Doctor>(`${this.baseURL}/doctor/${doctorId}`);
+    }
 }

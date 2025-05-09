@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DoctorAvailability, DoctorSession, SessionSlot } from '../models/doctor';
+import { DoctorAvailability, DoctorSession, ExtraSlotInfo, HealthRecord, PatientGeneralInfo, SessionSlot } from '../models/doctor';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -53,4 +53,23 @@ export class DoctorService {
     return this.httpClient.post<SessionSlot[]>(apiUrl, { sessionId: session_id });
   }
 
+  uploadHr(hr: HealthRecord){
+    const apiUrl = "http://127.0.0.1:8086/upload";
+    return this.httpClient.post(apiUrl, hr, { responseType: 'text' });
+  }
+
+  getHrsByPatientId(patient_id: string): Observable<HealthRecord[]> {
+    const apiUrl = this.baseURL + '/getHealthRecordsByPatientId';
+    return this.httpClient.post<HealthRecord[]>(apiUrl, { patientId: patient_id });
+  }
+
+  getSlotDataBySlotId(slot_id: string){
+    const apiUrl = "http://localhost:8080/api/appointment/get-patient";
+    return this.httpClient.post<ExtraSlotInfo>(apiUrl, slot_id);
+  }
+
+  getPatientGeneralInfo(patient_id: string) {
+    const apiUrl = "http://localhost:8080/api/auth/fetch-userinfo";
+    return this.httpClient.post<PatientGeneralInfo>(apiUrl, patient_id);
+  }
 }

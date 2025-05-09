@@ -160,14 +160,17 @@ export class AddAppointmentComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+        console.log('Token in localStorage:', localStorage.getItem('token'));
         this.loadDoctors();
         this.loadAppointments();
     }
 
     loadDoctors() {
         this.isLoading = true;
+        console.log('Loading doctors...');
         this.authService.getDoctors().subscribe({
             next: (data: any) => {
+                console.log('Doctors data received:', data);
                 // Parse the doctor data from the backend format
                 this.allDoctors = this.parseDoctorData(data);
                 this.filteredDoctors = [...this.allDoctors];
