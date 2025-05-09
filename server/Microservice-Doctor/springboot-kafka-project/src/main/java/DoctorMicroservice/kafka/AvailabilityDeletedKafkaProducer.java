@@ -10,7 +10,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import DoctorMicroservice.dto.DoctorAvailabilityDto;
-import DoctorMicroservice.dto.SessionIdDto;
+import DoctorMicroservice.dto.Session_idDto;
 
 @Service
 public class AvailabilityDeletedKafkaProducer {
@@ -24,10 +24,10 @@ public class AvailabilityDeletedKafkaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void deleteDoctorAvailability(SessionIdDto Dto) {
+    public void deleteDoctorAvailability(Session_idDto Dto) {
         LOGGER.info("Sending deleted doctor Availability to Kafka topic: {}",Dto);
 
-        Message<SessionIdDto> message = MessageBuilder
+        Message<Session_idDto> message = MessageBuilder
                 .withPayload(Dto)
                 .setHeader(KafkaHeaders.TOPIC, TOPIC)
                 .build();
