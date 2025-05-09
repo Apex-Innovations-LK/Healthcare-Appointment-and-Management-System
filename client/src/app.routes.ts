@@ -5,7 +5,10 @@ import { DoctorLayout } from './app/pages/doctor/doctor.layout';
 import { PatientLayout } from './app/pages/patient/patient.layout';
 import { StaffLayout } from './app/pages/staff/staff.layout';
 import { HomeComponent } from './app/pages/home/home';
-import { AuthGuard } from './app/service/auth.guard';
+import { AdminAuthGuard } from './app/service/AuthGuards/adminAuth.guard';
+import { PatientAuthGuard } from './app/service/AuthGuards/patientAuth.guard';
+import { DoctorAuthGuard } from './app/service/AuthGuards/doctorAuth.guard';
+import { StaffAuthGuard } from './app/service/AuthGuards/staffAuth.guard';
 
 import { VideoCallComponent } from './app/video-call/video-call.component';
 export const appRoutes: Routes = [
@@ -22,7 +25,7 @@ export const appRoutes: Routes = [
     {
         path: 'admin',
         component: AppLayout,
- //       canActivate: [AuthGuard],
+ //       canActivate: [AdminAuthGuard],
         children: [
             {
                 path: '',
@@ -33,7 +36,7 @@ export const appRoutes: Routes = [
     {
         path: 'patient',
         component: PatientLayout,
- //       canActivate: [AuthGuard],
+//        canActivate: [PatientAuthGuard],
         children: [
             {
                 path: '',
@@ -44,7 +47,7 @@ export const appRoutes: Routes = [
     {
         path: 'doctor',
         component: DoctorLayout,
- //       canActivate: [AuthGuard],
+ //       canActivate: [DoctorAuthGuard],
         children: [
             {
                 path: '',
@@ -56,7 +59,7 @@ export const appRoutes: Routes = [
     {
         path: 'staff',
         component: StaffLayout,
-//        canActivate: [AuthGuard],
+//        canActivate: [StaffAuthGuard],
         children: [
             {
                 path: '',

@@ -28,7 +28,7 @@ public class AppointmentService {
     public void makeAppointment(MakeAppointment appointment) {
         appointmentRepo.updateAppointment(appointment.getAppointment_type(), appointment.getPatient_id(),appointment.getSlotId());
 
-        AppointmentBookedDto appointmentBookedDto = new AppointmentBookedDto("Booked",appointment.getSlotId());
+        AppointmentBookedDto appointmentBookedDto = new AppointmentBookedDto("booked",appointment.getSlotId());
 
         kafkaProducerService.sendAppointmentBookedEvent(appointmentBookedDto);
     }

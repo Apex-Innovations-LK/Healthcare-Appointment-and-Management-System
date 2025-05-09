@@ -84,5 +84,4 @@ public class DoctorKafkaEvent {
                 ", eventType='" + eventType + '\'' +
                 '}';
     }
-
 }

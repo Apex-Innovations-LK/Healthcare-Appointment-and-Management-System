@@ -287,6 +287,10 @@ export class AddAppointmentComponent implements OnInit {
             next: (response: string) => {
                 this.isBooking = false;
                 this.notificationService.showSuccess('Appointment booked successfully!');
+                const currentUrl = this.router.url;
+                this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+                    this.router.navigate([currentUrl]);
+                });
                 this.router.navigate(['/patient/appointments']);
             },
             error: (err) => {

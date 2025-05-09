@@ -42,7 +42,7 @@ export class AuthStateService implements OnInit {
     }
 
     getRole(): string | null {
-        return this.userInfo?.role || null;
+        return this.getUserDetails()?.role || null;
     }
 
     isAuthenticated(): boolean {

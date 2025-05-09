@@ -122,7 +122,6 @@ export class Login {
 
     private redirectUserBasedOnRole(token: string, username: string, role: string, status: string): void {
         localStorage.setItem('token', token);
-        this.authStateService.fetchUserInfo();
         const routesByRole: Record<string, string> = {
             PATIENT: '/patient',
             ADMIN: '/admin',
@@ -137,6 +136,7 @@ export class Login {
         this.authService.loginUser(this.user).subscribe({
             next: (data) => {
                 console.log(data);
+                this.authStateService.fetchUserInfo();
                 this.notificationService.showSuccess('Login successful!');
                 this.redirectUserBasedOnRole(data.token, data.username, data.role, data.status);
             },

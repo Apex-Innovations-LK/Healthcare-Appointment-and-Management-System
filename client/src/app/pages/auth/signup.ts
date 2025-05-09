@@ -85,8 +85,8 @@ import { NotificationService } from '../../service/notification.service';
                                 <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Speciality</label>
                                 <input pInputText id="speciality1" type="text" placeholder="Speciality" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.speciality" />
 
-                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">License Number</label>
-                                <input pInputText id="license_number1" type="text" placeholder="License Number" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.license_number" />
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Title</label>
+                                <input pInputText id="license_number1" type="text" placeholder="ex :- MBBS" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.license_number" />
                             </div>
 
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">First Name</label>

@@ -1,5 +1,6 @@
 package com.team06.serviceschedule.service;
 
+import com.team06.serviceschedule.dto.ScheduleDto;
 import com.team06.serviceschedule.model.Availibility;
 import com.team06.serviceschedule.model.SessionAssignment;
 import com.team06.serviceschedule.model.Users;
@@ -73,5 +74,9 @@ public class SchedularService {
         stats.put("doctorCount", doctorCount);
         stats.put("staffCount", staffCount);
         return stats;
+    }
+
+    public List<ScheduleDto> getSchedule(UUID staff_id) {
+        return sessionAssignmentRepo.getSchedule(staff_id);
     }
 }
