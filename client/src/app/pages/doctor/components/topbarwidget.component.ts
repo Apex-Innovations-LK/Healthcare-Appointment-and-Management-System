@@ -65,6 +65,17 @@ import { NotificationService } from '../../../service/notification.service';
                         <span>Next Week</span>
                     </a>
                 </li>
+                <li>
+                    <a 
+                        (click)="router.navigate(['/doctor/chatbot'])" 
+                        pRipple 
+                        class="px-6 py-3 bg-primary text-surface-0 hover:bg-primary/90 rounded-full font-semibold text-lg transition duration-300"
+                    >
+                        <span>Chatbot</span>
+                    </a>
+                </li>
+
+
             </ul>
             <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0">
                 <button pButton pRipple label="Logout" [rounded]="true" (click)="logout()"></button>
