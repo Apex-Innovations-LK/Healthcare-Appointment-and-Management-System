@@ -15,6 +15,9 @@ import com.team07.ipfs_service.services.producer.IPFSProducer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class IPFSService implements FileServiceImpl {
@@ -70,4 +73,31 @@ public class IPFSService implements FileServiceImpl {
             throw new RuntimeException("Error whilst communicating with the IPFS node.",e);
         }
     }
+
+    @Override
+    public Map<String, byte[]> loadMultipleFiles(List<String> hashes) {
+    try {
+        IPFS ipfs = ipfsConfig.getIpfs();
+        Map<String, byte[]> results = new ConcurrentHashMap<>();
+        
+        // Use parallel processing for better performance
+        hashes.parallelStream().forEach(hash -> {
+            try {
+                Multihash filePointer = Multihash.fromBase58(hash);
+                byte[] content = ipfs.cat(filePointer);
+                results.put(hash, content);
+            } catch (Exception e) {
+                // Log the error but continue with other files
+                System.err.println("Failed to load file with hash: " + hash);
+                e.printStackTrace();
+            }
+        
+        });
+        return results;
+    } catch (Exception e) {
+        throw new RuntimeException("Error whilst communicating with the IPFS node.", e);
+    }
+}
+
+
 }
