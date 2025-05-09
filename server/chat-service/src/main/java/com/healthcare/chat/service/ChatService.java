@@ -22,7 +22,7 @@ public class ChatService {
 
     public ChatService(WebClient.Builder builder) {
         this.webClient = builder
-                .baseUrl("https://0c54-34-105-96-183.ngrok-free.app") // the link should be changed.
+                .baseUrl("https://quietly-evolved-raptor.ngrok-free.app") // the link should be changed.
                 .build();
     }
 
