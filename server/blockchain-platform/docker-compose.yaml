@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  fabric-network:
+    image: hyperledger/fabric-tools:2.4
+    container_name: fabric-network
+    volumes:
+      - ./fabric-samples:/fabric-samples
+      - ./healthchaincode:/healthchaincode
+      - ./scripts:/scripts
+      - /var/run/docker.sock:/var/run/docker.sock  # For docker commands inside
+    working_dir: /fabric-samples/test-network
+    environment:
+      - FABRIC_CFG_PATH=/fabric-samples/config
+      - PATH=/fabric-samples/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    command: bash /scripts/deploy_mycc.sh
+    healthcheck:
+      test: ["CMD", "peer", "version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  blockchain-service:
+    build: ./blockchain-service
+    container_name: blockchain-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      fabric-network:
+        condition: service_healthy
+    volumes:
+      - ./fabric-samples:/app/fabric-samples
+    environment:
+      - CHANNEL_NAME=mychannel
+      - CHAINCODE_NAME=mycc
