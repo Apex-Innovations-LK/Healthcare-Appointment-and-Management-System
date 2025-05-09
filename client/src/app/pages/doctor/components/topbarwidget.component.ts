@@ -55,6 +55,11 @@ import { ToastModule } from 'primeng/toast';
                     </a>
                 </li>
                 <li>
+                    <a (click)="router.navigate(['/doctor/consult'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
+                        <span>Consult</span>
+                    </a>
+                </li>
+                <li>
                     <a (click)="router.navigate(['/doctor/next-week'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
                         <span>Next Week</span>
                     </a>

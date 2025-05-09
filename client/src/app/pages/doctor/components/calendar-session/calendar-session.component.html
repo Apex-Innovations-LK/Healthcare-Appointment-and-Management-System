@@ -7,10 +7,10 @@
     #componentRef2
 >
     <p class="time-duration text-lg m-0 font-bold">{{ fromTime | date: 'shortTime' }} - {{ toTime | date: 'shortTime' }}</p>
-    <div class="flex flex-row items-center justify-start mt-1 w-full flex-wrap">
+    <!-- <div class="flex flex-row items-center justify-start mt-1 w-full flex-wrap">
         <p class="key-staff text-md m-0">Staff member :</p>
         <p-chip label="Ayodya Madumali" class="ml-4 mt-2 cursor-pointer value-staff text-large"></p-chip>
-    </div>
+    </div> -->
     <p class="appointments-key mt-2 text-md w-full text-left">
         Appointments <span class="text-lime-500 ml-5 text-2xl font-semibold">{{ getBookedCount() }}</span
         ><span class="full-count"> /{{ session.number_of_patients }}</span>
@@ -26,9 +26,9 @@
                 }
             </div>
         }
-        <p-button class="mt-4" label="View HRs" severity="info" raised />
-        @if (!isExpired()) {
+        <p-button class="mt-4" label="View HRs" severity="info" raised (click)="goToConsult()" />
+        <!-- @if (!isExpired()) {
             <p-button class="mt-2" label="Reject Appointments" severity="warn" raised />
-        }
+        } -->
     }
 </div>
