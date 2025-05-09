@@ -12,6 +12,6 @@ import { FooterWidget } from './components/footerwidget';
         <doctor-topbar-widget class="py-6 px-6 mx-0 md:mx-12 lg:mx-20 lg:px-20 flex items-center justify-between relative lg:static" />
         <router-outlet></router-outlet>
         <doctor-footer-widget />
-    `
+    `  
 })
 export class DoctorLayout {}

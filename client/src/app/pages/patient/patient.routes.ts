@@ -8,5 +8,6 @@ export default [
     { path: '', component: Patient },
     { path: 'appointment', component: Appointment },
     { path: 'appointment/add', component: AddAppointmentComponent },
-    { path: 'appointment/view', component: ViewAppointmentComponent }
+    { path: 'appointment/view', component: ViewAppointmentComponent },
+
 ] as Routes;

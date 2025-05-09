@@ -14,21 +14,21 @@ import java.util.UUID;
 public interface AppointmentRepo extends JpaRepository<Appointment, UUID> {
 
     @Query(value = """
-        SELECT
+            SELECT
             a.slot_id,
             d.doctor_id,
             d."from",
             d."to"
-        FROM
-            appointment a
-        JOIN
-            availibility d
-        ON
+            FROM
+            appointmentservice.appointment a
+            JOIN
+            appointmentservice.availibility d
+            ON
             a.session_id = d.session_id
-        WHERE
-            a.status = 'Available'
-            AND d."from" >= date_trunc('week', now())
-            AND d."from" < date_trunc('week', now()) + interval '7 days'
+            WHERE
+            a.status = 'available'
+            AND d."from" >= date_trunc('week', now())  + interval '7 days'
+            AND d."from" < date_trunc('week', now()) + interval '14 days'
         """, nativeQuery = true)
     List<Object> findAvailableSlotsForCurrentWeek();
 
@@ -36,24 +36,31 @@ public interface AppointmentRepo extends JpaRepository<Appointment, UUID> {
     @Modifying
     @Transactional
     @Query(value = """
-        UPDATE Appointment 
-        SET appointment_type = :appointment_type, status = 'Booked', patient_id = :patient_id 
+
+            UPDATE appointmentservice.appointment 
+        SET appointment_type = :appointment_type, status = 'booked', patient_id = :patient_id 
         WHERE slot_id = :slotId
         """, nativeQuery = true)
     void updateAppointment(@Param("appointment_type") String appointment_type,
                            @Param("patient_id") UUID patient_id,
                            @Param("slotId") UUID slotId);
 
+
     @Modifying
     @Transactional
     @Query(value = """
-        UPDATE Appointment 
-        SET status = 'Rejected'
-        WHERE slot_id = :slotId
+        UPDATE appointmentservice.appointment
+        SET appointment.status = 'rejected'
+        WHERE appointment.slot_id = :slotId
         """, nativeQuery = true)
     void updateAppointmentTable(@Param("slotId") UUID slotId);
+
 
     @Query("SELECT a FROM Appointment a WHERE a.patient_id = :patientId")
     List<Appointment> findByPatientId(@Param("patientId") UUID patientId);
 }
-
+//@Modifying
+//@Transactional
+//@Query(value = """
+//    UPDATE appoint`
+//

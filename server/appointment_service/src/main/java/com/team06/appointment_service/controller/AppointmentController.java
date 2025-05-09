@@ -34,7 +34,9 @@ public class AppointmentController {
 
     @GetMapping("/get-slots")
     public List<Object> findSlots() {
-        return appointmentService.findSlots();
+        List<Object> list = appointmentService.findSlots();
+        System.out.println("list: " + list);
+        return list;
     }
 
     @PostMapping("/book-appointment")

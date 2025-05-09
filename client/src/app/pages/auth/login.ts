@@ -11,6 +11,8 @@ import { User } from '../../models/user';
 import { AuthService } from '../../service/auth.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { AuthStateService } from '../../service/auth-state.service';
+import { NotificationService } from '../../service/notification.service';
 
 @Component({
     selector: 'app-login',
@@ -100,7 +102,9 @@ export class Login {
     constructor(
         private router: Router,
         private authService: AuthService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private authStateService: AuthStateService,
+        private notificationService: NotificationService
     ) {}
 
     email: string = '';
@@ -129,20 +133,11 @@ export class Login {
     }
 
     login() {
-        console.log('user', this.user);
         this.authService.loginUser(this.user).subscribe({
             next: (data) => {
-                console.log('Login response:', data);
-                // Store token in localStorage
-                localStorage.setItem('token', data.token);
-                // Store user details in localStorage
-                localStorage.setItem('user', JSON.stringify(data));
-                
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: 'Login successful!'
-                });
+                console.log(data);
+                this.authStateService.fetchUserInfo();
+                this.notificationService.showSuccess('Login successful!');
                 this.redirectUserBasedOnRole(data.token, data.username, data.role, data.status);
             },
             error: (error) => {

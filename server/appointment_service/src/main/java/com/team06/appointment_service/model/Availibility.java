@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "availibility")
+@Table(name = "availibility", schema = "appointmentservice")
 public class Availibility {
 
     @Id

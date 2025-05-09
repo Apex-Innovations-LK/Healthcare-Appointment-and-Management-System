@@ -29,7 +29,7 @@ public interface UserRepo extends JpaRepository<Users, UUID> {
                 doctor.speciality,
                 doctor.license_number 
         FROM 
-                users JOIN doctor ON users.id = doctor.id
+                authservice.users JOIN authservice.doctor ON users.id = doctor.id
                 """, nativeQuery = true)
     List<DoctorDetails> findAllDoctors();
 

@@ -110,7 +110,7 @@ public class UserService {
         }
         String token = jwtService.generateToken(user.getUsername(), user.getRole());
 
-        // Create the UserKafkaEvent object
+
         UserKafkaEvent userEvent = new UserKafkaEvent(
                 savedUser.getId(),
                 savedUser.getUsername(),

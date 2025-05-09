@@ -8,6 +8,8 @@ import { AuthService } from '../../../service/auth.service';
 import { Appointment } from '../appointment';
 import { AuthStateService } from '../../../service/auth-state.service';
 import { MakeAppointment } from '../../../models/makeAppointment';
+import { NotificationService } from '../../../service/notification.service';
+import { RefreshButtonComponent } from './refreshButtonComponent';
 
 interface Doctor {
     doctor_id: string;
@@ -27,10 +29,13 @@ interface AppointmentSlot {
 @Component({
     selector: 'app-add-appointment',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, HttpClientModule],
+    imports: [CommonModule, FormsModule, RouterModule, RefreshButtonComponent],
     template: `
         <div class="container mx-auto p-4">
-            <h1 class="text-2xl font-bold mb-6 text-black dark:text-white">Make an Appointment</h1>
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="text-2xl font-bold mb-6 text-black dark:text-white">Make an Appointment</h1>
+                <app-refresh-button></app-refresh-button>
+            </div>
 
             <!-- Search doctor -->
             <div class="mb-6">
@@ -55,7 +60,7 @@ interface AppointmentSlot {
                             *ngFor="let doctor of filteredDoctors"
                             (click)="selectDoctor(doctor)"
                             class="border rounded-lg p-4 cursor-pointer transition duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
-                            [ngClass]="{ 'bg-blue-50 border-blue-500 shadow-md': selectedDoctorId === doctor.doctor_id }"
+                            [ngClass]="{ 'dark:bg-gray-900 bg-gray-50 border-blue-500 shadow-md': selectedDoctorId === doctor.doctor_id }"
                         >
                             <h3 class="font-medium text-lg">Dr. {{ doctor.first_name }} {{ doctor.last_name }}</h3>
                             <p class="text-gray-400">{{ doctor.speciality }}</p>
@@ -93,7 +98,7 @@ interface AppointmentSlot {
                             </div>
                             <div
                                 class="p-3 bg-green-100 text-green-800 hover:bg-green-200 rounded cursor-pointer transition duration-150"
-                                [ngClass]="{ 'bg-green-500 text-white': selectedSlot && selectedSlot.slot_id === appointment.slot_id }"
+                                [ngClass]="{ 'bg-primary text-black': selectedSlot && selectedSlot.slot_id === appointment.slot_id }"
                                 (click)="selectSlot(appointment)"
                             >
                                 {{ formatAppointmentTime(appointment.from) }} - {{ formatAppointmentTime(appointment.to) }}
@@ -144,7 +149,8 @@ export class AddAppointmentComponent implements OnInit {
         private route: ActivatedRoute,
         private appointmentService: AppointmentsService,
         private authService: AuthService,
-        private authStateService: AuthStateService // Assuming you have a service to manage authentication state
+        private authStateService: AuthStateService,
+        private notificationService: NotificationService
     ) {}
 
     ngOnInit() {
@@ -175,6 +181,7 @@ export class AddAppointmentComponent implements OnInit {
         this.isLoading = true;
         this.appointmentService.getAppointments().subscribe({
             next: (data: any) => {
+                console.log('slots', data);
                 // Parse the appointment data from the backend format
                 this.allAppointments = this.parseAppointmentData(data);
                 this.isLoading = false;
@@ -261,13 +268,14 @@ export class AddAppointmentComponent implements OnInit {
     isBooking: boolean = false;
     bookAppointment() {
         if (!this.selectedDoctor || !this.selectedSlot) {
-            alert('Please select a doctor and a time slot.');
+            this.notificationService.showWarning('Please select a doctor and a time slot before booking.');
             return;
         }
 
         const patientId = this.authStateService.getUserDetails()?.id;
+        console.log('patientId', patientId);
         if (!patientId) {
-            alert('User not authenticated. Please log in again.');
+            this.notificationService.showError('Error Occured. Please log in again.');
             return;
         }
 
@@ -281,19 +289,22 @@ export class AddAppointmentComponent implements OnInit {
         this.appointmentService.bookAppointment(makeAppointment).subscribe({
             next: (response: string) => {
                 this.isBooking = false;
-                alert('Appointment booked successfully!');
+                this.notificationService.showSuccess('Appointment booked successfully!');
+                const currentUrl = this.router.url;
+                this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+                    this.router.navigate([currentUrl]);
+                });
                 this.router.navigate(['/patient/appointments']);
             },
             error: (err) => {
                 this.isBooking = false;
                 console.error('Error booking appointment:', err);
-                alert('Failed to book appointment. Please try again later.');
+                this.notificationService.showError('Failed to book appointment. Please try again later.');
             }
         });
 
         this.selectedSlot = null;
     }
-    
 
     onCancel() {
         window.history.back();

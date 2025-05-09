@@ -13,6 +13,8 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../service/auth.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { AuthStateService } from '../../service/auth-state.service';
+import { NotificationService } from '../../service/notification.service';
 
 @Component({
     selector: 'app-signup',
@@ -83,8 +85,8 @@ import { ToastModule } from 'primeng/toast';
                                 <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Speciality</label>
                                 <input pInputText id="speciality1" type="text" placeholder="Speciality" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.speciality" />
 
-                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">License Number</label>
-                                <input pInputText id="license_number1" type="text" placeholder="License Number" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.license_number" />
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Title</label>
+                                <input pInputText id="license_number1" type="text" placeholder="ex :- MBBS" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.license_number" />
                             </div>
 
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">First Name</label>
@@ -134,7 +136,9 @@ export class Signup {
     constructor(
         private router: Router,
         private authService: AuthService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private authStateService: AuthStateService,
+        private notificationService: NotificationService
     ) {}
 
     email: string = '';
@@ -158,6 +162,7 @@ export class Signup {
 
     private redirectUserBasedOnRole(token: string, username: string, role: string, status: string): void {
         localStorage.setItem('token', token);
+        this.authStateService.fetchUserInfo();
         const routesByRole: Record<string, string> = {
             PATIENT: '/patient',
             ADMIN: '/admin',
@@ -172,15 +177,7 @@ export class Signup {
     registerUser() {
         this.authService.registerUser(this.user).subscribe({
             next: (data) => {
-                // console.log(data);
-                // if (!data.token) {
-                //     this.messageService.add({
-                //         severity: 'error',
-                //         summary: 'Error',
-                //         detail: data.message || 'Signup failed.'
-                //     });
-                //     return;
-                // }
+                this.notificationService.showSuccess('Signup successful!');
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',

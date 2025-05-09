@@ -1,11 +1,15 @@
 package com.team06.serviceschedule.controller;
 
+import com.team06.serviceschedule.dto.ScheduleDto;
+import com.team06.serviceschedule.dto.StaffRequest;
 import com.team06.serviceschedule.service.SchedularService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -24,5 +28,12 @@ public class SchedulerController {
     public Map<String, Long> getCount() {
         return schedularService.getCount();
     }
+
+    @PostMapping("/get-schedule")
+    public List<ScheduleDto> getSchedule(@RequestBody Map<String, UUID> payload) {
+        UUID staffId = payload.get("staff_id");
+        return schedularService.getSchedule(staffId);
+    }
+
 }
 

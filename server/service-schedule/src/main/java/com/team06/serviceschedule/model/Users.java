@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema = "schedulaservice")
 public class Users {
     @Id
     @Column(name = "id", updatable = false, nullable = false)
