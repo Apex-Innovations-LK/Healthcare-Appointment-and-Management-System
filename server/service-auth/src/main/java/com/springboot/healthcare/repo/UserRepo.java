@@ -33,5 +33,18 @@ public interface UserRepo extends JpaRepository<Users, UUID> {
                 """, nativeQuery = true)
     List<DoctorDetails> findAllDoctors();
 
+    @Query(value = """
+        SELECT 
+                users.id, 
+                users.first_name,
+                users.last_name,
+                doctor.speciality,
+                doctor.license_number 
+        FROM 
+                users JOIN doctor ON users.id = doctor.id
+        WHERE 
+                users.id = :doctorId
+                """, nativeQuery = true)
+    DoctorDetails findDoctorById(UUID doctorId);
 }
 
