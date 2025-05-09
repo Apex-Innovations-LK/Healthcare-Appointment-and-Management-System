@@ -1,5 +1,0 @@
-fastapi
-uvicorn
-aiokafka
-aiosmtplib
-python-dotenv
