@@ -1,28 +1,33 @@
 <div class="card grid grid-cols-12 gap-6 p-6 bg-white rounded-2xl shadow-md">
     <!-- Left Section: Resource Info -->
-    <div class="col-span-12 xl:col-span-4 space-y-4">
+    <div class="flex gap-6 xl:col-span-4 space-y-4">
         <div>
-            <h2 class="text-xl font-bold text-gray-800">(Resource Name)</h2>
-            <p class="text-sm text-gray-500">(Department)</p>
+            <p-button
+                icon="pi pi-arrow-left"
+                class="p-button-text text-gray-600"
+                (onClick)="handleGoBack()"
+            ></p-button>
         </div>
         <div>
-            <p-button label="Edit Resource" class="p-button-link"></p-button>
+            <h2 class="text-xl font-bold text-gray-800">{{ resource.name }}</h2>
+            <p class="text-sm text-gray-500">{{ resource.department }}</p>
         </div>
     </div>
+
 
     <!-- Middle Section: Metrics -->
     <div class="col-span-12 xl:col-span-4 space-y-4">
         <div>
             <p class="text-sm text-gray-500">Status</p>
-            <p class="text-lg font-semibold text-green-600">(Available)</p>
+            <p class="text-lg font-semibold text-green-600">{{resource.status}}</p>
         </div>
         <div>
             <p class="text-sm text-gray-500">Total Allocations</p>
-            <p class="text-lg font-semibold text-gray-800">(5)</p>
+            <p class="text-lg font-semibold text-gray-800">5</p>
         </div>
         <div>
             <p class="text-sm text-gray-500">Utilization</p>
-            <p class="text-lg font-semibold text-blue-600">(44%)</p>
+            <p class="text-lg font-semibold text-blue-600">44%</p>
         </div>
     </div>
 

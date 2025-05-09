@@ -22,7 +22,7 @@ export default [
     { path: 'schedular', component: Schedular },
     { path: 'analytics', component: Analytics },
     { path: 'staff-utilization', component: StaffUtilization},
-    { path: 'staff/:id', component: StaffUtilizationDetailViewComponent },
+    { path: 'staff/:id/:avgUtilization', component: StaffUtilizationDetailViewComponent },
     { path: 'resource-allocation', component: ResourceAllocation },
     { path: 'resource-allocation/resources', component: Resources },
     { path: 'resource-allocation/resource-allocation-detail/:id', component: ResourceAllocationDetail },

@@ -29,4 +29,14 @@ public class ResourceService {
     public List<Resource> findAllByResourceIdIn(List<Long> resourceIds) {
         return resourceRepo.findAllByResourceIdIn(resourceIds).orElseThrow(() -> new ResourceAllocationNotFoundException("Resource Allocation by ids was not found"));
     }
+
+
+
+    public Integer getResourceCount() {
+        return (int) resourceRepo.count();
+    }
+
+    public Resource getResourceByResourceId(Long resourceId) {
+        return resourceRepo.getResourceByResourceId(resourceId).orElseThrow(() -> new ResourceAllocationNotFoundException("Not Found 404"));
+    }
 }

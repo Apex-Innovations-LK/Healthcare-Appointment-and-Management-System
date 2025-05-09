@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "staff_allocations" ,schema = "resource_manager")
-public class staffAllocations implements Serializable {
+public class StaffAllocation implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,12 +27,12 @@ public class staffAllocations implements Serializable {
     private float utilization;
     private String status;
 
-    public staffAllocations() {
+    public StaffAllocation() {
     }
 
-    public staffAllocations(UUID staffId, String name, String role, Date date,
-                            float scheduleTime, float overtime, float idle_time,
-                            float active_time, float utilization, String status) {
+    public StaffAllocation(UUID staffId, String name, String role, Date date,
+                           float scheduleTime, float overtime, float idle_time,
+                           float active_time, float utilization, String status) {
         this.staffId = staffId;
         this.name = name;
         this.role = role;

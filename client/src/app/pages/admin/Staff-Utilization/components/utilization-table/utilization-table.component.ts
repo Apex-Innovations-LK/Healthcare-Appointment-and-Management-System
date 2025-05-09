@@ -64,7 +64,7 @@ export class UtilizationTable implements OnInit{
                 label: 'utilization',
                 backgroundColor: '#42A5F5',
                 borderColor: 'green',
-                data: [65, 59]
+                data: [0, 0]
             }
             // {
             //     label: 'My Second dataset',
@@ -119,10 +119,10 @@ export class UtilizationTable implements OnInit{
     };
 
     pieData = {
-        labels: ['Low: 24%', 'Normal: 38%', 'High: 38%'],
+        labels: ["Low", "Normal", "High"],
         datasets: [
             {
-                data: [2, 3, 3],
+                data: [0, 0, 0],
                 backgroundColor: ['#42A5F5', '#66BB6A', '#EF5350'], // blue, green, red
                 hoverBackgroundColor: ['#2196F3', '#43A047', '#E53935'] // darker variants
             }
@@ -141,7 +141,9 @@ export class UtilizationTable implements OnInit{
     };
 
     utilizationRecords: UtilizationRecord[] = [];
-    avgUtilization: number = 77.81; // Average utilization percentage for all staff
+    avgUtilization: number = 0; // Average utilization percentage for all staff
+    numberOfOverUsedStaff: number = 0; // Number of staff members with utilization above 80%
+    totalStaffMembers: number = 0; // Total number of staff members
 
     roles: any[] = [
         { name: 'Doctor', code: 'DOC' },
@@ -165,10 +167,39 @@ export class UtilizationTable implements OnInit{
             }));
             this.loading = false;
         });        
+        this.utilizationService.getStaffUtilizationOverall().subscribe((data) => {
+            this.avgUtilization = data.avarageUtilization;
+            this.numberOfOverUsedStaff = data.numberOfOverUsedStaff;
+            this.totalStaffMembers = data.totalStaffMembers;
+            this.barData = {
+                labels: ['Doctors', 'Staff'],
+                datasets: [
+                    {
+                        label: 'utilization',
+                        backgroundColor: '#42A5F5',
+                        borderColor: 'green',
+                        data: [data.utilizationByRoleDoctor, data.utilizationByRoleStaff]
+                    }
+                ]
+            };
+            this.pieData = {
+                labels: data.staffStateDestributionLebal as string[],
+                datasets: [
+                    {
+                        data: data.staffStateDestribution,
+                        backgroundColor: ['#42A5F5', '#66BB6A', '#EF5350'], // blue, green, red
+                        hoverBackgroundColor: ['#2196F3', '#43A047', '#E53935'] // darker variants
+                    }
+                ]
+            };    
+            // console.log(this.barData.datasets[0].data);
+        });
+        
     }
 
     goToDetail(record : any) {
-        this.router.navigate(['/admin/staff', record.id]);
+        // console.log(record.staffAllocationId , avgUtilization);
+        this.router.navigate(['/admin/staff', record.staffAllocationId , this.avgUtilization]);
     }
 
 }

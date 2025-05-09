@@ -1,10 +1,11 @@
 export interface UtilizationRecord {
-    id: string
+    staffAllocationId: string
+    staffId: string
     name: string
     role: string
     date: string
-    scheduled_hours: number
-    active_hours: number
+    scheduleTime: number
+    active_time: number
     utilization: number
     idle_time: string
     overtime: number

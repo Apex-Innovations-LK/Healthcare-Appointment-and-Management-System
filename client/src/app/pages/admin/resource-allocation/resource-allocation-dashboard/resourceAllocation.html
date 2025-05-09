@@ -7,15 +7,13 @@
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
         <div style="background-color: #eeeeee5d; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
-            <p style="color: #777; font-weight: 500; margin-bottom: 6px;">Total Sessions Today</p>
-            <p style="font-size: 2.2em; font-weight: bold; color: #222;">24</p>
-            <p style="color: #4CAF50; font-weight: 500;">+5% from yesterday</p>
+            <p style="color: #777; font-weight: 500; margin-bottom: 6px;">Total Sessions</p>
+            <p style="font-size: 2.2em; font-weight: bold; color: #222;">{{AllSessions}}</p>
         </div>
 
         <div style="background-color: #eeeeee5d; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
             <p style="color: #777; font-weight: 500; margin-bottom: 6px;">Available Resources</p>
-            <p style="font-size: 2.2em; font-weight: bold; color: #222;">42</p>
-            <p style="color: #2196F3; font-weight: 500;">18 rooms, 24 equipments</p>
+            <p style="font-size: 2.2em; font-weight: bold; color: #222;">{{numberOfResources}}</p>
         </div>
 
     </div>
@@ -75,7 +73,7 @@
                         {{ record.to | date: 'MM/dd/yyyy' }}
                     </td>
                     <td class="flex flex-row justify-between items-center">
-                        {{ record.resourceIds }}
+                        {{ record.resourceIds.length }}
                         <p-button label="See Details" class="p-button-link" (click)="goToResourceAllocationDetail(record)"></p-button>
                     </td>
                 </tr>

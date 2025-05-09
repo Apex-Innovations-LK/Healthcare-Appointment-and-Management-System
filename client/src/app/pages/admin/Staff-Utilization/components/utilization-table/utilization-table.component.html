@@ -8,12 +8,12 @@
         </div>
         <div style="flex: 1; padding: 16px; border: 1px solid #ccc; border-radius: 8px; text-align: center;">
           <p style="margin: 0; font-weight: bold;">Overused Staff</p>
-          <p style="margin: 8px 0; font-size: 24px; color: black; font-weight: bold;">3</p>
-          <p style="margin: 0; color: #757575;">Staff with utilization > 85%</p>
+          <p style="margin: 8px 0; font-size: 24px; color: black; font-weight: bold;">{{numberOfOverUsedStaff}}</p>
+          <p style="margin: 0; color: #757575;">Staff with utilization > 80%</p>
         </div>
         <div style="flex: 1; padding: 16px; border: 1px solid #ccc; border-radius: 8px; text-align: center;">
           <p style="margin: 0; font-weight: bold;">Total Staff Members</p>
-          <p style="margin: 8px 0; font-size: 24px; color: black; font-weight: bold;">8</p>
+          <p style="margin: 8px 0; font-size: 24px; color: black; font-weight: bold;">{{totalStaffMembers}}</p>
           <p style="margin: 0; color: #757575;">Active in the system</p>
         </div>
       </div>      
@@ -53,25 +53,8 @@
             [globalFilterFields]="['name', 'role', 'id' , 'status' , 'date']"
             responsiveLayout="scroll"
         >
-            <!-- <ng-template #caption>
-                <div class="flex justify-between items-center flex-column sm:flex-row">
-                    <button pButton label="Clear" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
-                    <p-iconfield iconPosition="left" class="ml-auto">
-                        <p-inputicon>
-                            <i class="pi pi-search"></i>
-                        </p-inputicon>
-                        <input pInputText type="text" (input)="onGlobalFilter(dt1, $event)" placeholder="Search keyword" />
-                    </p-iconfield>
-                </div>
-            </ng-template> -->
             <ng-template #header>
                 <tr>
-                    <th style="min-width: 12rem">
-                        <div class="flex justify-between items-center">
-                            ID
-                            <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter>
-                        </div>
-                    </th>
                     <th style="min-width: 12rem">
                         <div class="flex justify-between items-center">
                             Name
@@ -123,18 +106,6 @@
                             <p-columnFilter type="numeric" field="utilization" display="menu"></p-columnFilter>
                         </div>
                     </th>
-                    <th style="min-width: 12rem">
-                        <div class="flex justify-between items-center">
-                            Idle Time
-                            <p-columnFilter type="numeric" field="idle_time" display="menu"></p-columnFilter>
-                        </div>
-                    </th>
-                    <th style="min-width: 12rem">
-                        <div class="flex justify-between items-center">
-                            Overtime
-                            <p-columnFilter type="numeric" field="overtime" display="menu"></p-columnFilter>
-                        </div>
-                    </th>
                     <th style="min-width: 14rem">
                         <div class="flex justify-between items-center">
                             Status
@@ -163,9 +134,6 @@
                     <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
                         {{ record.name }}
                     </td>
-                    <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
-                        {{ record.id }}
-                    </td>
                     <td class="text-center" [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
                         <p-tag 
                             [value]="record.role" 
@@ -180,19 +148,13 @@
                         {{ record.date | date: 'MM/dd/yyyy' }}
                     </td>
                     <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
-                        {{ record.scheduled_hours }} hours
+                        {{ record.scheduleTime }} hours
                     </td>
                     <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
-                        {{ record.active_hours }} hours
+                        {{ record.active_time }} hours
                     </td>
                     <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
                         {{ record.utilization }}%
-                    </td>
-                    <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
-                        {{ record.idle_time }} hours
-                    </td>
-                    <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
-                        {{ record.overtime }} hours
                     </td>
                     <td class="text-center" [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
                         <p-tag 
@@ -208,5 +170,4 @@
             </ng-template>
         </p-table>
     </div>
-    <!-- <p>{{ utilizationRecords | json }}</p> -->
 </div>

@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface ResourceRepo extends JpaRepository< Resource , Long>{
 
     Optional<List<Resource>> findAllByResourceIdIn(List<Long> resourceTds);
+
+    Optional<Resource> getResourceByResourceId(Long resourceId);
 }

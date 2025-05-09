@@ -7,9 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.team06.appointment_service.model.Availibility;
 //import com.team06.appointment_service.repo.AppointmentRepo;
 //import com.team06.appointment_service.repo.AvailibilityRepo;
-import manager.resources.resource_manage_service.model.Resource;
-import manager.resources.resource_manage_service.model.ResourceAllocation;
-import manager.resources.resource_manage_service.model.SheduledInfo;
+import manager.resources.resource_manage_service.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +15,9 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,15 +26,19 @@ public class KafkaConsumerService {
 
     private final ResourceAllocationService resourceAllocationService;
     private final ResourceService resourceService;
+    private final UserService userService;
+    private final StaffAllocationService staffAllocationService;
 
     Random random = new Random();
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    public KafkaConsumerService(ResourceAllocationService resourceAllocationService , ResourceService resourceService) {
+    public KafkaConsumerService(ResourceAllocationService resourceAllocationService , ResourceService resourceService , UserService userService , StaffAllocationService staffAllocationService) {
         this.resourceAllocationService = resourceAllocationService;
         this.resourceService = resourceService;
+        this.userService = userService;
+        this.staffAllocationService = staffAllocationService;
     }
 
     @KafkaListener(topics = "${kafka.topic.schedule-details}", groupId ="${spring.kafka.consumer.group-id}")
@@ -61,6 +62,26 @@ public class KafkaConsumerService {
                 resourceAllocationService.addResourceAllocation(newResourceAllocation);
             }
 
+            User doctor = userService.getUserById(scheduleSlotDto.getDoctor_id());
+            User staffMember = userService.getUserById(scheduleSlotDto.getStaff_id());
+            float scheduleTime = Duration.between(scheduleSlotDto.getFrom(), scheduleSlotDto.getTo()).toMinutes() / 60.0f;
+            float idle_time = ThreadLocalRandom.current().nextFloat() * scheduleTime;
+            float activeTime = scheduleTime - idle_time;
+            float utilization = (activeTime / scheduleTime) * 100.0f;
+            float overtime = 0;
+            String status;
+            if (utilization >= 80.0f) {
+                status = "High";
+            } else if (utilization >= 50.0f) {
+                status = "Normal";
+            } else {
+                status = "Low";
+            }
+
+            StaffAllocation newStaffAllocationForDoc = new StaffAllocation(doctor.getId(), doctor.getFirstName()+" "+doctor.getLastName(),"Doctor", Date.from(scheduleSlotDto.getFrom().toInstant()) , scheduleTime , overtime , idle_time , activeTime , utilization , status );
+            staffAllocationService.addStaffAllocation(newStaffAllocationForDoc);
+            StaffAllocation newStaffAllocationForStaff = new StaffAllocation(staffMember.getId(), staffMember.getFirstName()+" "+staffMember.getLastName(),"Staff", Date.from(scheduleSlotDto.getFrom().toInstant()) , scheduleTime , overtime , idle_time , activeTime , utilization , status );
+            staffAllocationService.addStaffAllocation(newStaffAllocationForStaff);
 
             // Acknowledge the message after successful processing
             acknowledgment.acknowledge();

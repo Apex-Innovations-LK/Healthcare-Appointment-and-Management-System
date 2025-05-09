@@ -17,6 +17,7 @@ export class ResourceAllocation implements OnInit{
 
     resourceAllocations: ResourceAllocation[] = [];
     AllSessions : number = 0 ; 
+    numberOfResources : number = 0 ;
     loading : boolean = true;
 
     constructor(
@@ -34,6 +35,12 @@ export class ResourceAllocation implements OnInit{
                 }));
                 this.AllSessions = this.resourceAllocations.length;
                 this.loading = false
+                console.log(this.resourceAllocations);
+            }
+        );
+        this.resourceAllocationService.getNumberOfResources().subscribe(
+            (data) => {
+                this.numberOfResources = data;
             }
         );
     }

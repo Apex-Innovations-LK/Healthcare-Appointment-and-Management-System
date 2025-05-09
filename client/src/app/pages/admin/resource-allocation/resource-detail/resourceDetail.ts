@@ -1,6 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { ChartModule } from 'primeng/chart';
 import { ButtonModule } from 'primeng/button';
+import { Resource } from '../resources/models/resource.model'
+import { ResourceService } from '../resources/services/resource.service'
+
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 
@@ -57,8 +61,27 @@ export class ResourceDetail implements OnInit {
 
     };
 
+    resource! : Resource ;
+    resourceId!: number;
+
+    constructor( 
+        private resourceService: ResourceService,
+        private router: Router,
+        private route: ActivatedRoute ,
+    ) {}
+
     ngOnInit(): void {
-        
+        this.resourceId = Number(this.route.snapshot.paramMap.get('id'));
+        this.resourceService.getResourceById(this.resourceId).subscribe(
+            (data) => {
+                this.resource = data;
+                console.log(this.resource);
+            }
+        );
+    }
+
+    handleGoBack(){
+        this.router.navigate(['/admin/resource-allocation/resources']);
     }
 
     

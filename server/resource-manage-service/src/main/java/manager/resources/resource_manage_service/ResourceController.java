@@ -33,5 +33,16 @@ public class ResourceController {
         return new ResponseEntity<>(savedResource , HttpStatus.CREATED);
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Integer> getResourceCount() {
+        Integer resourceCount = resourceService.getResourceCount();
+        return new ResponseEntity<>(resourceCount, HttpStatus.OK);
+    }
+
+    @GetMapping("/find/{id}")
+    public ResponseEntity<Resource> findResourceById(@PathVariable("id") Long id) {
+        Resource resource = resourceService.getResourceByResourceId(id);
+        return new ResponseEntity<>(resource , HttpStatus.OK);
+    }
 
 }
