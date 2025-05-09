@@ -60,6 +60,15 @@ public class AppointmentController {
         }
     }
 
+    @DeleteMapping("/delete-appointment/{slotId}")
+public ResponseEntity<?> deleteAppointment(@PathVariable UUID slotId) {
+    if (!appointmentService.existsById(slotId)) {
+        return ResponseEntity.notFound().build();
+    }
+    appointmentService.deleteById(slotId);
+    return ResponseEntity.ok().build();
+}
+
     // // Fetch doctor details by doctorId from the auth-service
     // @GetMapping("/get-doctor-details/{doctorId}")
     // public ResponseEntity<DoctorDetails> getDoctorDetails(@PathVariable UUID doctorId) {

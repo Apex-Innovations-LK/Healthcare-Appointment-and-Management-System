@@ -36,4 +36,12 @@ public class AppointmentService {
     public List<Appointment> getAppointmentsByPatientId(UUID patientId) {
         return appointmentRepo.findByPatientId(patientId);
     }
+
+    public boolean existsById(UUID slotId) {
+        return appointmentRepo.existsById(slotId);
+    }
+
+    public void deleteById(UUID slotId) {
+        appointmentRepo.deleteById(slotId);
+    }
 }

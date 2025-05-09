@@ -10,6 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../../service/auth.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-view-appointments',
@@ -54,7 +55,7 @@ import { catchError, map, switchMap } from 'rxjs/operators';
                                     </div>
                                 </div>
                                 <button
-                                    (click)="cancelAppointment(appointment.appointment_id)"
+                                    (click)="cancelAppointment(appointment.slot_id || appointment.slotId)"
                                     class="ml-4 px-4 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                 >
                                     Delete
@@ -128,71 +129,86 @@ export class ViewAppointmentComponent implements OnInit {
     }
 
     fetchAppointments(patientId: string): void {
-      this.loading = true;
-      this.error = null;
+        this.loading = true;
+        this.error = null;
   
-      // Fetch patient appointments first
-      this.appointmentsService.viewAppointments(patientId).pipe(
-        switchMap(appointments => {
-          console.log('Patient appointments:', appointments);
-          this.bookedAppointments = appointments;
-          console.log('Loaded appointments:', this.bookedAppointments);
+        // Fetch patient appointments first
+        this.appointmentsService.viewAppointments(patientId).pipe(
+            switchMap(appointments => {
+                console.log('Raw appointments from backend:', appointments);
+                this.bookedAppointments = appointments.map(app => {
+                    console.log('Processing appointment:', app);
+                    const slotId = app.slot_id || app.slotId;
+                    if (!slotId) {
+                        console.error('Appointment missing slot_id:', app);
+                    }
+                    return new Appointment(
+                        app.appointment_id,
+                        app.patient_id,
+                        app.session_id,
+                        slotId || '',  // Provide empty string as fallback
+                        app.status,
+                        app.appointment_type,
+                        app.notes || ''
+                    );
+                });
+                console.log('Processed appointments:', this.bookedAppointments);
   
-          if (appointments.length === 0) {
-            console.log('No appointments found');
-            return of([]);
-          }
+                if (appointments.length === 0) {
+                    console.log('No appointments found');
+                    return of([]);
+                }
   
-          // For each appointment, get the session details
-          const sessionObservables = appointments.map(appointment =>
-            this.appointmentsService.getSessionDetails(appointment.session_id).pipe(
-              catchError(error => {
-                console.error(`Error fetching session ${appointment.session_id}:`, error);
-                return of(null);
-              })
-            )
-          );
+                // For each appointment, get the session details
+                const sessionObservables = appointments.map(appointment =>
+                    this.appointmentsService.getSessionDetails(appointment.session_id).pipe(
+                        catchError(error => {
+                            console.error(`Error fetching session ${appointment.session_id}:`, error);
+                            return of(null);
+                        })
+                    )
+                );
   
-          return forkJoin(sessionObservables);
-        }),
-        switchMap(sessions => {
-          console.log('All session details:', sessions);
-          this.doctorSessions = sessions.filter(session => session !== null) as DoctorSessions[];
+                return forkJoin(sessionObservables);
+            }),
+            switchMap(sessions => {
+                console.log('All session details:', sessions);
+                this.doctorSessions = sessions.filter(session => session !== null) as DoctorSessions[];
   
-          if (this.doctorSessions.length === 0) {
-            this.error = 'No session details found for appointments.';
-            return of([]);
-          }
+                if (this.doctorSessions.length === 0) {
+                    this.error = 'No session details found for appointments.';
+                    return of([]);
+                }
   
-          // Get doctor details for each session
-          const doctorObservables = this.doctorSessions.map(session =>
-            this.appointmentsService.getDoctorDetails(session.doctor_id).pipe(
-              catchError(error => {
-                console.error(`Error fetching doctor ${session.doctor_id}:`, error);
-                return of(null);
-              })
-            )
-          );
+                // Get doctor details for each session
+                const doctorObservables = this.doctorSessions.map(session =>
+                    this.appointmentsService.getDoctorDetails(session.doctor_id).pipe(
+                        catchError(error => {
+                            console.error(`Error fetching doctor ${session.doctor_id}:`, error);
+                            return of(null);
+                        })
+                    )
+                );
   
-          return forkJoin(doctorObservables);
-        })
-      ).subscribe({
-        next: (doctors) => {
-          console.log('All doctor details:', doctors);
-          // Store doctor details in map
-          this.doctorSessions.forEach((session, index) => {
-            if (doctors[index]) {
-              this.doctorDetailsMap.set(session.doctor_id, doctors[index] as UserDetails);
+                return forkJoin(doctorObservables);
+            })
+        ).subscribe({
+            next: (doctors) => {
+                console.log('All doctor details:', doctors);
+                // Store doctor details in map
+                this.doctorSessions.forEach((session, index) => {
+                    if (doctors[index]) {
+                        this.doctorDetailsMap.set(session.doctor_id, doctors[index] as UserDetails);
+                    }
+                });
+                this.loading = false;
+            },
+            error: (error) => {
+                console.error('Error in appointment fetch flow:', error);
+                this.error = 'Failed to load appointment details.';
+                this.loading = false;
             }
-          });
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Error in appointment fetch flow:', error);
-          this.error = 'Failed to load appointment details.';
-          this.loading = false;
-        }
-      });
+        });
     }
 
     getDoctorDetails(sessionId: string): DoctorSessions | undefined {
@@ -204,14 +220,24 @@ export class ViewAppointmentComponent implements OnInit {
         return session ? this.doctorDetailsMap.get(session.doctor_id) : undefined;
     }
 
-    cancelAppointment(id: number): void {
-        console.log('Attempting to delete appointment with id:', id);
+    cancelAppointment(slot_id: string): void {
+        console.log('Attempting to delete appointment with slot_id:', slot_id);
+        console.log('Current appointments:', this.bookedAppointments);
+        
+        if (!slot_id) {
+            console.error('No slot_id provided for deletion');
+            alert('Invalid appointment ID');
+            return;
+        }
+        
         if (!confirm('Are you sure you want to delete this appointment?')) {
             return;
         }
-        this.appointmentsService.deleteAppointment(id).subscribe({
+        
+        this.appointmentsService.deleteAppointment(slot_id).subscribe({
             next: () => {
-                this.bookedAppointments = this.bookedAppointments.filter(app => app.appointment_id !== id);
+                console.log('Successfully deleted appointment with slot_id:', slot_id);
+                this.bookedAppointments = this.bookedAppointments.filter(app => app.slot_id !== slot_id);
                 alert('Appointment deleted successfully.');
             },
             error: (err) => {

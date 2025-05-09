@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { DoctorSessions } from '../models/DoctorSessions';
-import { map, mergeMap } from 'rxjs/operators';
+import { map, mergeMap, catchError } from 'rxjs/operators';
 import { MakeAppointment } from '../models/makeAppointment';
 import { BookingResponse } from '../models/BookingResponse';
 import { Appointment } from '../models/Appointment';
@@ -95,7 +95,16 @@ export class AppointmentsService {
     // }
 
     // Delete an appointment by its ID
-    deleteAppointment(appointmentId: number): Observable<any> {
-        return this.httpClient.delete(`${this.backendUrl}/delete-appointment/${appointmentId}`);
+    deleteAppointment(slot_id: string): Observable<any> {
+        if (!slot_id) {
+            return throwError(() => new Error('Invalid slot_id provided'));
+        }
+        console.log('Service: Deleting appointment with slot_id:', slot_id);
+        return this.httpClient.delete(`${this.backendUrl}/delete-appointment/${slot_id}`).pipe(
+            catchError(error => {
+                console.error('Error in deleteAppointment service:', error);
+                return throwError(() => error);
+            })
+        );
     }
 }
