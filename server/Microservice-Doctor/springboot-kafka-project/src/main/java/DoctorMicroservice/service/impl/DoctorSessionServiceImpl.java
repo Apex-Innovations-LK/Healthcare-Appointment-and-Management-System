@@ -22,7 +22,7 @@ import DoctorMicroservice.repository.ScheduleSlotRepository;
 import DoctorMicroservice.service.DoctorSessionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import DoctorMicroservice.dto.SessionIdDto;
+import DoctorMicroservice.dto.Session_idDto;
 
 @Service
 @RequiredArgsConstructor
@@ -111,7 +111,7 @@ public class DoctorSessionServiceImpl implements DoctorSessionService {
     @Transactional
     public void deleteDoctorSession(UUID sessionId) {
         doctorSessionRepository.deleteBySessionId(sessionId);
-        SessionIdDto sessionIdDto = new SessionIdDto(sessionId);
+        Session_idDto sessionIdDto = new Session_idDto(sessionId);
         availabilityDeletedKafkaProducer.deleteDoctorAvailability(sessionIdDto);
         scheduleSlotRepository.deleteBySessionId(sessionId);
     }
