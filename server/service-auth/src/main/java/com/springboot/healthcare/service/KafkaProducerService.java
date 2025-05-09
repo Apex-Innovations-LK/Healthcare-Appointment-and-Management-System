@@ -29,7 +29,6 @@ public class KafkaProducerService {
     public void sendMessage(String message) {
         logger.info("Sending message to topic {}: {}", userCreatedTopic, message);
         CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(userCreatedTopic, UUID.randomUUID().toString(), message);
-
         future.whenComplete((result, ex) -> {
             if (ex == null) {
                 logger.info("Message sent successfully to topic {}: {}",
