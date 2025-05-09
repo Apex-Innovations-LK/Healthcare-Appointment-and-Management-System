@@ -16,6 +16,7 @@ import { DatePipe } from '@angular/common';
 export class ResourceAllocation implements OnInit{
 
     resourceAllocations: ResourceAllocation[] = [];
+    AllSessions : number = 0 ; 
     loading : boolean = true;
 
     constructor(
@@ -31,16 +32,13 @@ export class ResourceAllocation implements OnInit{
                     from: new Date(record.from),
                     to: new Date(record.to),
                 }));
-                console.log(this.resourceAllocations);
+                this.AllSessions = this.resourceAllocations.length;
                 this.loading = false
             }
         );
     }
 
     navigateToAddNewResource(){
-        // Logic to navigate to the Add New Resource page
-        // console.log("Navigating to Add New Resource page...");
-        // You can use Angular Router for navigation if needed
         this.router.navigate(['/admin/resource-allocation/resources']);
     }
 

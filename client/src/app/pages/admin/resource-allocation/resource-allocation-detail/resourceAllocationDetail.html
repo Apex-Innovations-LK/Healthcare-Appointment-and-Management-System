@@ -10,7 +10,7 @@
         <p class="text-sm text-gray-500">View and manage session details & resources</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="bg-gray-50 p-4 rounded-lg">
             <p class="text-sm text-gray-500 font-medium">Doctor:</p>
             <p class="text-base text-gray-800">(Doctor Name) </p>
@@ -19,7 +19,7 @@
             <p class="text-sm text-gray-500 font-medium">Staff:</p>
             <p class="text-base text-gray-800">(Staff Name)</p>
         </div>
-    </div>
+    </div> -->
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-gray-50 p-4 rounded-lg">
@@ -37,8 +37,40 @@
             <div>
                 <h4 class="text-lg font-semibold" >Allocated Resources</h4>
             </div>
-            <p-button label="+ Allocate New Resource" class="p-button-link" (click)="allocateNewResource()"></p-button>
         </div>
+        <div class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Type Dropdown -->
+              <p-select
+                id="Type"
+                [(ngModel)]="typeItem"
+                [options]="typeItems"
+                optionLabel="name"
+                placeholder="Select Type"
+                class="w-full"
+              ></p-select>
+          
+              <!-- Resource Dropdown -->
+              <p-select
+                id="Resource"
+                [(ngModel)]="resourceItem"
+                [options]="typeItem?.code === 'Room' ? roomItems : equipmentItems"
+                optionLabel="name"
+                placeholder="Select Resource"
+                class="w-full"
+              ></p-select>
+            </div>
+          
+            <!-- Allocate Button -->
+            <div class="text-right">
+              <p-button
+                label="+ Allocate New Resource"
+                class="p-button-link text-primary-600 hover:text-primary-800 font-semibold"
+                (click)="allocateNewResource()"
+              ></p-button>
+            </div>
+          </div>
+          
         <p-table
             #dt1
             [value]="resources"
@@ -91,7 +123,10 @@
                         {{ record.type }}
                     </td>
                     <td>
-                        {{ record.department }}
+                        <div class="flex flex-row justify-between items-center" >
+                            {{ record.department }}
+                            <p-button label="Remove" icon="pi pi-trash" class="" (click) = "removeResourceAllocation(record)"></p-button>
+                        </div>
                     </td>
                 </tr>
             </ng-template>

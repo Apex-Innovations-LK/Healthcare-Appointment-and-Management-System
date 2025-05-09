@@ -18,7 +18,11 @@ public class ResourceAllocation implements Serializable {
 
     private UUID sessionId;
     private Long resourceId;
+
+    @Column(name = "\"from\"")
     private LocalDateTime from;
+
+    @Column(name = "\"to\"")
     private LocalDateTime to;
 
     public ResourceAllocation() {

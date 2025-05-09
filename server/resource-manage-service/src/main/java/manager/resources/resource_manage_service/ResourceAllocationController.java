@@ -7,14 +7,18 @@ import manager.resources.resource_manage_service.model.SessionResourceAllocation
 import manager.resources.resource_manage_service.model.SessionResourceResourceAllocation;
 import manager.resources.resource_manage_service.service.ResourceAllocationService;
 import manager.resources.resource_manage_service.service.ResourceService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -77,5 +81,58 @@ public class ResourceAllocationController {
 
         return new ResponseEntity<>(sessionResourceResourceAllocations, HttpStatus.OK);
     }
+
+    @GetMapping("/upcoming/{id}")
+    public ResponseEntity<List<ResourceAllocation>> getUpcomingAllocationsByResourceId(@PathVariable("id") Long id) {
+        List<ResourceAllocation> resourceAllocations = resourceAllocationService.getUpcomingResourceAllocations(id);
+        return new ResponseEntity<>(resourceAllocations, HttpStatus.OK);
+    }
+
+    @GetMapping("/busy/{from}/{to}")
+    public List<Long> getBusyResources(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime to) {
+        return resourceAllocationService.getBusyResources(from, to);
+    }
+
+    @GetMapping("/available/{from}/{to}")
+    public Map<String,List<Resource>> getAvailableResources(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime to) {
+        List<Long> busyResourceIds = resourceAllocationService.getBusyResources(from,to);
+        List<Resource> allResources = resourceService.findAllResources();
+        List<Resource> availableResources = allResources.stream()
+                .filter(resource -> !busyResourceIds.contains(resource.getResourceId()))  // Exclude busy resources
+                .filter(resource -> "Room".equalsIgnoreCase(resource.getType()) || "Equipment".equalsIgnoreCase(resource.getType()))  // Include only "Room" or "Equipment" types
+                .collect(Collectors.toList());
+
+        Map<String, List<Resource>> availableResourcesMap = availableResources.stream()
+                .collect(Collectors.groupingBy(resource -> {
+                    if ("Room".equalsIgnoreCase(resource.getType())) {
+                        return "room"; // Map "Room" to "room"
+                    } else if ("Equipment".equalsIgnoreCase(resource.getType())) {
+                        return "equipment"; // Map "Equipment" to "equipment"
+                    } else {
+                        return null; // Just in case you have other types
+                    }
+                }));
+
+
+        return availableResourcesMap;
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<ResourceAllocation> addResourceAllocation(@RequestBody ResourceAllocation resourceAllocation) {
+        ResourceAllocation newResourceAllocation = resourceAllocationService.addResourceAllocation(resourceAllocation);
+        return new ResponseEntity<>(newResourceAllocation, HttpStatus.CREATED);
+    }
+
+
+    @DeleteMapping("/delete/{sessionId}/{resourceId}")
+    public ResponseEntity<?> deleteResourceAllocation(@PathVariable("sessionId") UUID sessionId , @PathVariable("resourceId") Long resourceId) {
+        resourceAllocationService.deleteResourceAllocation( sessionId , resourceId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
 }

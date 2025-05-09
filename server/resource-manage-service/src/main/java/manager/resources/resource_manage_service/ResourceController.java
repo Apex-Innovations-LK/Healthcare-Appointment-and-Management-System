@@ -25,9 +25,13 @@ public class ResourceController {
         return new ResponseEntity<>(resources, HttpStatus.OK);
     }
 
+
+
     @PostMapping("/add")
     public ResponseEntity<Resource> addResource(@RequestBody Resource resource) {
         Resource savedResource = resourceService.addResource(resource);
         return new ResponseEntity<>(savedResource , HttpStatus.CREATED);
     }
+
+
 }

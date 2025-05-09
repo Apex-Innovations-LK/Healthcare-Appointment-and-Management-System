@@ -3,6 +3,8 @@ import { Injectable } from "@angular/core";
 
 import { Observable } from "rxjs";
 import { SessionResourceDetail } from "../models/sessionResourceDetail.model";
+import { AvailableResources } from "../models/availableResources.model";
+import { ResourceAllocation } from "../../resource-allocation-dashboard/resourceAllocation";
 
 @Injectable({
     providedIn: 'root',
@@ -14,6 +16,18 @@ export class SessionResourceDetailService{
 
     public getSessionResourceDetail(sessionId: string): Observable<SessionResourceDetail> {
         return this.http.get<SessionResourceDetail>(`${this.apiServerUrl}/find/${sessionId}`);
+    }
+
+    public getAvailableResources(from: string, to: string): Observable<AvailableResources> {
+        return this.http.get<AvailableResources>(`${this.apiServerUrl}/available/${from}/${to}`);
+    }
+
+    public addResourceToSession(resourceAllocation: ResourceAllocation): Observable<ResourceAllocation> {
+        return this.http.post<ResourceAllocation>(`${this.apiServerUrl}/add`, resourceAllocation);
+    }
+
+    public deleteResourceFromSession(  sessionId: string , resourceId: string): Observable<void> {
+        return this.http.delete<void>(`${this.apiServerUrl}/delete/${sessionId}/${resourceId}`);
     }
 
 }

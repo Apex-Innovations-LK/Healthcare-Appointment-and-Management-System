@@ -1,3 +1,41 @@
-<div>
-    <h1>Resource Detail...</h1>
+<div class="card grid grid-cols-12 gap-6 p-6 bg-white rounded-2xl shadow-md">
+    <!-- Left Section: Resource Info -->
+    <div class="col-span-12 xl:col-span-4 space-y-4">
+        <div>
+            <h2 class="text-xl font-bold text-gray-800">(Resource Name)</h2>
+            <p class="text-sm text-gray-500">(Department)</p>
+        </div>
+        <div>
+            <p-button label="Edit Resource" class="p-button-link"></p-button>
+        </div>
+    </div>
+
+    <!-- Middle Section: Metrics -->
+    <div class="col-span-12 xl:col-span-4 space-y-4">
+        <div>
+            <p class="text-sm text-gray-500">Status</p>
+            <p class="text-lg font-semibold text-green-600">(Available)</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Total Allocations</p>
+            <p class="text-lg font-semibold text-gray-800">(5)</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Utilization</p>
+            <p class="text-lg font-semibold text-blue-600">(44%)</p>
+        </div>
+    </div>
+
+    <!-- Right Section: Chart -->
+    <div class="col-span-12 xl:col-span-12">
+        <div class="bg-gray-50 p-6 rounded-2xl shadow-inner space-y-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Resource Usage Over Time</h2>
+                <p class="text-sm text-gray-500">View the usage patterns of this resource over the past 30 days</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow">
+                <p-chart type="line" [data]="lineData" [options]="lineOptions"></p-chart>
+            </div>
+        </div>
+    </div>
 </div>
