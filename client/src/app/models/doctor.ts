@@ -13,3 +13,31 @@ export class Doctor {
         this.license_number = license_number;
     }
 }
+
+export interface DoctorSession {
+    session_id: string;
+    doctor_id: string;
+    from: string;
+    to: string;
+    number_of_patients: number;
+}
+
+export interface DoctorAvailability {
+    session_id: string;
+    doctor_id: string;
+    from: string;
+    to: string;
+    number_of_patients: number;
+}
+
+export interface DoctorViewModalHandlers {
+    editModalHandler: (availability: DoctorAvailability) => void;
+    deleteModalHandler: (availability: DoctorAvailability) => void;
+    //rejectModalHandler: () => void;
+}
+
+export interface SessionSlot {
+    slot_id: string;
+    session_id: string;
+    status: 'booked' | 'available' | 'rejected';
+}

@@ -14,8 +14,8 @@ public class DoctorAvailabilityMapper {
                 return new DoctorAvailabilityDto(
                                 doctorAvailability.getSession_id(),
                                 doctorAvailability.getDoctor_id(),
-                                doctorAvailability.getTo(),
                                 doctorAvailability.getFrom(),
+                                doctorAvailability.getTo(),
                                 doctorAvailability.getNumber_of_patients());
         }
 
@@ -26,8 +26,8 @@ public class DoctorAvailabilityMapper {
                 return new DoctorAvailability(
                                 dto.getSession_id(),
                                 dto.getDoctor_id(),
-                                dto.getTo(),
                                 dto.getFrom(),
+                                dto.getTo(),
                                 dto.getNumber_of_patients());
         }
 }
