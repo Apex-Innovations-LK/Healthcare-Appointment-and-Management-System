@@ -39,7 +39,8 @@ A fully dockerized IPFS service implementation.
    ```
 
 ### Stopping the Service
-    ```
+- 
+    ```bash
     docker stop ipfs-service
     docker rm ipfs-service
     ```
