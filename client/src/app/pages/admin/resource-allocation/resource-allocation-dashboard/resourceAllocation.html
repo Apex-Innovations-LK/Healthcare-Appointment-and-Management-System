@@ -1,0 +1,83 @@
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; margin: auto; background-color: #ffffff; border-radius: 12px;" >
+    <!-- Header -->
+    <div style="text-align: start; margin-bottom: 30px;">
+        <h1 style="font-size: 2.5em; color: #000000; margin-bottom: 5px;">Resource Allocation Dashboard</h1>
+        <p style="font-size: 1.2em; color: #555;">Manage and allocate resources to sessions</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
+        <div style="background-color: #eeeeee5d; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
+            <p style="color: #777; font-weight: 500; margin-bottom: 6px;">Total Sessions</p>
+            <p style="font-size: 2.2em; font-weight: bold; color: #222;">{{AllSessions}}</p>
+        </div>
+
+        <div style="background-color: #eeeeee5d; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center;">
+            <p style="color: #777; font-weight: 500; margin-bottom: 6px;">Available Resources</p>
+            <p style="font-size: 2.2em; font-weight: bold; color: #222;">{{numberOfResources}}</p>
+        </div>
+
+    </div>
+    <div style="margin-top: 30px; margin-bottom: 30px;">
+        <p-button label="See All Resources" class="p-button-link" (click)="navigateToAddNewResource()"></p-button>
+    </div>
+    <div>
+        <p-table
+            #dt1
+            [value]="resourceAllocations"
+            dataKey="id"
+            [rows]="10"
+            [loading]="loading"
+            [rowHover]="true"
+            [showGridlines]="true"
+            [paginator]="true"
+            [globalFilterFields]="['sessionId', 'resourceIds']"
+            responsiveLayout="scroll"
+        >
+            
+            <ng-template #header>
+                <tr>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Session ID
+                            <p-columnFilter type="text" field="sessionId" display="menu" placeholder="Search by name"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 10rem">
+                        <div class="flex justify-between items-center">
+                            Start Time
+                            <p-columnFilter type="date" field="from" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 10rem">
+                        <div class="flex justify-between items-center">
+                            End Time
+                            <p-columnFilter type="date" field="to" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+                        </div>
+                    </th>
+                    <th style="min-width: 12rem">
+                        <div class="flex justify-between items-center">
+                            Allocated Resources
+                        </div>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template #body let-record>
+                <tr (click)="goToResourceAllocationDetail(record)">
+                    <td [style] = "{'background-color': record.status === 'High' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(158, 158, 158, 0)'}">
+                        {{ record.sessionId }}
+                    </td>
+                    <td>
+                        {{ record.from | date: 'MM/dd/yyyy' }}
+                    </td>
+                    <td>
+                        {{ record.to | date: 'MM/dd/yyyy' }}
+                    </td>
+                    <td class="flex flex-row justify-between items-center">
+                        {{ record.resourceIds.length }}
+                        <p-button label="See Details" class="p-button-link" (click)="goToResourceAllocationDetail(record)"></p-button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
