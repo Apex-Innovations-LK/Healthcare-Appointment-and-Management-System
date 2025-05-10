@@ -1,0 +1,116 @@
+# IPFS Service
+
+A fully dockerized IPFS service implementation.
+
+## Quick Start
+
+### Prerequisites
+- Docker
+
+### Getting Started
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Apex-Innovations-LK/Healthcare-Appointment-and-Management-System.git
+   cd ./Healthcare-Appointment-and-Management-System/server/ipfs-service
+   ```
+
+2. Build the Docker image:
+   ```bash
+   docker build -t ipfs-service .
+   ```
+
+3. Start the IPFS service:
+   ```bash
+   docker run -d \
+     --name ipfs-service \
+     -p 8085:8085 \
+     -p 9092:9092 \
+     -p 5001:5001 \
+     -p 8095:8095 \
+     -v ipfs-data:/data/ipfs \
+     -v ipfs-export:/export \
+     ipfs-service:latest
+   ```
+
+4. Verify the service is running:
+   ```bash
+   docker ps
+   ```
+
+### Stopping the Service
+    ```bash
+    docker stop ipfs-service
+    docker rm ipfs-service
+    ```
+
+## Configuration
+
+Configuration is handled automatically within the Docker container.
+
+## API Endpoints
+
+### IPFS Core API
+- Base URL: http://localhost:5001/api/v0
+- Check IPFS version: 
+  ```bash
+  curl -X POST http://127.0.0.1:5001/api/v0/version
+  ```
+
+### Custom Service Endpoints
+- Upload a file: 
+  ```bash
+  curl -X POST -F "file=@./yourfile.txt" http://127.0.0.1:8085/upload
+  ```
+- Access a file by CID:
+  ```bash
+  curl -X GET http://127.0.0.1:8085/file/[CID]
+  ```
+  Example:
+  ```bash
+  curl -X GET http://127.0.0.1:8085/file/QmUkPg9t9uxY2BNJr1zKi9oZFa7R1FND6g1X8GdEruZa3K
+  ```
+- Batch file upload:
+  ```bash
+  curl -X POST -F "files=@./file1.txt" -F "files=@./file2.txt" http://127.0.0.1:8085/files/batch
+  ```
+
+## Troubleshooting
+
+If you encounter any issues, check the logs:
+```bash
+docker logs ipfs-service
+```
+
+To restart the service:
+```bash
+docker restart ipfs-service
+```
+
+## Maintenance
+
+### Update IPFS Service
+1. Stop and remove the existing container:
+   ```bash
+   docker stop ipfs-service
+   docker rm ipfs-service
+   ```
+2. Pull the latest code and rebuild:
+   ```bash
+   git pull
+   docker build -t ipfs-service .
+   ```
+3. Start the service again with the command in the Getting Started section
+
+### Data Persistence
+Data is stored in Docker volumes (`ipfs-data` and `ipfs-export`) for persistence. No additional setup required.
+
+## Port Reference
+- 8085: File upload API
+- 9092: Internal service port
+- 5001: IPFS API
+- 8095: Additional service port
+
+## Support
+
+For issues or questions, please open an issue in the repository.
