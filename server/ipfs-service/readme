@@ -74,6 +74,62 @@ Configuration is handled automatically within the Docker container.
   ```bash
   curl -X POST -F "files=@./file1.txt" -F "files=@./file2.txt" http://127.0.0.1:8085/files/batch
   ```
+### Usage Examples
+- Example 1: Upload Health Record
+```bash
+  curl -X POST -H "Content-Type: application/json" -d '{
+  "record_id": "HR-015",
+  "patient_id": "PAT-71983",
+  "patient_name": "Stacy Hogan",
+  "patient_dob": "1974-07-24",
+  "date_of_service": "2025-03-27T22:33:43.646343+0000",
+  "referring_doctor": "DR-21419",
+  "chief_complaint": [
+    "Cough",
+    "Blurred vision"
+  ],
+  "allergies": [
+    "Eggs",
+    "Other",
+    "Latex"
+  ],
+  "medications": [
+    "Metformin",
+    "Amoxicillin",
+    "Atorvastatin"
+  ],
+  "problem_list": [
+    "Back Pain",
+    "Asthma",
+    "Other"
+  ],
+  "patient_sex": "Other",
+  "address": "245 Johnny Route Apt. 872",
+  "city": "Colombo",
+  "state": "Western",
+  "zip": "00700",
+  "patient_phone": "0791170829",
+  "lbf_data": [
+    "LBF101:5.8",
+    "LBF102:14.9",
+    "LBF103:126/79"
+  ],
+  "his_data": [
+    "HIS005",
+    "HIS007"
+  ]
+}' http://127.0.0.1:8085/upload 
+```
+
+- Example 2: Batch Load Files by CID
+``` bash
+  curl -X POST -H "Content-Type: application/json" -d '[
+  "QmPRQY1DcyBCmohGj9GQY77iSSF2zYmA4Q9kshfzp3eWNd", 
+  "QmaC2GdFNfU65M8dx44uWvQQEntKBKN6ZJghnLw2cM39FA", 
+  "QmU593515WPjpXGet1rx3bPH4hsiMHjFfP1PBhSFJVauKs", 
+  "QmUkPg9t9uxY2BNJr1zKi9oZFa7R1FND6g1X8GdEruZa3K"
+]' http://127.0.0.1:8085/files/batch
+```
 
 ## Troubleshooting
 
