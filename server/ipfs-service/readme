@@ -39,7 +39,7 @@ A fully dockerized IPFS service implementation.
    ```
 
 ### Stopping the Service
-   ```bash
+   ```
     docker stop ipfs-service
     docker rm ipfs-service
    ```
@@ -76,7 +76,7 @@ Configuration is handled automatically within the Docker container.
   ```
 ### Usage Examples
 - Example 1: Upload Health Record
-```bash
+  ```bash
   curl -X POST -H "Content-Type: application/json" -d '{
   "record_id": "HR-015",
   "patient_id": "PAT-71983",
@@ -118,30 +118,31 @@ Configuration is handled automatically within the Docker container.
     "HIS005",
     "HIS007"
   ]
-}' http://127.0.0.1:8085/upload 
-```
+  }' http://127.0.0.1:8085/upload 
+
+  ```
 
 - Example 2: Batch Load Files by CID
-``` bash
+  ```bash
   curl -X POST -H "Content-Type: application/json" -d '[
   "QmPRQY1DcyBCmohGj9GQY77iSSF2zYmA4Q9kshfzp3eWNd", 
   "QmaC2GdFNfU65M8dx44uWvQQEntKBKN6ZJghnLw2cM39FA", 
   "QmU593515WPjpXGet1rx3bPH4hsiMHjFfP1PBhSFJVauKs", 
   "QmUkPg9t9uxY2BNJr1zKi9oZFa7R1FND6g1X8GdEruZa3K"
-]' http://127.0.0.1:8085/files/batch
-```
+  ]' http://127.0.0.1:8085/files/batch
+  ```
 
 ## Troubleshooting
 
 If you encounter any issues, check the logs:
-```bash
-docker logs ipfs-service
-```
+  ```bash
+  docker logs ipfs-service
+  ```
 
 To restart the service:
-```bash
-docker restart ipfs-service
-```
+  ```bash
+  docker restart ipfs-service
+  ```
 
 ## Maintenance
 
