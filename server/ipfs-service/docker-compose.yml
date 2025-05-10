@@ -28,7 +28,7 @@ services:
     ports:
       - "4001:4001"
       - "5001:5001"
-      - "8080:8080"
+      - "8070:8070"
     volumes:
       - ipfs_data:/data/ipfs
       - ipfs_staging:/export
