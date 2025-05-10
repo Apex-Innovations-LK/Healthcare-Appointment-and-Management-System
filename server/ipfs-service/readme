@@ -119,7 +119,6 @@ Configuration is handled automatically within the Docker container.
     "HIS007"
   ]
   }' http://127.0.0.1:8085/upload 
-
   ```
 
 - Example 2: Batch Load Files by CID
@@ -134,13 +133,13 @@ Configuration is handled automatically within the Docker container.
 
 ## Troubleshooting
 
-If you encounter any issues, check the logs:
-  ```bash
+- If you encounter any issues, check the logs:
+  ```
   docker logs ipfs-service
   ```
 
-To restart the service:
-  ```bash
+- To restart the service:
+  ```
   docker restart ipfs-service
   ```
 
