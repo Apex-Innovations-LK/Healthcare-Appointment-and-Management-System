@@ -33,6 +33,20 @@ export interface RiskDistribution {
     [key: string]: number;
 }
 
+// Clinical guideline models
+export interface ClinicalRecommendation {
+  condition: string;
+  recommendation: string;
+  source: string;
+}
+
+export interface DrugInteraction {
+  drugA: string;
+  drugB: string;
+  severity: string;
+  description: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PatientService {
     private baseUrl = 'http://localhost:8080/api';
@@ -145,5 +159,10 @@ export class PatientService {
      */
     getDistributionCacheTime(): number {
         return this.distributionCacheTime;
+    }
+
+    // Guidelines and medication interaction endpoints
+    evaluatePatient(patientData: any): Observable<ClinicalRecommendation[]> {
+        return this.http.post<ClinicalRecommendation[]>(`${this.baseUrl}/guidelines/evaluate`, patientData);
     }
 }
