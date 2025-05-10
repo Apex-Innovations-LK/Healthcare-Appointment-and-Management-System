@@ -11,6 +11,7 @@ public class ChatHistory {
     private Long id;
 
     private String sessionId;
+    private String userId;
     private String sender;
     private String message;
     private LocalDateTime timestamp;

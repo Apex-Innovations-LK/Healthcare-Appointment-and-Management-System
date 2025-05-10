@@ -14,4 +14,8 @@ public interface ChatHistoryRepository extends JpaRepository<ChatHistory, Long> 
     List<ChatHistory> findBySessionIdOrderByTimestampAsc(String sessionId);
     
     List<ChatHistory> findBySender(String sender);
+
+    List<ChatHistory> findByUserId(String userId); // Retrieve all chat history for a user
+
+    List<String> findDistinctSessionIdByUserId(String userId); // Retrieve distinct session IDs for a user
 }
