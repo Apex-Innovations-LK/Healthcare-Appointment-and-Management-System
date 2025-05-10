@@ -54,8 +54,8 @@ export class DoctorService {
   }
 
   uploadHr(hr: HealthRecord){
-    const apiUrl = "http://127.0.0.1:8086/upload";
-    return this.httpClient.post(apiUrl, hr, { responseType: 'text' });
+    const apiUrl = "http://localhost:8086/upload";
+    return this.httpClient.post(apiUrl, hr);
   }
 
   getHrsByPatientId(patient_id: string): Observable<HealthRecord[]> {

@@ -72,7 +72,7 @@ export class AddNewHRComponent {
         phone: string;
     };
 
-    @Input() refreshHrView!:() => void;
+    @Input() refreshHrView!: () => void;
 
     constructor(
         private fb: FormBuilder,
@@ -105,21 +105,48 @@ export class AddNewHRComponent {
         this.getFieldArray(field).removeAt(index);
     }
 
+    formatDateToISO8601WithMillisecondsAndUTC(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+
+        // To get the UTC offset in the "Z" format (for UTC time),
+        // we can simply use the toISOString() method and then adjust.
+        // However, if you need the local time with offset, it's more complex.
+
+        // Assuming you want UTC time with "Z"
+        const utcDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+        const utcYear = utcDate.getUTCFullYear();
+        const utcMonth = String(utcDate.getUTCMonth() + 1).padStart(2, '0');
+        const utcDay = String(utcDate.getUTCDate()).padStart(2, '0');
+        const utcHours = String(utcDate.getUTCHours()).padStart(2, '0');
+        const utcMinutes = String(utcDate.getUTCMinutes()).padStart(2, '0');
+        const utcSeconds = String(utcDate.getUTCSeconds()).padStart(2, '0');
+        const utcMilliseconds = String(utcDate.getUTCMilliseconds()).padStart(3, '0');
+
+        return `${utcYear}-${utcMonth}-${utcDay}T${utcHours}:${utcMinutes}:${utcSeconds}.${utcMilliseconds}Z`;
+    }
+
     submitRecord() {
         if (this.recordForm.valid) {
             const newRecord = this.recordForm.value;
-            const userDetails = this.authStateService.getUserDetails();
-            const doctor_id = userDetails ? userDetails.id : '';
-            //const doctorId = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
-            const date = new Date().toISOString();
+            //const userDetails = this.authStateService.getUserDetails();
+            //const doctor_id = userDetails ? userDetails.id : '';
+            const doctor_id = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
             const record_id = uuid();
+            // const dateOfService = this.formatDateToISO8601WithMillisecondsAndUTC(new Date());
+            const dateOfService = new Date().toISOString();;
 
             const hr: HealthRecord = {
                 record_id: record_id,
                 patient_id: this.patientInfo.patient_id,
                 patient_name: this.patientInfo.name,
                 patient_dob: this.patientInfo.dob,
-                date_of_service: date,
+                date_of_service: dateOfService,
                 referring_doctor: doctor_id,
                 chief_complaint: newRecord.chief_complaint,
                 allergies: newRecord.allergies,
@@ -134,6 +161,7 @@ export class AddNewHRComponent {
                 lbf_data: newRecord.lbf_data,
                 his_data: newRecord.his_data
             };
+            console.log('Submitting HR:', hr);
 
             this.doctorService.uploadHr(hr).subscribe({
                 next: (response) => {
