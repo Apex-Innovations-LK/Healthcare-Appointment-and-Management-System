@@ -4,29 +4,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team8.healthanalytics.dto.AnalyticsData;
 import com.team8.healthanalytics.dto.AnalyticsData.Point;
 import com.team8.healthanalytics.model.HealthRecord;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.apache.spark.sql.SparkSession;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-public class AnalyticsService {
+public class AnalyticsService implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private transient final SparkSession spark;
 
     private static final String JSON_FILE_PATH = "health_records.json";
-    private static final ZoneId ZONE = ZoneId.systemDefault();
-    private static final DateTimeFormatter MONTH_FMT =
-            DateTimeFormatter.ofPattern("yyyy-MM").withZone(ZONE);
+            
+    // Constructor to replace @RequiredArgsConstructor
+    @Autowired
+    public AnalyticsService(ObjectMapper objectMapper, SparkSession sparkSession) {
+        this.objectMapper = objectMapper;
+        this.spark = sparkSession;
+    }
+    
+    @PreDestroy
+    public void cleanup() {
+        // Note: We don't close the SparkSession here since it might be shared with RiskAssessmentService
+    }
 
     /* ─────────────────────────────────────────────────────── */
     public AnalyticsData fetchAnalytics() {
@@ -45,72 +53,63 @@ public class AnalyticsService {
                     Collections.emptyList(),
                     Collections.emptyMap(),
                     Collections.emptyMap(),
-                    Collections.emptyMap(),
                     Collections.emptyMap()
             );
         }
 
-        /* 1 ─ Distinct‑patient count / month */
-        Map<String, Long> perMonth = records.stream()
-                .map(r -> r.getDateOfService())
-                .filter(s -> s != null && !s.isBlank())
-                .map(AnalyticsService::toMonth)
-                .collect(Collectors.groupingBy(m -> m, TreeMap::new, Collectors.counting()));
+        // Use Spark to process analytics
+        org.apache.spark.sql.Dataset<org.apache.spark.sql.Row> df = spark.createDataFrame(records, HealthRecord.class);
+        df.createOrReplaceTempView("records");
 
-        List<Point> patientTimeline = perMonth.entrySet().stream()
-                .map(e -> new Point(e.getKey(), e.getValue().intValue()))
-                .collect(Collectors.toList());
+        // 1. Distinct-patient count per month
+        org.apache.spark.sql.Dataset<org.apache.spark.sql.Row> perMonthDF = spark.sql(
+                "SELECT substring(dateOfService, 1, 7) as month, COUNT(DISTINCT patientId) as count " +
+                "FROM records WHERE dateOfService IS NOT NULL AND dateOfService != '' GROUP BY month ORDER BY month"
+        );
+        List<Point> patientTimeline = new ArrayList<>();
+        for (org.apache.spark.sql.Row row : perMonthDF.collectAsList()) {
+            String month = row.getAs("month");
+            int count = ((Number) row.getAs("count")).intValue();
+            patientTimeline.add(new Point(month, count));
+        }
 
-        /* 2 ─ Allergy distribution */
-        Map<String,Integer> allergyCounts = new HashMap<>();
-        records.forEach(r -> Optional.ofNullable(r.getAllergies()).orElse(List.of())
-                .forEach(a -> allergyCounts.merge(a,1,Integer::sum)));
+        // 2. Allergy distribution
+        org.apache.spark.sql.Dataset<org.apache.spark.sql.Row> allergyDF = df.withColumn("allergy", org.apache.spark.sql.functions.explode(df.col("allergies")))
+                .groupBy("allergy").count();
+        Map<String, Integer> allergyCounts = new HashMap<>();
+        for (org.apache.spark.sql.Row row : allergyDF.collectAsList()) {
+            String allergy = row.getAs("allergy");
+            int count = ((Number) row.getAs("count")).intValue();
+            allergyCounts.put(allergy, count);
+        }
 
-        /* 3 ─ Problem statistics */
-        Map<String,Integer> problemCounts  = new HashMap<>();
-        Map<String,Map<String,Integer>> bySex = new HashMap<>();
+        // 3. Problem statistics (overall)
+        org.apache.spark.sql.Dataset<org.apache.spark.sql.Row> problemDF = df.withColumn("problem", org.apache.spark.sql.functions.explode(df.col("problemList")))
+                .groupBy("problem").count();
+        Map<String, Integer> problemCounts = new HashMap<>();
+        for (org.apache.spark.sql.Row row : problemDF.collectAsList()) {
+            String problem = row.getAs("problem");
+            int count = ((Number) row.getAs("count")).intValue();
+            problemCounts.put(problem, count);
+        }
 
-        records.forEach(r -> {
-            String sex = Optional.ofNullable(r.getPatientSex()).orElse("Unknown");
-            Map<String,Integer> sexMap = bySex.computeIfAbsent(sex, k -> new HashMap<>());
-            Optional.ofNullable(r.getProblemList()).orElse(List.of())
-                    .forEach(p -> {
-                        problemCounts.merge(p,1,Integer::sum);
-                        sexMap.merge(p,1,Integer::sum);
-                    });
-        });
+        // 4. Problem statistics by sex
+        org.apache.spark.sql.Dataset<org.apache.spark.sql.Row> bySexDF = df.withColumn("problem", org.apache.spark.sql.functions.explode(df.col("problemList")))
+                .groupBy("patientSex", "problem").count();
+        Map<String, Map<String, Integer>> bySex = new HashMap<>();
+        for (org.apache.spark.sql.Row row : bySexDF.collectAsList()) {
+            String sex = row.getAs("patientSex") != null ? row.getAs("patientSex") : "Unknown";
+            String problem = row.getAs("problem");
+            int count = ((Number) row.getAs("count")).intValue();
+            bySex.computeIfAbsent(sex, k -> new HashMap<>()).put(problem, count);
+        }
 
-        /* 4 ─ Risk‑category calculation (Low / Moderate / High) */
-        Map<String,Integer> riskCounts = new HashMap<>(Map.of(
-                "Low",0,"Moderate",0,"High",0));
-
-        records.forEach(r -> {
-            int score = computeRiskScore(r);
-            String cat = score >= 8 ? "High" : score >= 4 ? "Moderate" : "Low";
-            riskCounts.merge(cat,1,Integer::sum);
-        });
-
-        /* 5 ─ Build DTO */
+        // Build DTO
         return new AnalyticsData(
                 patientTimeline,
                 allergyCounts,
                 problemCounts,
-                bySex,
-                riskCounts
+                bySex
         );
-    }
-
-    /* ========== helpers =================================== */
-    private static String toMonth(String iso) {
-        try { return iso.substring(0,7); } catch (Exception e) { return "Unknown"; }
-    }
-
-    /** simplistic rule‑based score – adjust as you see fit */
-    private static int computeRiskScore(HealthRecord r) {
-        int base = 0;
-        base += Optional.ofNullable(r.getProblemList()).orElse(List.of()).size();
-        base += Optional.ofNullable(r.getMedications()).orElse(List.of()).size() / 2;
-        base += Optional.ofNullable(r.getAllergies()).orElse(List.of()).size() / 3;
-        return base;
     }
 }

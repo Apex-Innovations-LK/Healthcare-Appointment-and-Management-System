@@ -54,7 +54,7 @@
               <p-select
                 id="Resource"
                 [(ngModel)]="resourceItem"
-                [options]="typeItem?.code === 'Room' ? roomItems : equipmentItems"
+                [options]="typeItem.code === 'Room' ? roomItems : equipmentItems"
                 optionLabel="name"
                 placeholder="Select Resource"
                 class="w-full"

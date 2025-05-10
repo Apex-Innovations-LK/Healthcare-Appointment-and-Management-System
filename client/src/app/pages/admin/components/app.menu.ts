@@ -21,66 +21,58 @@ export class AppMenu {
     ngOnInit() {
         this.model = [
             {
-                label: 'Home',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/admin'] }]
+                label: 'Main',
+                items: [
+                    { 
+                        label: 'Dashboard', 
+                        icon: 'pi pi-fw pi-home', 
+                        routerLink: ['/admin'] 
+                    }
+                ]
             },
-
             {
-                label: 'Pages',
-                icon: 'pi pi-fw pi-briefcase',
+                label: 'Analytics',
                 items: [
                     {
-                        label: 'Schedule',
-                        icon: 'pi pi-calendar',
-                        routerLink: ['/admin/schedular']
-                    }, {
-                        label: 'Analytics',
+                        label: 'Health Metrics',
                         icon: 'pi pi-chart-line',
                         routerLink: ['/admin/analytics']
                     },
                     {
+                        label: 'Risk Distribution',
+                        icon: 'pi pi-chart-pie',
+                        routerLink: ['/admin/risk-distribution']
+                    }
+                ]
+            },
+            {
+                label: 'Reporting',
+                items: [
+                    {
+                        label: 'Report Builder',
+                        icon: 'pi pi-fw pi-file',
+                        routerLink: ['/admin/report-builder']
+                    },
+                    {
+                        label: 'Visualizer',
+                        icon: 'pi pi-fw pi-chart-bar',
+                        routerLink: ['/admin/report-visualizer']
+                    }
+                ]
+            },
+            {
+                label: 'Patient Management',
+                items: [
+                    {
                         label: 'Patient Risk Assessment',
-                        icon: 'pi pi-fw pi-users',
+                        icon: 'pi pi-users',
                         routerLink: ['/admin/patients']
                     },
                     {
-                        label: 'Risk Dashboard',
-                        icon: 'pi pi-fw pi-chart-pie',
-                        routerLink: ['/admin/dashboard']
+                        label: 'Schedule',
+                        icon: 'pi pi-calendar',
+                        routerLink: ['/admin/schedular']
                     }
-
-                    //,
-                    // {
-                    //     label: 'Auth',
-                    //     icon: 'pi pi-fw pi-user',
-                    //     items: [
-                    //         {
-                    //             label: 'Login',
-                    //             icon: 'pi pi-fw pi-sign-in',
-                    //             routerLink: ['/auth/login']
-                    //         },
-                    //         {
-                    //             label: 'Error',
-                    //             icon: 'pi pi-fw pi-times-circle',
-                    //             routerLink: ['/auth/error']
-                    //         },
-                    //         {
-                    //             label: 'Access Denied',
-                    //             icon: 'pi pi-fw pi-lock',
-                    //             routerLink: ['/auth/access']
-                    //         }
-                    //     ]
-                    // },
-                    // {
-                    //     label: 'Not Found',
-                    //     icon: 'pi pi-fw pi-exclamation-circle',
-                    //     routerLink: ['/pages/notfound']
-                    // },
-                    // {
-                    //     label: 'Empty',
-                    //     icon: 'pi pi-fw pi-circle-off',
-                    //     routerLink: ['/pages/empty']
-                    // }
                 ]
             }
         ];
