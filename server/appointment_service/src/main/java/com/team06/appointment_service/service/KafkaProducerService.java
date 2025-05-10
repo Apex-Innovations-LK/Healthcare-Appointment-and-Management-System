@@ -2,6 +2,7 @@ package com.team06.appointment_service.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team06.appointment_service.dto.AppointmentBookedDto;
+import com.team06.appointment_service.dto.Notification1Dto;
 import com.team06.appointment_service.dto.NotificationDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +21,6 @@ public class KafkaProducerService {
 
     @Value("${kafka.topic.appointment-booked}")
     private String appointmentBookedTopic;
-
-    @Value("${kafka.topic.notification}")
-    private String notificationTopic;
 
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
@@ -53,25 +51,4 @@ public class KafkaProducerService {
         }
     }
 
-    public void sendMessageNotification(String message) {
-        logger.info("Sending message to topic {}: {}", notificationTopic, message);
-        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(notificationTopic, message);
-        future.whenComplete((result, ex) -> {
-            if (ex == null) {
-                logger.info("Message sent successfully to topic {}: {}", notificationTopic, message);
-            } else {
-                logger.error("Failed to send message to topic {}: {}",
-                        notificationTopic, ex.getMessage());
-            }
-        });
-    }
-
-    public void sendNotificationEvent(NotificationDto notificationDto) {
-        try {
-            String userJson = objectMapper.writeValueAsString(notificationDto);
-            sendMessageNotification(userJson);
-        } catch (Exception e) {
-            logger.error("Error serializing user event: {}", e.getMessage());
-        }
-    }
 }

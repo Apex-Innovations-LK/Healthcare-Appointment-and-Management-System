@@ -24,8 +24,6 @@ public class KafkaProducerConfig {
     @Value("${kafka.topic.appointment-booked}")
     private String appointmentBooked;
 
-    @Value("${kafka.topic.notification}")
-    private String notificationTopic;
 
     @Bean
     public KafkaAdmin kafkaAdmin() {
@@ -38,11 +36,6 @@ public class KafkaProducerConfig {
     public NewTopic appointmentBookedTopic() {
         // Creating the topic with 1 partition and replication factor of 1
         return new NewTopic(appointmentBooked, 1, (short) 1);
-    }
-
-    @Bean
-    public NewTopic patient() {
-        return new NewTopic(notificationTopic, 1, (short) 1);
     }
 
     @Bean
