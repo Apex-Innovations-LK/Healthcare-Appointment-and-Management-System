@@ -1,10 +1,10 @@
-package com.main.notification_service;
+package com.kafka.emailproducer;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class NotificationServiceApplicationTests {
+class EmailproducerApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,13 +1,13 @@
-package com.main.notification_service;
+package com.kafka.emailproducer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class NotificationServiceApplication {
+public class EmailproducerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(NotificationServiceApplication.class, args);
+		SpringApplication.run(EmailproducerApplication.class, args);
 	}
 
 }
