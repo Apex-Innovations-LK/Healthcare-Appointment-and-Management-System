@@ -1,0 +1,287 @@
+@startuml Health Analytics Module
+
+' Style and Theming
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+skinparam classFontSize 12
+skinparam classBackgroundColor #FEFECE
+skinparam classArrowColor #333333
+skinparam linetype ortho
+skinparam titleFontSize 18
+skinparam titleFontStyle bold
+
+title "Healthcare Appointment and Management System - Health Analytics Module"
+
+' Package for Models
+package "healthanalytics.model" {
+  ' Health Records
+  class HealthRecord {
+    -String recordId
+    -String patientId
+    -String patientName
+    -String patientDOB
+    -String dateOfService
+    -String referringDoctor
+    -List<String> chiefComplaint
+    -List<String> allergies
+    -List<String> medications
+    -List<String> problemList
+    -String patientSex
+    -Integer riskScore
+    +getters()
+    +setters()
+  }
+
+  class PatientRecord {
+    -String recordId
+    -String patientId
+    -String patientName
+    -String patientDob
+    -String dateOfService
+    -String referringDoctor
+    -List<String> chiefComplaint
+    -List<String> allergies
+    -List<String> medications
+    -List<String> problemList
+    -String patientSex
+    -String address
+    -String city
+    -String state
+    -String zip
+    -String patientPhone
+    -List<String> lbfData
+    -List<String> hisData
+    +getters()
+    +setters()
+  }
+
+  class RiskAssessment {
+    -String patientId
+    -String riskLevel
+    -String riskReason
+    -double riskProbability
+    +RiskAssessment(patientId, riskLevel, riskReason)
+    +getters()
+    +setters()
+  }
+
+  ' Resource Management
+  class Resource {
+    -Long resourceId
+    -String name
+    -String type
+    -String department
+    -String description
+    -String status
+    -LocalDateTime createdTime
+    +Resource()
+    +Resource(name, type, department, description)
+    +onCreate()
+    +getters()
+    +setters()
+  }
+
+  class ResourceAllocation {
+    -UUID allocationId
+    -UUID sessionId
+    -Long resourceId
+    -LocalDateTime from
+    -LocalDateTime to
+    +ResourceAllocation()
+    +ResourceAllocation(sessionId, resourceId, from, to)
+    +getters()
+    +setters()
+  }
+
+  class SessionResourceAllocations {
+    -UUID allocation_id
+    -UUID sessionId
+    -List<Long> resourceIds
+    -LocalDateTime from
+    -LocalDateTime to
+    +SessionResourceAllocations()
+    +SessionResourceAllocations(allocation_id, sessionId, resourceIds, from, to)
+    +getters()
+    +setters()
+  }
+
+  class SessionResourceResourceAllocation {
+    -UUID allocation_id
+    -UUID sessionId
+    -List<Resource> resources
+    -LocalDateTime from
+    -LocalDateTime to
+    -float duration
+    +SessionResourceResourceAllocation()
+    +SessionResourceResourceAllocation(allocation_id, sessionId, resources, from, to, duration)
+    +getters()
+    +setters()
+    +setResourceAllocation(resourceAllocation)
+  }
+
+  ' Staff Management
+  class StaffAllocation {
+    -UUID staffAllocationId
+    -UUID staffId
+    -String name
+    -String role
+    -Date date
+    -float scheduleTime
+    -float overtime
+    -float idle_time
+    -float active_time
+    -float utilization
+    -String status
+    +StaffAllocation()
+    +StaffAllocation(staffId, name, role, date, scheduleTime, overtime, idle_time, active_time, utilization, status)
+    +getters()
+    +setters()
+  }
+  
+  class StaffUtilizationOverallDto {
+    -float avarageUtilization
+    -float numberOfOverUsedStaff
+    -float totalStaffMembers
+    -float utilizationByRoleDoctor
+    -float utilizationByRoleStaff
+    -List<Float> staffStateDestribution
+    -List<String> staffStateDestributionLebal
+    +StaffUtilizationOverallDto(avarageUtilization, numberOfOverUsedStaff, totalStaffMembers, utilizationByRoleDoctor, utilizationByRoleStaff, staffStateDestribution, staffStateDestributionLebal)
+    +getters()
+    +setters()
+  }
+
+  ' User management
+  class User {
+    -UUID id
+    -String username
+    -String firstName
+    -String lastName
+    -LocalDateTime dateOfBirth
+    -String gender
+    +getters()
+    +setters()
+  }
+}
+
+' Package for DTOs
+package "healthanalytics.dto" {
+  class AnalyticsData {
+    -List<Point> patientCountTimeline
+    -Map<String,Integer> allergiesDistribution
+    -Map<String,Integer> problemListCounts
+    -Map<String,Map<String,Integer>> problemListBySex
+    +AnalyticsData()
+    +AnalyticsData(patientCountTimeline, allergiesDistribution, problemListCounts, problemListBySex)
+    +getters()
+    +setters()
+  }
+
+  class Point {
+    -String date
+    -Integer count
+    +Point()
+    +Point(date, count)
+    +getters()
+    +setters()
+  }
+}
+
+' Package for Repositories
+package "healthanalytics.repo" {
+  interface ResourceAllocationRepo {
+    +findAllResourceAllocationBySessionId(UUID id) : Optional<List<ResourceAllocation>>
+    +findByResourceIdAndFromAfter(Long resourceId, LocalDateTime from) : List<ResourceAllocation>
+    +findBusyResourceIds(LocalDateTime from, LocalDateTime to) : List<Long>
+    +deleteResourceAllocationByAllocationId(UUID id) : void
+    +deleteBySessionIdAndResourceId(UUID sessionId, Long resourceId) : void
+  }
+
+  interface StaffAllocationRepo {
+    +getStaffAllocationByStaffAllocationId(UUID id) : StaffAllocation
+  }
+
+  interface UserRepo {
+  }
+}
+
+' Package for Services
+package "healthanalytics.service" {
+  class AnalyticsService {
+    -ObjectMapper objectMapper
+    -SparkSession spark
+    -String JSON_FILE_PATH
+    +AnalyticsService(objectMapper, sparkSession)
+    +cleanup() : void
+    +fetchAnalytics() : AnalyticsData
+  }
+
+  class RiskAssessmentService {
+    -List<PatientRecord> patientRecords
+    -SparkSession spark
+    -JavaSparkContext jsc
+    -Map<String, Long> distributionCache
+    -long cacheTimestamp
+    -long CACHE_DURATION_MS
+    +RiskAssessmentService(sparkSession)
+    +loadPatientData() : void
+    +getAllRiskAssessments() : List<RiskAssessment>
+    +getAllPatientRecords() : List<PatientRecord>
+    +assessRisk(record) : RiskAssessment
+    +assessRiskWithSciPy(record) : RiskAssessment
+    +assessRiskWithSciPyBatch(records) : List<RiskAssessment>
+    +getBatchRiskAssessment(patientIds) : List<RiskAssessment>
+    +getRiskDistribution() : Map<String, Long>
+    +clearDistributionCache() : void
+  }
+  
+  class ResourceAllocationService {
+    -ResourceAllocationRepo resourceAllocationRepo
+    +ResourceAllocationService(resourceAllocationRepo)
+    +findAllResourceAllocations() : List<ResourceAllocation>
+    +addResourceAllocation(resourceAllocation) : ResourceAllocation
+    +findAllResourceAllocationBySessionId(id) : List<ResourceAllocation>
+    +getUpcomingResourceAllocations(resourceId) : List<ResourceAllocation>
+    +getBusyResources(givenFrom, givenTo) : List<Long>
+    +deleteResourceAllocation(sessionId, resourceId) : void
+  }
+  
+  class StaffAllocationService {
+    -StaffAllocationRepo staffAllocationRepo
+    +StaffAllocationService(staffAllocationRepo)
+    +addStaffAllocation(staffAllocation) : StaffAllocation
+    +getStaffUtilizationOverall() : StaffUtilizationOverallDto
+    +getAllStaffAllocations() : List<StaffAllocation>
+    +getStaffAllocationByStaffAllocationId(id) : StaffAllocation
+  }
+}
+
+' Relationships
+
+' Model relationships
+PatientRecord "1" -- "0..*" RiskAssessment : assessed for >
+ResourceAllocation "1" -- "1" Resource : allocates >
+SessionResourceAllocations "1" -- "0..*" ResourceAllocation : contains >
+SessionResourceResourceAllocation "1" -- "0..*" Resource : contains >
+SessionResourceResourceAllocation "0..*" -- "1" ResourceAllocation : based on >
+
+' Repository relationships
+ResourceAllocationRepo "1" -- "0..*" ResourceAllocation : manages >
+StaffAllocationRepo "1" -- "0..*" StaffAllocation : manages >
+UserRepo "1" -- "0..*" User : manages >
+
+' Service dependencies
+AnalyticsService --> HealthRecord : uses >
+RiskAssessmentService --> PatientRecord : analyzes >
+RiskAssessmentService --> RiskAssessment : produces >
+ResourceAllocationService --> ResourceAllocationRepo : uses >
+ResourceAllocationService --> ResourceAllocation : manages >
+StaffAllocationService --> StaffAllocationRepo : uses >
+StaffAllocationService --> StaffAllocation : manages >
+StaffAllocationService --> StaffUtilizationOverallDto : produces >
+
+' DTO relationships
+AnalyticsService --> AnalyticsData : produces >
+AnalyticsData o-- Point : contains >
+
+@enduml

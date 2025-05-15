@@ -74,7 +74,22 @@ export class AppMenu {
                         routerLink: ['/admin/schedular']
                     }
                 ]
-            }
+            },
+            {
+                label: 'Staff & Resource Management',
+                items: [
+                    {
+                        label: 'Resource Allocation',
+                        icon: 'pi pi-fw pi-cog',
+                        routerLink: ['/admin/resource-allocation']
+                    },
+                    {
+                        label: 'Staff Utilization',
+                        icon: 'pi pi-fw pi-user',
+                        routerLink: ['/admin/staff-utilization']
+                    }
+                ]
+            },
         ];
     }
 }

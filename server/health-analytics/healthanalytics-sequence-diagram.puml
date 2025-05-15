@@ -1,0 +1,176 @@
+@startuml Health Analytics Module - Sequence Diagram
+
+' Style and Theming
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam sequenceParticipant bold
+skinparam sequenceActorBorderColor #666666
+skinparam sequenceLifeLineBorderColor #666666
+skinparam sequenceLifeLineBackgroundColor #EEEEEE
+skinparam sequenceParticipantBorderColor #666666
+skinparam sequenceParticipantBackgroundColor #FEFECE
+skinparam sequenceGroupBackgroundColor #EEEEEE
+skinparam sequenceGroupBorderColor #666666
+skinparam sequenceGroupBorderThickness 1
+skinparam sequenceGroupHeaderFontStyle bold
+skinparam titleFontSize 18
+skinparam titleFontStyle bold
+
+title "Healthcare Appointment and Management System - Health Analytics Sequence"
+
+' Participants
+actor "Healthcare Professional" as User
+participant "AnalyticsController" as Controller
+participant "AnalyticsService" as AnalyticsService
+participant "RiskAssessmentService" as RiskService
+participant "ResourceAllocationService" as ResourceService
+participant "StaffAllocationService" as StaffService
+database "HealthRecord Repository" as HealthRepo
+database "ResourceAllocationRepo" as ResourceRepo
+database "StaffAllocationRepo" as StaffRepo
+
+' Main Analytics Workflow
+group Analytics Dashboard Request
+    User -> Controller: requestAnalytics()
+    activate Controller
+    
+    Controller -> AnalyticsService: fetchAnalytics()
+    activate AnalyticsService
+    
+    AnalyticsService -> HealthRepo: loadHealthRecords()
+    activate HealthRepo
+    HealthRepo --> AnalyticsService: healthRecordsList
+    deactivate HealthRepo
+    
+    AnalyticsService -> AnalyticsService: processAnalytics()
+    note right
+        1. Calculate patient count timeline
+        2. Process allergies distribution
+        3. Calculate problem list statistics
+        4. Analyze problems by sex
+    end note
+    
+    AnalyticsService --> Controller: return AnalyticsData
+    deactivate AnalyticsService
+    
+    Controller --> User: display analytics dashboard
+    deactivate Controller
+end
+
+' Risk Assessment Workflow
+group Patient Risk Assessment
+    User -> Controller: requestRiskAssessment(patientId)
+    activate Controller
+    
+    Controller -> RiskService: assessRiskWithSciPy(patientRecord)
+    activate RiskService
+    
+    RiskService -> RiskService: extractMetrics()
+    note right
+        Extract key health metrics:
+        - Blood glucose
+        - Hemoglobin
+        - Blood pressure
+        - Other vital signs
+    end note
+    
+    RiskService -> RiskService: calculateRiskProbability()
+    RiskService -> RiskService: determineRiskLevel()
+    
+    RiskService --> Controller: return RiskAssessment
+    deactivate RiskService
+    
+    Controller --> User: display risk assessment results
+    deactivate Controller
+end
+
+' Resource Allocation Workflow
+group Resource Allocation Management
+    User -> Controller: requestResourceAllocations()
+    activate Controller
+    
+    Controller -> ResourceService: findAllResourceAllocations()
+    activate ResourceService
+    
+    ResourceService -> ResourceRepo: findAll()
+    activate ResourceRepo
+    ResourceRepo --> ResourceService: resourceAllocationsList
+    deactivate ResourceRepo
+    
+    ResourceService --> Controller: return ResourceAllocations
+    deactivate ResourceService
+    
+    Controller --> User: display resource allocations
+    deactivate Controller
+    
+    ' Adding a specific resource allocation
+    User -> Controller: allocateResource(resourceAllocation)
+    activate Controller
+    
+    Controller -> ResourceService: addResourceAllocation(resourceAllocation)
+    activate ResourceService
+    
+    ResourceService -> ResourceService: validateResourceAvailability()
+    
+    ResourceService -> ResourceRepo: save(resourceAllocation)
+    activate ResourceRepo
+    ResourceRepo --> ResourceService: saved allocation
+    deactivate ResourceRepo
+    
+    ResourceService --> Controller: return added allocation
+    deactivate ResourceService
+    
+    Controller --> User: confirm resource allocation
+    deactivate Controller
+end
+
+' Staff Utilization Workflow
+group Staff Utilization Analysis
+    User -> Controller: requestStaffUtilization()
+    activate Controller
+    
+    Controller -> StaffService: getStaffUtilizationOverall()
+    activate StaffService
+    
+    StaffService -> StaffRepo: findAll()
+    activate StaffRepo
+    StaffRepo --> StaffService: staffAllocationsList
+    deactivate StaffRepo
+    
+    StaffService -> StaffService: calculateUtilizationMetrics()
+    note right
+        Calculate:
+        - Average utilization
+        - Over-utilized staff count
+        - Utilization by role
+        - Staff state distribution
+    end note
+    
+    StaffService --> Controller: return StaffUtilizationOverallDto
+    deactivate StaffService
+    
+    Controller --> User: display staff utilization dashboard
+    deactivate Controller
+end
+
+' Resource Availability Check
+group Check Resource Availability
+    User -> Controller: checkResourceAvailability(timeSlot)
+    activate Controller
+    
+    Controller -> ResourceService: getBusyResources(from, to)
+    activate ResourceService
+    
+    ResourceService -> ResourceRepo: findBusyResourceIds(from, to)
+    activate ResourceRepo
+    ResourceRepo --> ResourceService: busyResourceIds
+    deactivate ResourceRepo
+    
+    ResourceService --> Controller: return busyResourcesList
+    deactivate ResourceService
+    
+    Controller --> User: display available resources
+    deactivate Controller
+end
+
+@enduml

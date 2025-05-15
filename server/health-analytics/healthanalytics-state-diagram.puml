@@ -1,0 +1,213 @@
+@startuml Health Analytics Module - State Diagram
+
+' Style and Theming
+skinparam state {
+  BackgroundColor #FEFECE
+  BorderColor #666666
+  BorderThickness 2
+  FontStyle bold
+}
+
+title "Healthcare Analytics Module - Simplified State Diagram"
+
+' Starting state
+[*] --> Idle
+
+' Main States
+state Idle
+state "Data Loading" as Loading
+state "Processing" as Processing
+state "Results Ready" as Results
+state "Error" as Error
+
+' Analytics Flow
+Idle --> Loading : Request Analytics
+Loading --> Processing : Data Retrieved
+Processing --> Results : Processing Complete
+Loading --> Error : API Failure
+Processing --> Error : Processing Failure
+
+' Risk Assessment States
+state "Calculating Risk" as Risk
+Idle --> Loading : Request Risk Assessment
+Loading --> Risk : Patient Data Retrieved
+Risk --> Results : Risk Calculated
+
+' Results States
+state ResultsReady {
+  state "Dashboard View" as dashView
+  state "Report View" as reportView
+  state "Risk Summary View" as riskView
+  
+  [*] --> dashView
+  dashView --> reportView : Switch View
+  reportView --> riskView : Switch View
+  riskView --> dashView : Switch View
+}
+
+' Risk Assessment States
+Idle --> RiskAssessmentRequested : Request Patient Risk Assessment
+
+state RiskAssessmentRequested {
+  state "Fetching Patient Data" as fetchPatient
+  state "Processing Health Metrics" as procHealth
+  
+  [*] --> fetchPatient
+  fetchPatient --> procHealth : Patient Data Available
+  fetchPatient --> Error : Patient Not Found
+}
+
+RiskAssessmentRequested --> PythonProcessing : Metrics Ready
+
+state PythonProcessing {
+  state "Executing SciPy" as execScipy
+  state "Calculating Risk Score" as calcRisk
+  
+  [*] --> execScipy
+  execScipy --> calcRisk
+  calcRisk --> [*]
+}
+
+PythonProcessing --> RiskAssessed : Risk Assessment Complete
+
+state RiskAssessed {
+  state "Low Risk" as lowRisk
+  state "Moderate Risk" as modRisk
+  state "High Risk" as highRisk
+  
+  [*] --> lowRisk : Low Score
+  [*] --> modRisk : Moderate Score
+  [*] --> highRisk : High Score
+}
+
+' Report Generation States
+Idle --> ReportRequested : Request Healthcare Report
+
+' Common Transitions
+Results --> Idle : Close View
+Error --> Idle : Reset
+
+' Final state
+Results --> [*] : Session End
+Error --> [*] : Session End
+
+@enduml
+
+state RiskAssessmentRequested {
+  state "Fetching Patient Data" as fetchPatient
+  state "Processing Health Metrics" as procHealth
+  
+  [*] --> fetchPatient
+  fetchPatient --> procHealth : Patient Data Available
+  fetchPatient --> Error : Patient Not Found
+}
+
+RiskAssessmentRequested --> PythonProcessing : Metrics Ready
+
+state PythonProcessing {
+  state "Executing SciPy" as execScipy
+  state "Calculating Risk Score" as calcRisk
+  
+  [*] --> execScipy
+  execScipy --> calcRisk
+  calcRisk --> [*]
+}
+
+PythonProcessing --> RiskAssessed : Risk Assessment Complete
+
+state RiskAssessed {
+  state "Low Risk" as lowRisk
+  state "Moderate Risk" as modRisk
+  state "High Risk" as highRisk
+  
+  [*] --> lowRisk : Low Score
+  [*] --> modRisk : Moderate Score
+  [*] --> highRisk : High Score
+}
+
+' Report Generation States
+Idle --> ReportRequested : Request Healthcare Report
+
+state ReportRequested {
+  state "Validating Request" as validReq
+  state "Fetching Report Data" as fetchRepData
+  
+  [*] --> validReq
+  validReq --> fetchRepData : Valid Request
+  validReq --> Error : Invalid Request
+}
+
+ReportRequested --> ReportGeneration : Data Available
+
+state ReportGeneration {
+  state "Demographic Report" as demoRep
+  state "Diagnosis Report" as diagRep
+  state "Visit Report" as visitRep
+  
+  [*] --> demoRep : Demographic Requested
+  [*] --> diagRep : Diagnosis Requested
+  [*] --> visitRep : Visit Requested
+}
+
+ReportGeneration --> ReportFormatting : Report Generated
+
+state ReportFormatting {
+  state "JSON Format" as jsonFmt
+  state "CSV Format" as csvFmt
+  
+  [*] --> jsonFmt : JSON Requested
+  [*] --> csvFmt : CSV Requested
+}
+
+ReportFormatting --> ReportReady : Formatting Complete
+
+' Staff Utilization States
+Idle --> StaffAnalyticsRequested : Request Staff Analytics
+
+state StaffAnalyticsRequested {
+  state "Fetching Allocation Data" as fetchAlloc
+  state "Calculating Metrics" as calcMetrics
+  
+  [*] --> fetchAlloc
+  fetchAlloc --> calcMetrics : Data Available
+  fetchAlloc --> Error : Data Unavailable
+}
+
+StaffAnalyticsRequested --> StaffAnalyticsReady : Metrics Calculated
+
+state StaffAnalyticsReady {
+  state "Utilization View" as utilView
+  state "Staff Performance View" as perfView
+  
+  [*] --> utilView
+  utilView --> perfView : Switch View
+  perfView --> utilView : Switch View
+}
+
+' Error state
+state Error {
+  state "API Error" as apiErr
+  state "Processing Error" as procErr
+  state "Data Error" as dataErr
+  
+  [*] --> apiErr : API Failure
+  [*] --> procErr : Processing Failure
+  [*] --> dataErr : Data Issue
+}
+
+Error --> Idle : Reset
+
+' Transitions back to Idle
+ResultsReady --> Idle : Close Dashboard
+RiskAssessed --> Idle : Close Risk View
+ReportReady --> Idle : Close Report
+StaffAnalyticsReady --> Idle : Close Staff Analytics
+
+' Final state transitions
+ResultsReady --> [*] : Session End
+RiskAssessed --> [*] : Session End
+ReportReady --> [*] : Session End
+StaffAnalyticsReady --> [*] : Session End
+Error --> [*] : Session End
+
+@enduml
