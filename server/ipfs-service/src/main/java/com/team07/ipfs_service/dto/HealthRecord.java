@@ -30,7 +30,7 @@ public class HealthRecord {
     private Date patientDOB;
 
     @JsonProperty("date_of_service")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
     private Date dateOfService; // Timestamp of the record creation
 
     @JsonProperty("referring_doctor")
