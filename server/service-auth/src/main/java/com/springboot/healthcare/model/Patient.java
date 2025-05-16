@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "patient")
+@Table(name = "patient", schema = "authservice")
 public class Patient {
 
     @Id
