@@ -16,7 +16,7 @@ public class ChatHistoryController {
 
     // Endpoint to get all sessions for a user
     @GetMapping("/sessions/{userId}")
-    public List<String> getUserSessions(@PathVariable String userId) {
+    public List<Object[]> getUserSessions(@PathVariable String userId) {
         return chatHistoryService.getUserSessions(userId);
     }
 

@@ -33,7 +33,7 @@ public class ChatHistoryConsumer {
 
             ChatHistory history = new ChatHistory();
             history.setSessionId((String) messageMap.get("sessionId"));
-            history.setSender((String) messageMap.get("sender"));
+            history.setSender((String) messageMap.get("role"));
             history.setMessage((String) messageMap.get("content"));
             history.setUserId((String) messageMap.get("userId"));
 

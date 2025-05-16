@@ -22,7 +22,10 @@ public interface ChatHistoryRepository extends JpaRepository<ChatHistory, Long> 
    // List<ChatHistory> findBySender(String sender);
 
     //List<ChatHistory> findByUserId(String userId); // Retrieve all chat history for a user
-    @Query("SELECT DISTINCT c.sessionId FROM ChatHistory c WHERE c.userId = :userId ORDER BY " +
-            "(SELECT MIN(ch.timestamp) FROM ChatHistory ch WHERE ch.sessionId = c.sessionId)")
-    List<String> findDistinctSessionIdByUserIdOrderbyFirstTimestamp(String userId); // Retrieve distinct session IDs for a user
+    @Query("SELECT c.sessionId, MIN(c.timestamp)" +
+            "FROM ChatHistory c " +
+            "WHERE c.userId = :userId " +
+            "GROUP BY c.sessionId " +
+            "ORDER BY MIN(c.timestamp) ASC")
+    List<Object[]> findDistinctSessionIdByUserIdOrderbyFirstTimestamp(String userId); // Retrieve distinct session IDs for a user
 }
