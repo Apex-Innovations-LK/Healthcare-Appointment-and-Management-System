@@ -61,6 +61,6 @@ For more information on using the Angular CLI, including detailed command refere
 
 # Run Locally
 ```bash
-docker build -t medicare-app ./client
+docker build -t medicare-app .
 docker run -d -p 4200:4200 medicare-app 
 ```
