@@ -6,7 +6,7 @@ import { PatientListComponent } from './patient-list';
 import { RiskAssessmentComponent } from './risk-assessment';
 import { RiskDistributionComponent } from './risk-distribution.component';
 import { ReportBuilderComponent } from './reporting/report-builder/report-builder';
-import { VisualAnalyticsComponent } from './reporting/visual-analytics/visual-analytics';
+import { VisualAnalyticsComponent } from '../doctor/reporting/visual-analytics/visual-analytics';
 import { StaffUtilization } from './Staff-Utilization/staffUtilization';
 import { StaffUtilizationDetailViewComponent } from './Staff-Utilization/components/staff-utilization-detail-view/staff-utilization-detail-view.component'
 import { ResourceAllocation } from './resource-allocation/resource-allocation-dashboard/resourceAllocation'
