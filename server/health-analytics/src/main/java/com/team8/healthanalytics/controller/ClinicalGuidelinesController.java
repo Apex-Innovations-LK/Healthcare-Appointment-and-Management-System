@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/guidelines")
+@RequestMapping("/api/analytics/guidelines")
 public class ClinicalGuidelinesController {
     @Autowired
     private ClinicalGuidelinesService guidelinesService;

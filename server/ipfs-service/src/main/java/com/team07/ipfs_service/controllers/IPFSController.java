@@ -13,6 +13,7 @@ import com.team07.ipfs_service.dto.HealthRecord;
 import com.team07.ipfs_service.services.ipfs.IPFSService;
 
 @RestController
+@RequestMapping("/api/ipfs")
 public class IPFSController {
 
     @Autowired
