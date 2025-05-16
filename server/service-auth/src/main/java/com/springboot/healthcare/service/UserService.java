@@ -2,9 +2,7 @@ package com.springboot.healthcare.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springboot.healthcare.dto.AuthResponse;
-import com.springboot.healthcare.dto.RegisterRequest;
-import com.springboot.healthcare.dto.UserKafkaEvent;
+import com.springboot.healthcare.dto.*;
 import com.springboot.healthcare.exception.EmailAlreadyExistsException;
 import com.springboot.healthcare.exception.UsernameAlreadyExistsException;
 import com.springboot.healthcare.model.Doctor;
@@ -19,10 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -104,7 +103,7 @@ public class UserService {
         }
         String token = jwtService.generateToken(user.getUsername(), user.getRole());
 
-        // Create the UserKafkaEvent object
+
         UserKafkaEvent userEvent = new UserKafkaEvent(
                 savedUser.getId(),
                 savedUser.getUsername(),
@@ -142,5 +141,23 @@ public class UserService {
 
     public Optional<Users> getUserByUsername(String username) {
         return userRepo.findByUsername(username);
+    }
+    public List<Users> getUsers() {
+        return userRepo.findAll();
+    }
+
+    public Map<String, Long> getCount() {
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("DoctorsAvailable",userRepo.countByRole("DOCTOR"));
+        stats.put("StaffsAvailable",userRepo.countByRole("STAFF"));
+        return stats;
+    }
+
+    public List<DoctorDetails> fetchAllDoctors() {
+        return userRepo.findAllDoctors();
+    }
+
+    public UserDetailsDto fetchUserInfo(UUID patientId) {
+        return userRepo.fetchUserDetails(patientId);
     }
 }
