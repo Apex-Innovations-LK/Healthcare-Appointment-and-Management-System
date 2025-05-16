@@ -1,12 +1,16 @@
 // notification.service.ts
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MessageService } from 'primeng/api';
+import { Observable } from 'rxjs';
+import { Notification } from '../models/Notification';
 
 @Injectable({
     providedIn: 'root'
 })
 export class NotificationService {
-    constructor(private messageService: MessageService) {}
+    private baseURL = 'http://localhost:8080/api/notify';
+    constructor(private messageService: MessageService, private httpClient : HttpClient) {}
 
     showSuccess(message: string, title: string = 'Success') {
         this.messageService.add({
@@ -42,5 +46,10 @@ export class NotificationService {
 
     clear() {
         this.messageService.clear();
+    }
+
+
+    sendNotification(notification : Notification):Observable<any> {
+        return this.httpClient.post(`${this.baseURL}/send`, notification);
     }
 }

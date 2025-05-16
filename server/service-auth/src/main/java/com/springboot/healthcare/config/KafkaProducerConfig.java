@@ -24,6 +24,7 @@ public class KafkaProducerConfig {
     @Value("${kafka.topic.user-created}")
     private String userCreatedTopic;
 
+
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
@@ -36,6 +37,7 @@ public class KafkaProducerConfig {
         // Creating the topic with 1 partition and replication factor of 1
         return new NewTopic(userCreatedTopic, 1, (short) 1);
     }
+
 
     @Bean
     public ProducerFactory<String, String> producerFactory() {
