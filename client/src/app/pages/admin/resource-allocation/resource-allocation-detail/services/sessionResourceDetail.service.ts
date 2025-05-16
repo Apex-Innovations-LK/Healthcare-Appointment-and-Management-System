@@ -10,7 +10,7 @@ import { ResourceAllocation } from "../../resource-allocation-dashboard/resource
     providedIn: 'root',
 })
 export class SessionResourceDetailService{
-    private apiServerUrl = 'http://localhost:8080/resource-allocation'; // Replace with your API server URL
+    private apiServerUrl = 'http://localhost:8081/resource-allocation'; // Replace with your API server URL
 
     constructor(private http: HttpClient) {}
 
