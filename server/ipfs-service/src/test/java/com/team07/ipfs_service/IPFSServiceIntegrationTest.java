@@ -13,10 +13,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import io.ipfs.api.IPFS;
-import io.ipfs.api.MerkleNode;
-import io.ipfs.api.NamedStreamable;
-import io.ipfs.multihash.Multihash;
 
 import java.util.Arrays;
 import java.util.HashMap;

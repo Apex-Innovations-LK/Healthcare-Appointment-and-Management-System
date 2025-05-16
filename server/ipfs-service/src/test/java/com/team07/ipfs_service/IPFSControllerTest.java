@@ -2,7 +2,6 @@ package com.team07.ipfs_service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team07.ipfs_service.controllers.IPFSController;
-import com.team07.ipfs_service.config.IpfsConfig;
 import com.team07.ipfs_service.dto.HealthRecord;
 import com.team07.ipfs_service.services.ipfs.IPFSService;
 import org.junit.jupiter.api.BeforeEach;
