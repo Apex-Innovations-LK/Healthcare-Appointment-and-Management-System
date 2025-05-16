@@ -31,7 +31,7 @@ public class KafkaConsumerService {
         try {
             logger.info("Received message: {}", message);
             UserKafkaEvent userEvent = objectMapper.readValue(message, UserKafkaEvent.class);
-
+            System.out.println(userEvent.getEventType());
             if ("USER_CREATED".equals(userEvent.getEventType())) {
                 processUserCreatedEvent(userEvent);
             } else {
