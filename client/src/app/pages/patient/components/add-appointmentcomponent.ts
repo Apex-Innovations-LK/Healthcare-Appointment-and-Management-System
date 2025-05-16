@@ -10,6 +10,7 @@ import { AuthStateService } from '../../../service/auth-state.service';
 import { MakeAppointment } from '../../../models/makeAppointment';
 import { NotificationService } from '../../../service/notification.service';
 import { RefreshButtonComponent } from './refreshButtonComponent';
+import { Notification } from '../../../models/Notification';
 
 interface Doctor {
     doctor_id: string;
@@ -308,6 +309,22 @@ export class AddAppointmentComponent implements OnInit {
                 this.notificationService.showError('Failed to book appointment. Please try again later.');
             }
         });
+
+        const notification : Notification = new Notification(
+            this.authStateService.getUserDetails()?.email || '',
+            'Appointment Confirmation',
+            `Your appointment with Dr. ${this.selectedDoctor.first_name} ${this.selectedDoctor.last_name} has been booked for ${this.formatAppointmentDate(this.selectedSlot.from)} at ${this.formatAppointmentTime(this.selectedSlot.from)}.`
+        )
+
+        this.notificationService.sendNotification(notification).subscribe({
+            next: (response) => {
+                console.log('Notification sent successfully:', response);
+            },
+            error: (error) => {
+                console.error('Error sending notification:', error);
+                this.notificationService.showError('Failed to send notification. Please try again later.');
+             }
+        })
 
         this.selectedSlot = null;
     }

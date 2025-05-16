@@ -1,6 +1,7 @@
 package com.springboot.healthcare.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springboot.healthcare.dto.NotificationDto;
 import com.springboot.healthcare.dto.UserKafkaEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,4 +49,5 @@ public class KafkaProducerService {
             logger.error("Error serializing user event: {}", e.getMessage());
         }
     }
+
 }
