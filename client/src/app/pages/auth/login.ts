@@ -73,7 +73,7 @@ import { NotificationService } from '../../service/notification.service';
                                     <p-checkbox [(ngModel)]="checked" id="rememberme1" binary class="mr-2"></p-checkbox>
                                     <label for="rememberme1">Remember me</label>
                                 </div>
-                                <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
+                                <!-- <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span> -->
                             </div>
                             <p-button label="Log In" styleClass="w-full" (click)="login()"></p-button>
                         </div>

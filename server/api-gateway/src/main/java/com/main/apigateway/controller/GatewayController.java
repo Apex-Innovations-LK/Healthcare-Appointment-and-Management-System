@@ -31,7 +31,7 @@ public class GatewayController {
             String relativePath = requestURI.substring(basePath.length());
 
             // Final destination URL
-            String destinationUrl = "http://localhost:808" + getPort(service) + "/api/" + service + "/" + relativePath;
+            String destinationUrl = "http://localhost:80" + getPort(service) + "/api/" + service + "/" + relativePath;
 
             HttpMethod httpMethod = HttpMethod.valueOf(request.getMethod());
 
@@ -69,10 +69,17 @@ public class GatewayController {
 
     private String getPort(String service) {
         return switch (service.toLowerCase()) {
-            case "auth" -> "1";   // http://localhost:8081
-            case "schedule" -> "2";   // http://localhost:8082
-            case "appointment" -> "3"; // http://localhost:8083
-            case "doctors" -> "5"; // http://localhost:8085
+            case "appointment" -> "81"; // http://localhost:8081
+            case "blockchain" -> "82";   // http://localhost:8082
+            case "chat" -> "83";   // http://localhost:8083
+            case "analytics" -> "84";   // http://localhost:8084
+            case "ipfs" -> "85";   // http://localhost:8085
+            case "doctors" -> "86"; // http://localhost:8086
+            case "resource" -> "87";   // http://localhost:8087
+            case "auth" -> "88";   // http://localhost:8088
+            case "schedule" -> "89";   // http://localhost:8089
+            case "webrtc" -> "90";   // http://localhost:80810
+
             default -> throw new IllegalArgumentException("Unknown service: " + service);
         };
     }

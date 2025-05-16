@@ -36,7 +36,7 @@ import { Router, RouterModule } from '@angular/router';
                     <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">Contact Us</h4>
                     <p class="text-lg text-gray-600 dark:text-gray-400">123 Medicare Lane, Colombo 03, Sri Lanka</p>
                     <p class="text-lg text-gray-600 dark:text-gray-400">Phone: +94 11 234 5678</p>
-                    <p class="text-lg text-gray-600 dark:text-gray-400">Email: support-medicare.lk</p>
+                    <p class="text-lg text-gray-600 dark:text-gray-400">Email: support&#64;medicare.lk</p>
                 </div>
             </div>
 

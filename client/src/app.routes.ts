@@ -11,16 +11,11 @@ import { DoctorAuthGuard } from './app/service/AuthGuards/doctorAuth.guard';
 import { StaffAuthGuard } from './app/service/AuthGuards/staffAuth.guard';
 
 import { VideoCallComponent } from './app/video-call/video-call.component';
+
 export const appRoutes: Routes = [
     {
         path: '',
         component: HomeComponent
-        // children: [
-        //     {
-        //         path: '',
-        //         loadChildren: () => import('./app/pages/home/home.routes').then((m) => m.default)
-        //     }
-        // ]
     },
     {
         path: 'admin',

@@ -40,7 +40,7 @@ import { Router } from '@angular/router';
                     </div>
                     <div>
                         <h4 class="font-semibold text-xl mb-1">Email</h4>
-                        <p>supportmedicare.lk</p>
+                        <p>support&#64;medicare.lk</p>
                     </div>
                     <div>
                         <h4 class="font-semibold text-xl mb-1">Address</h4>
@@ -48,7 +48,7 @@ import { Router } from '@angular/router';
                     </div>
                     <div>
                         <h4 class="font-semibold text-xl mb-1">Working Hours</h4>
-                        <p>Mon - Fri: 8:00 AM – 6:00 PM<br />Sat: 9:00 AM – 1:00 PM</p>
+                        <p>Mon - Sun : 8:00 AM – 10:00 PM</p>
                     </div>
                 </div>
             </div>
@@ -57,8 +57,10 @@ import { Router } from '@angular/router';
             <h2 class="text-4xl font-bold text-surface-900 dark:text-white mb-2">Find Your Doctor</h2>
             <div class="flex flex-col items-center justify-center space-y-4">
                 <span class="text-muted-color text-2xl">Connect with trusted specialists and manage appointments effortlessly.</span>
-                <p-button label=" Make an Appointment" styleClass="p-button p-component md:w-full text-center block" (click)="navigateToAppointment()"></p-button>
-                <p-button label=" View your Appointments" styleClass="p-button p-component md:w-full text-center block" (click)="navigateToViewAppointments()"></p-button>
+                <div class="flex flex-col space-y-4 mt-6">
+                    <p-button label=" Make an Appointment" styleClass="p-button p-component md:w-full text-center block" (click)="navigateToAppointment()"></p-button>
+                    <p-button label=" View your Appointments" styleClass="p-button p-component md:w-full text-center block" (click)="navigateToViewAppointments()"></p-button>
+                </div>
             </div>
         </div>
     `
