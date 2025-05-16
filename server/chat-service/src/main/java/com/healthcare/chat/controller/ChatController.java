@@ -20,7 +20,7 @@ public class ChatController {
     @PostMapping(value = "/message", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ChatMessage> chat(
             @RequestParam("sessionId") String sessionId,
-            @RequestParam("UserID") String userId,
+            @RequestParam(value= "UserID", required = false, defaultValue = "guest") String userId, //change and remove default
             @RequestParam("question") String userMessage,
             @RequestParam(value = "image", required = false) MultipartFile image) {
         ChatMessage response = chatService.sendMessage(sessionId,userId, userMessage, image);

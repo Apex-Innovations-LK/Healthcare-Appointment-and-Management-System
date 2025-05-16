@@ -15,7 +15,7 @@ public class ChatHistoryService {
 
     // Get all chat sessions for a user
     public List<String> getUserSessions(String userId) {
-        return chatHistoryRepository.findDistinctSessionIdByUserId(userId);
+        return chatHistoryRepository.findDistinctSessionIdByUserIdOrderbyFirstTimestamp(userId);
     }
 
     // Get complete chat history for a session

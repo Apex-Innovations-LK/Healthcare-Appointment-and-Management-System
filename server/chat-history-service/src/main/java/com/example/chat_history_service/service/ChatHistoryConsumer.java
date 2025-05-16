@@ -35,6 +35,7 @@ public class ChatHistoryConsumer {
             history.setSessionId((String) messageMap.get("sessionId"));
             history.setSender((String) messageMap.get("sender"));
             history.setMessage((String) messageMap.get("content"));
+            history.setUserId((String) messageMap.get("userId"));
 
             // Handle timestamp conversion from epoch milliseconds if available
             if (messageMap.containsKey("timestamp") && messageMap.get("timestamp") instanceof Number) {
