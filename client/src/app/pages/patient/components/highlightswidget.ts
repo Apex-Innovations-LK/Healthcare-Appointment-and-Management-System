@@ -38,7 +38,7 @@ import { Component } from '@angular/core';
             </div>
 
             <div class="grid grid-cols-12 gap-4 my-10 pt-2">
-                <div class="flex justify-center col-span-12 lg:col-span-6 bg-purple-100 p-0 order-1 lg:order-none" style="border-radius: 8px">
+                <div class="flex justify-center col-span-12 lg:col-span-6 dark:bg-gray-900 bg-white p-0 order-1 lg:order-none" style="border-radius: 8px">
                     <img src="assets/images/doctor_patient.png" class="w-full h-auto onject-contain" alt="Doctor profiles" />
                 </div>
 

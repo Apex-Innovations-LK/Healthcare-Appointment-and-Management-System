@@ -7,6 +7,7 @@ import { AppFloatingConfigurator } from "../../admin/components/app.floatingconf
 import { AuthStateService } from '../../../service/auth-state.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
     selector: 'doctor-topbar-widget',
@@ -50,15 +51,31 @@ import { ToastModule } from 'primeng/toast';
                     </a>
                 </li>
                 <li>
-                    <a (click)="router.navigate(['/doctor/appointment'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>Appointments</span>
+                    <a (click)="router.navigate(['/doctor/this-week'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
+                        <span>This Week</span>
                     </a>
                 </li>
                 <li>
-                    <a (click)="router.navigate(['/doctor/schedule'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>Schedule</span>
+                    <a (click)="router.navigate(['/doctor/consult'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
+                        <span>Consult</span>
                     </a>
                 </li>
+                <li>
+                    <a (click)="router.navigate(['/doctor/next-week'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
+                        <span>Next Week</span>
+                    </a>
+                </li>
+                <li>
+                    <a 
+                        (click)="router.navigate(['/doctor/chatbot'])" 
+                        pRipple 
+                        class="px-6 py-3 bg-primary text-surface-0 hover:bg-primary/90 rounded-full font-semibold text-lg transition duration-300"
+                    >
+                        <span>Chatbot</span>
+                    </a>
+                </li>
+
+
             </ul>
             <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0">
                 <button pButton pRipple label="Logout" [rounded]="true" (click)="logout()"></button>
@@ -70,12 +87,13 @@ export class TopbarWidget {
     constructor(
         public router: Router,
         private authStateService: AuthStateService,
-        private messageService: MessageService
+        private messageService: MessageService,
+         private notificationService: NotificationService
     ) {}
 
     logout() {
         this.authStateService.clear();
-        this.messageService.add({ severity: 'success', summary: 'Logout', detail: 'Logged out successfully' });
+        this.notificationService.showSuccess('Logout successful', 'Success');
         setTimeout(() => {
             this.router.navigate(['/auth/login']);
         }, 2000);

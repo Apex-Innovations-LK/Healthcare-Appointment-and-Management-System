@@ -1,6 +1,10 @@
 .vscode
 .env
+<<<<<<< HEAD
 
 .idea
 
 .venv
+=======
+.idea
+>>>>>>> d9359364b1b2e581e9b020d35bc5e61addd79f4f

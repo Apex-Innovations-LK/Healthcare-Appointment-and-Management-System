@@ -8,6 +8,7 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TabViewModule } from 'primeng/tabview';
 import { Router } from '@angular/router';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { AnalyticsService, AnalyticsData, Point } from './service/admin.patient.analytics';
 import { HttpClient } from '@angular/common/http';
@@ -18,7 +19,7 @@ Chart.register(...registerables);
 @Component({
     selector: 'app-admin-analytics',
     standalone: true,
-    imports: [CommonModule, ChartModule, FluidModule, CardModule, ButtonModule, TabViewModule],
+    imports: [CommonModule, ChartModule, FluidModule, CardModule, ButtonModule, TabViewModule, ProgressSpinnerModule],
     template: `
     <div class="grid">
         <div class="col-12">
@@ -50,10 +51,17 @@ Chart.register(...registerables);
                     label="Refresh Data" 
                     class="p-button-outlined" 
                     (click)="forceRefreshAnalytics()"
-                    [disabled]="isRefreshing"
+                    [disabled]="isRefreshing || isLoading"
                 ></button>
             </div>
-            <p-tabView>
+            
+            <!-- Loading Indicator -->
+            <div *ngIf="isLoading" class="flex justify-content-center align-items-center" style="min-height: 400px;">
+                <p-progressSpinner strokeWidth="4" animationDuration=".5s"></p-progressSpinner>
+                <span class="ml-3 font-medium">Loading analytics data...</span>
+            </div>
+            
+            <p-tabView *ngIf="!isLoading">
                 <!-- Patient Demographics Tab -->
                 <p-tabPanel header="Patient Demographics">
                     <div class="grid space-y-4">
@@ -150,6 +158,7 @@ export class Analytics implements OnInit, OnDestroy {
     private sub?: Subscription;
 
     isRefreshing = false;
+    isLoading = true;
 
     constructor(
         private api: AnalyticsService,
@@ -160,8 +169,10 @@ export class Analytics implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.isLoading = true;
         if (this.analyticsCache && !this.isCacheExpired()) {
             this.initCharts(this.analyticsCache);
+            this.isLoading = false;
         } else {
             this.fetchAndCacheAnalytics();
         }
@@ -173,6 +184,7 @@ export class Analytics implements OnInit, OnDestroy {
 
     forceRefreshAnalytics(): void {
         this.isRefreshing = true;
+        this.isLoading = true;
         this.clearAnalyticsCache();
         this.fetchAndCacheAnalytics(true);
         // Set isRefreshing to false after data is loaded (in fetchAndCacheAnalytics)
@@ -187,11 +199,13 @@ export class Analytics implements OnInit, OnDestroy {
                 this.saveCacheToStorage(res, this.analyticsCacheTime);
                 this.initCharts(res);
                 this.isRefreshing = false;
+                this.isLoading = false;
             },
             error: (err) => {
                 console.error('Error fetching analytics data:', err);
                 this.initCharts(this.emptyAnalytics());
                 this.isRefreshing = false;
+                this.isLoading = false;
             }
         });
     }

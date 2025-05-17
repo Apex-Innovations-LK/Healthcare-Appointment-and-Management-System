@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "doctor")
+@Table(name = "doctor", schema = "authservice")
 public class Doctor {
 
     @Id

@@ -3,10 +3,11 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { Router, RouterModule } from '@angular/router';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
-import { AppFloatingConfigurator } from "../../admin/components/app.floatingconfigurator";
+import { AppFloatingConfigurator } from '../../admin/components/app.floatingconfigurator';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthStateService } from '../../../service/auth-state.service';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
     selector: 'staff-topbar-widget',
@@ -65,12 +66,13 @@ export class TopbarWidget {
     constructor(
         public router: Router,
         private authStateService: AuthStateService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private notificationService: NotificationService
     ) {}
 
     logout() {
         this.authStateService.clear();
-        this.messageService.add({ severity: 'success', summary: 'Logout', detail: 'Logged out successfully' });
+        this.notificationService.showSuccess('Logout successful', 'Success');
         setTimeout(() => {
             this.router.navigate(['/auth/login']);
         }, 2000);
