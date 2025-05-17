@@ -139,11 +139,7 @@ export class Login {
             },
             error: (error) => {
                 console.log('Error in login' + error.message);
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Login failed!'
-                });
+                this.notificationService.showError("Login failed! Try again later")
             }
         });
     }
