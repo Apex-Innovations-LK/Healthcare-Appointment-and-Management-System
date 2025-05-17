@@ -1,17 +1,19 @@
 #!/bin/bash
 set -e
 
+THIS_DIR=$(pwd)
+
 echo "=== 🧼 Cleaning and Building Java Chaincode ==="
-cd ~/Desktop/blockchain-platform/healthchaincode
+cd healthchaincode
 mvn clean package
 
 echo "=== 🗃️ Preparing chaincode directory ==="
-CHAINCODE_DIR=~/Desktop/blockchain-platform/healthchaincode/mycc
+CHAINCODE_DIR=healthchaincode/mycc
 mkdir -p "$CHAINCODE_DIR"
 cp target/healthchaincode-0.0.1-SNAPSHOT.jar "$CHAINCODE_DIR/chaincode.jar"
 
 echo "=== ♻️ Restarting Fabric Network ==="
-cd ~/Desktop/blockchain-platform/fabric-samples/test-network
+cd $THIS_DIR/fabric-samples/test-network
 ./network.sh down
 docker volume prune -f
 ./network.sh up createChannel -c mychannel -ca
@@ -114,8 +116,8 @@ echo "✅ Chaincode deployment complete."
 
 
 
-{"recordId": "rec001", "patientId": "pat001", "doctorId": "doc001", "ipfsHash": "QmOldHashToRemove"}
-{"recordId": "rec002", "patientId": "pat002", "doctorId": "doc002", "ipfsHash": "QmNewHashToAdd"}
-{"recordId": "rec003", "patientId": "pat001", "doctorId": "doc003", "ipfsHash": "QmAnotherNewHashToAdd"}
-{"recordId": "rec004", "patientId": "pat004", "doctorId": "doc004", "ipfsHash": "QmYetAnotherNewHashToAdd"}
-{"recordId": "rec005", "patientId": "pat005", "doctorId": "doc005", "ipfsHash": "QmFinalNewHashToAdd"}
+# {"recordId": "rec001", "patientId": "pat001", "doctorId": "doc001", "ipfsHash": "QmOldHashToRemove"}
+# {"recordId": "rec002", "patientId": "pat002", "doctorId": "doc002", "ipfsHash": "QmNewHashToAdd"}
+# {"recordId": "rec003", "patientId": "pat001", "doctorId": "doc003", "ipfsHash": "QmAnotherNewHashToAdd"}
+# {"recordId": "rec004", "patientId": "pat004", "doctorId": "doc004", "ipfsHash": "QmYetAnotherNewHashToAdd"}
+# {"recordId": "rec005", "patientId": "pat005", "doctorId": "doc005", "ipfsHash": "QmFinalNewHashToAdd"}

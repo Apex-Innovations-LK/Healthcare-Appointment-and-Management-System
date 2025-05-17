@@ -213,13 +213,13 @@ import java.net.http.HttpResponse;
 @Service
 public class BlockchainService {
 
-    private final String scriptPath = "/home/damindu/Desktop/blockchain-platform/interact_chaincode.sh";
+    private final String scriptPath = "interact_chaincode.sh";
 
 public String fetchRecordFromIPFS(String ipfsHash) {
     try {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://netlyfytest.netlify.app/api/file/" + ipfsHash))
+                .uri(URI.create("http://localhost:8085/file/" + ipfsHash))
                 .GET()
                 .build();
 

@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
-cd ~/Desktop/blockchain-platform/fabric-samples/test-network
+PARENT_FOLDER=$(pwd)
+
+cd $PARENT_FOLDER/fabric-samples/test-network
 
 export PATH=${PWD}/../bin:$PATH
 export FABRIC_CFG_PATH=${PWD}/../config/
