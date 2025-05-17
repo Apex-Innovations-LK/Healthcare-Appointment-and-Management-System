@@ -1,49 +1,45 @@
 version: '3.8'
-
 services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.1
-    container_name: zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-
-  kafka:
-    image: confluentinc/cp-kafka:7.5.1
-    container_name: kafka
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"       # For host to access Kafka
-      - "29092:29092"     # For containers to access Kafka
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:29092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
-  doctor-app:
+  app:
+    image: doctor-microservice
     container_name: doctor-app
-    build:
-      context: .
-      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
     depends_on:
       - kafka
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-south-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.sbihxmjllrogpwipwrbq
+      - DATABASE_PASSWORD=fJFCrWYnEPLNpVoE
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    restart: always
+    networks:
+      - app-network
+  # ... (Kafka and Zookeeper remain mostly the same, but ensure they are on app-network)
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: kafka
     ports:
-      - "8080:8080"
+      - "9092:9092"
     environment:
-      # Kafka bootstrap for internal network
-      SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS: kafka:29092
-      SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:29092
-
-      # Supabase DB config
-      SPRING_DATASOURCE_URL: jdbc:postgresql://aws-0-ap-south-1.pooler.supabase.com:5432/postgres
-      SPRING_DATASOURCE_USERNAME: postgres.sbihxmjllrogpwipwrbq
-      SPRING_DATASOURCE_PASSWORD: fJFCrWYnEPLNpVoE
-
-      # Optional - override default schema
-      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: doctorService
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092 # Change this
+      ALLOW_PLAINTEXT_LISTENER: yes
+    depends_on:
+      - zookeeper
+    networks:
+      - app-network
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: yes
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
