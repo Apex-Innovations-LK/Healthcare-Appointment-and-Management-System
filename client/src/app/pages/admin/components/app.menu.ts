@@ -74,7 +74,26 @@ export class AppMenu {
                         routerLink: ['/admin/schedular']
                     }
                 ]
+            },
+            {
+                label: 'Resource Management',
+                icon: 'pi pi-cogs', // Represents system/resource settings
+                items: [
+                    {
+                        label: 'Manage Resources',
+                        icon: 'pi pi-database', // Represents data/resources
+                        routerLink: ['/admin/resource-allocation'],
+                        tooltip: 'Add resources, assign them to sessions, and view resource details'
+                    },
+                    {
+                        label: 'Staff Utilization',
+                        icon: 'pi pi-chart-line', // Represents analytics or tracking
+                        routerLink: ['/admin/staff-utilization'],
+                        tooltip: 'View staff utilization reports and analytics'
+                    }
+                ]
             }
+
         ];
     }
 }
