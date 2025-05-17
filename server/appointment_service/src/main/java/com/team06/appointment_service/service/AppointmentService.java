@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.team06.appointment_service.dto.AppointmentBookedDto;
 import com.team06.appointment_service.dto.MakeAppointment;
+import com.team06.appointment_service.dto.Notification1Dto;
 import com.team06.appointment_service.dto.PatientDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,9 +29,7 @@ public class AppointmentService {
 
     public void makeAppointment(MakeAppointment appointment) {
         appointmentRepo.updateAppointment(appointment.getAppointment_type(), appointment.getPatient_id(),appointment.getSlotId());
-
         AppointmentBookedDto appointmentBookedDto = new AppointmentBookedDto("booked",appointment.getSlotId());
-
         kafkaProducerService.sendAppointmentBookedEvent(appointmentBookedDto);
     }
 

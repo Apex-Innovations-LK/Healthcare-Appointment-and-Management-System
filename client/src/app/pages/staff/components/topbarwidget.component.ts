@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { StyleClassModule } from 'primeng/styleclass';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { AppFloatingConfigurator } from '../../admin/components/app.floatingconfigurator';
@@ -8,11 +8,13 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthStateService } from '../../../service/auth-state.service';
 import { NotificationService } from '../../../service/notification.service';
+import { filter } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'staff-topbar-widget',
-    providers: [MessageService],
-    imports: [ToastModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator],
+    imports: [CommonModule, ToastModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator],
+    standalone: true,
     template: `<a class="flex items-center" href="/staff">
             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 mr-2">
                 <path
@@ -41,17 +43,17 @@ import { NotificationService } from '../../../service/notification.service';
         <div class="items-center dark:bg-surface-900 grow justify-between hidden lg:flex absolute lg:static w-full left-0 top-full px-12 lg:px-0 z-20 rounded-border">
             <ul class="list-none p-0 m-0 flex lg:items-center select-none flex-col lg:flex-row cursor-pointer gap-8">
                 <li>
-                    <a (click)="router.navigate(['/staff'], { fragment: 'hero' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
+                    <a (click)="navigateTo('/staff', 'hero')" pRipple class="flex px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl relative" [ngClass]="{ 'active-tab': isActive('/staff', 'hero') }">
                         <span>Home</span>
                     </a>
                 </li>
                 <li>
-                    <a (click)="router.navigate(['/staff'], { fragment: 'highlights' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
+                    <a (click)="navigateTo('/staff', 'highlights')" pRipple class="flex px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl relative" [ngClass]="{ 'active-tab': isActive('/staff', 'highlights') }">
                         <span>Features</span>
                     </a>
                 </li>
                 <li>
-                    <a (click)="router.navigate(['/staff/schedule'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
+                    <a (click)="router.navigate(['/staff/schedule'])" pRipple class="flex px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl relative" [ngClass]="{ 'active-tab': isActive('/staff/schedule') }">
                         <span>Schedule</span>
                     </a>
                 </li>
@@ -60,15 +62,89 @@ import { NotificationService } from '../../../service/notification.service';
                 <button pButton pRipple label="Logout" [rounded]="true" (click)="logout()"></button>
                 <app-floating-configurator />
             </div>
-        </div> `
+        </div>
+        <style>
+            .active-tab {
+                color: var(--primary-color) !important;
+                border-bottom: 2px solid var(--primary-color);
+            }
+            .active-tab::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background-color: var(--primary-color);
+                transform: scaleX(1);
+                transition: transform 0.3s ease;
+            }
+
+            /* Hover effect for non-active tabs */
+            a:not(.active-tab):hover::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background-color: var(--primary-color);
+                transform: scaleX(0);
+                transform-origin: right;
+                transition: transform 0.3s ease;
+                animation: hover-animation 0.3s forwards;
+            }
+
+            @keyframes hover-animation {
+                from {
+                    transform: scaleX(0);
+                }
+                to {
+                    transform: scaleX(1);
+                }
+            }
+        </style> `
 })
-export class TopbarWidget {
+export class TopbarWidget implements OnInit {
+    currentUrl: string = '';
+    currentFragment: string | null = null;
+
     constructor(
         public router: Router,
         private authStateService: AuthStateService,
         private messageService: MessageService,
         private notificationService: NotificationService
     ) {}
+
+    ngOnInit() {
+        // Initialize the current URL and fragment
+        this.updateActiveRoute(this.router.url);
+
+        // Subscribe to router events to update active tab
+        this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: any) => {
+            this.updateActiveRoute(event.url);
+        });
+    }
+
+    updateActiveRoute(url: string) {
+        const [routePart, fragmentPart] = url.split('#');
+        this.currentUrl = routePart;
+        this.currentFragment = fragmentPart || null;
+    }
+
+    navigateTo(route: string, fragment: string) {
+        this.router.navigate([route], { fragment: fragment });
+    }
+
+    isActive(route: string, fragment?: string): boolean {
+        // For routes with fragments
+        if (fragment) {
+            return this.currentUrl === route && this.currentFragment === fragment;
+        }
+
+        // For full routes without fragments (like /staff/schedule)
+        return this.currentUrl === route;
+    }
 
     logout() {
         this.authStateService.clear();

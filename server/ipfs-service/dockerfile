@@ -1,0 +1,76 @@
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+
+# Set working directory for the build stage
+WORKDIR /build
+
+# Copy pom.xml and src directory
+COPY pom.xml .
+COPY src/ ./src/
+
+# Build the application using Maven
+RUN mvn clean package -DskipTests
+
+# Main image
+FROM maven:3.9.6-eclipse-temurin-21
+
+# Install required tools and dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    gnupg \
+    supervisor \
+    netcat \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Zookeeper and Kafka 
+RUN mkdir -p /opt/kafka
+WORKDIR /opt/kafka
+RUN curl -O https://archive.apache.org/dist/kafka/3.4.1/kafka_2.13-3.4.1.tgz \
+    && tar -xzf kafka_2.13-3.4.1.tgz --strip 1 \
+    && rm kafka_2.13-3.4.1.tgz
+
+# Configure Kafka to use the container's hostname
+RUN sed -i 's/#listeners=PLAINTEXT:\/\/:9092/listeners=PLAINTEXT:\/\/:9092,PLAINTEXT_INTERNAL:\/\/:29092/g' config/server.properties \
+    && sed -i 's/#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092/advertised.listeners=PLAINTEXT:\/\/localhost:9092,PLAINTEXT_INTERNAL:\/\/localhost:29092/g' config/server.properties \
+    && echo "listener.security.protocol.map=PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT" >> config/server.properties \
+    && sed -i 's/zookeeper.connect=localhost:2181/zookeeper.connect=localhost:2181/g' config/server.properties \
+    && echo "offsets.topic.replication.factor=1" >> config/server.properties \
+    && echo "transaction.state.log.min.isr=1" >> config/server.properties \
+    && echo "transaction.state.log.replication.factor=1" >> config/server.properties
+
+# Install IPFS
+RUN mkdir -p /opt/ipfs /data/ipfs /export
+WORKDIR /opt/ipfs
+RUN curl -O https://dist.ipfs.tech/kubo/v0.18.1/kubo_v0.18.1_linux-amd64.tar.gz \
+    && tar -xzf kubo_v0.18.1_linux-amd64.tar.gz --strip 1 \
+    && rm kubo_v0.18.1_linux-amd64.tar.gz \
+    && ./install.sh \
+    && ipfs init
+
+# Configure IPFS to accept connections from any IP
+RUN ipfs config Addresses.API "/ip4/0.0.0.0/tcp/5001" \
+    && ipfs config Addresses.Gateway "/ip4/0.0.0.0/tcp/8095"
+
+# Set up workdir for the application
+WORKDIR /app
+
+# Copy the built JAR from the build stage instead of from host
+COPY --from=build /build/target/*.jar app.jar
+
+# Set up supervisord configuration
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Create required volumes
+VOLUME ["/tmp", "/data/ipfs", "/export"]
+
+# Expose all the ports
+EXPOSE 2181 9092 29092 4001 5001 8095 8085
+
+# Set environment variables for Spring Boot
+ENV SPRING_PROFILES_ACTIVE=default \
+    IPFS_NODE_HOST=localhost \
+    IPFS_NODE_PORT=5001 \
+    SPRING_KAFKA_BOOTSTRAP_SERVERS=localhost:29092
+
+# Start services using supervisord
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

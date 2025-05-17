@@ -37,7 +37,12 @@ import { ChartModule } from 'primeng/chart';
                 </form>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6" *ngIf="chartData">
+            <div *ngIf="isLoading" class="flex justify-center items-center mt-8">
+                <span class="pi pi-spin pi-spinner text-4xl text-blue-500"></span>
+                <span class="ml-3 text-lg text-blue-600">Loading data...</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6" *ngIf="chartData && !isLoading">
                 <div class="bg-white shadow-md rounded-lg p-6">
                     <h3 class="text-xl font-semibold mb-4">Visits by Month</h3>
                     <p-chart type="bar" [data]="chartData.visitsByMonth" [options]="chartOptions" class="h-64"></p-chart>
@@ -75,6 +80,7 @@ export class VisualAnalyticsComponent implements OnInit {
     filterForm: FormGroup;
     chartData: any = null;
     chartOptions: any;
+    isLoading: boolean = false;
     // Array of colors for charts
     chartColors = {
         primary: ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD'],
@@ -139,7 +145,7 @@ export class VisualAnalyticsComponent implements OnInit {
             this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Please select a report type' });
             return;
         }
-
+        this.isLoading = true;
         const request: ReportRequest = this.formatRequest(this.filterForm.value);
         this.reportService.getVisualizationData(request).subscribe({
             next: (data: VisualizationData) => {
@@ -165,9 +171,11 @@ export class VisualAnalyticsComponent implements OnInit {
                         datasets: [{ label: 'City Distribution', data: data.city_values, backgroundColor: '#8B5CF6' }]
                     }
                 };
+                this.isLoading = false;
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Visualization data loaded' });
             },
             error: (error: Error) => {
+                this.isLoading = false;
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message });
             }
         });

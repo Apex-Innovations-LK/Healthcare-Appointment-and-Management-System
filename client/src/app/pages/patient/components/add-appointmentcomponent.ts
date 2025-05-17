@@ -10,6 +10,8 @@ import { AuthStateService } from '../../../service/auth-state.service';
 import { MakeAppointment } from '../../../models/makeAppointment';
 import { NotificationService } from '../../../service/notification.service';
 import { RefreshButtonComponent } from './refreshButtonComponent';
+import { Notification } from '../../../models/Notification';
+import { DoctorSession } from '../../../models/doctor';
 
 interface Doctor {
     doctor_id: string;
@@ -107,13 +109,17 @@ interface AppointmentSlot {
                     </div>
                     <div class="flex justify-end space-x-4 mt-6">
                         <!-- Booking action buttons --><label for="diagnosisType" class="border p-2 ">Diagnosis Type</label>
-                        <select id="diagnosisType" [(ngModel)]="selectedDiagnosisType" name="diagnosisType" class="form-control border p-2 bg-primary-100 text-black" >
+                        <select id="diagnosisType" [(ngModel)]="selectedDiagnosisType" name="diagnosisType" class="form-control border p-2 bg-primary-100 text-black">
                             <option *ngFor="let type of diagnosisTypes" [value]="type">{{ type }}</option>
                         </select>
                     </div>
                     <div class="flex justify-end space-x-4 mt-6">
                         <button (click)="onCancel()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
                         <button (click)="bookAppointment()" [disabled]="!selectedSlot" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">Book Appointment</button>
+                    </div>
+                    <div *ngIf="isLoading" class="flex justify-center items-center mt-6">
+                        <i class="pi pi-spin pi-spinner text-3xl text-primary"></i>
+                        <span class="ml-3 text-lg text-primary">Booking confirmed! Refreshing...</span>
                     </div>
                 </div>
 
@@ -169,7 +175,7 @@ export class AddAppointmentComponent implements OnInit {
         this.isLoading = true;
         console.log('Loading doctors...');
         this.authService.getDoctors().subscribe({
-            next: (data: any) => {
+            next: (data: any[]) => {
                 console.log('Doctors data received:', data);
                 // Parse the doctor data from the backend format
                 this.allDoctors = this.parseDoctorData(data);
@@ -186,7 +192,7 @@ export class AddAppointmentComponent implements OnInit {
     loadAppointments() {
         this.isLoading = true;
         this.appointmentService.getAppointments().subscribe({
-            next: (data: any) => {
+            next: (data: any[]) => {
                 console.log('slots', data);
                 // Parse the appointment data from the backend format
                 this.allAppointments = this.parseAppointmentData(data);
@@ -218,21 +224,19 @@ export class AddAppointmentComponent implements OnInit {
     }
 
     parseAppointmentData(data: any): AppointmentSlot[] {
-        // Based on the console output format
         const appointments: AppointmentSlot[] = [];
 
         if (Array.isArray(data) && data.length > 0) {
             data.forEach((item: any) => {
-                if (Array.isArray(item) && item.length >= 4) {
-                    appointments.push({
-                        slot_id: item[0],
-                        doctor_id: item[1],
-                        from: item[2],
-                        to: item[3]
-                    });
-                }
+                appointments.push({
+                    slot_id: item.slot_id,
+                    doctor_id: item.doctor_id,
+                    from: item.from,
+                    to: item.to
+                });
             });
         }
+        console.log('Parsed appointments:', appointments);
         return appointments;
     }
 
@@ -251,8 +255,18 @@ export class AddAppointmentComponent implements OnInit {
         this.selectedDoctor = doctor;
         this.selectedSlot = null;
 
+        if (this.allAppointments.length === 0) {
+            // Appointments haven't loaded yet
+            this.notificationService.showWarning('Appointments are still loading. Please wait a moment.');
+            return;
+        }
+
+        console.log('Selected doctor:', doctor);
+        console.log('All appointments:', this.allAppointments);
+        console.log('doctor appointments before:', this.doctorAppointments);
         // Filter appointments for this doctor
         this.doctorAppointments = this.allAppointments.filter((appointment) => appointment.doctor_id === doctor.doctor_id);
+        console.log('doctor appointments after:', this.doctorAppointments);
     }
 
     selectSlot(slot: AppointmentSlot) {
@@ -294,18 +308,34 @@ export class AddAppointmentComponent implements OnInit {
         this.isBooking = true;
         this.appointmentService.bookAppointment(makeAppointment).subscribe({
             next: (response: string) => {
+                this.isLoading = true;
                 this.isBooking = false;
                 this.notificationService.showSuccess('Appointment booked successfully!');
-                const currentUrl = this.router.url;
-                this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-                    this.router.navigate([currentUrl]);
-                });
-                this.router.navigate(['/patient/appointments']);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             },
             error: (err) => {
                 this.isBooking = false;
                 console.error('Error booking appointment:', err);
                 this.notificationService.showError('Failed to book appointment. Please try again later.');
+            }
+        });
+
+        const notification: Notification = new Notification(
+            this.authStateService.getUserDetails()?.email || '',
+            'Appointment Confirmation',
+            `Your appointment with Dr. ${this.selectedDoctor.first_name} ${this.selectedDoctor.last_name} has been booked for ${this.formatAppointmentDate(this.selectedSlot.from)} at ${this.formatAppointmentTime(this.selectedSlot.from)}.`
+        );
+
+        console.log(notification);
+        this.notificationService.sendNotification(notification).subscribe({
+            next: (response) => {
+                console.log('Notification sent successfully:', response);
+            },
+            error: (error) => {
+                console.error('Error sending notification:', error);
+                this.notificationService.showError('Failed to send notification. Please try again later.');
             }
         });
 
@@ -316,3 +346,5 @@ export class AddAppointmentComponent implements OnInit {
         window.history.back();
     }
 }
+
+

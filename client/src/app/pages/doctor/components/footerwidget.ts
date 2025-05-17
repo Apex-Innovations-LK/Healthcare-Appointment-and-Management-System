@@ -5,9 +5,10 @@ import { Router, RouterModule } from '@angular/router';
     selector: 'doctor-footer-widget',
     imports: [RouterModule],
     template: `
-        <div class="py-12 px-12 mx-0 mt-20 lg:mx-20">
-            <div class="grid grid-cols-12 gap-4">
-                <div class="col-span-12 md:col-span-2">
+        <div class="py-12 px-12 mx-0 mt-20 lg:mx-20 bg-gray-100 dark:bg-black text-gray-700 dark:text-gray-300">
+            <div class="grid grid-cols-12 gap-8">
+                <!-- Logo -->
+                <div class="col-span-12 md:col-span-6">
                     <a (click)="router.navigate(['/pages/landing'], { fragment: 'home' })" class="flex flex-wrap items-center justify-center md:justify-start md:mb-0 mb-6 cursor-pointer">
                         <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-14 mr-2">
                             <path
@@ -30,41 +31,16 @@ import { Router, RouterModule } from '@angular/router';
                     </a>
                 </div>
 
-                <div class="col-span-12 md:col-span-10">
-                    <div class="grid grid-cols-12 gap-8 text-center md:text-left">
-                        <div class="col-span-12 md:col-span-3">
-                            <h4 class="font-medium text-2xl leading-normal mb-6 text-surface-900 dark:text-surface-0">Company</h4>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">About Us</a>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">News</a>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">Investor Relations</a>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">Careers</a>
-                            <a class="leading-normal text-xl block cursor-pointer text-surface-700 dark:text-surface-100">Media Kit</a>
-                        </div>
-
-                        <div class="col-span-12 md:col-span-3">
-                            <h4 class="font-medium text-2xl leading-normal mb-6 text-surface-900 dark:text-surface-0">Resources</h4>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">Get Started</a>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">Learn</a>
-                            <a class="leading-normal text-xl block cursor-pointer text-surface-700 dark:text-surface-100">Case Studies</a>
-                        </div>
-
-                        <div class="col-span-12 md:col-span-3">
-                            <h4 class="font-medium text-2xl leading-normal mb-6 text-surface-900 dark:text-surface-0">Community</h4>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">Discord</a>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">Event</a>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">FAQ</a>
-                            <a class="leading-normal text-xl block cursor-pointer text-surface-700 dark:text-surface-100">Blog</a>
-                        </div> 
-
-                        <div class="col-span-12 md:col-span-3">
-                            <h4 class="font-medium text-2xl leading-normal mb-6 text-surface-900 dark:text-surface-0">Legal</h4>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">Brand Policy</a>
-                            <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">Privacy Policy</a>
-                            <a class="leading-normal text-xl block cursor-pointer text-surface-700 dark:text-surface-100">Terms of Service</a>
-                        </div>
-                    </div>
+                <!-- Contact Info -->
+                <div class="col-span-12 md:col-span-6">
+                    <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">Contact Us</h4>
+                    <p class="text-lg text-gray-600 dark:text-gray-400">123 Medicare Lane, Colombo 03, Sri Lanka</p>
+                    <p class="text-lg text-gray-600 dark:text-gray-400">Phone: +94 11 234 5678</p>
+                    <p class="text-lg text-gray-600 dark:text-gray-400">Email: support&#64;medicare.lk</p>
                 </div>
             </div>
+
+            <div class="mt-12 border-t border-gray-300 dark:border-gray-700 pt-6 text-center text-sm text-gray-500 dark:text-gray-400">2025 MediCare. All rights reserved.</div>
         </div>
     `
 })

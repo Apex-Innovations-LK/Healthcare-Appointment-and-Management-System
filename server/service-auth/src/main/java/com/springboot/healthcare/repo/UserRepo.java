@@ -47,5 +47,12 @@ public interface UserRepo extends JpaRepository<Users, UUID> {
     WHERE u.id = :patient_id
     """, nativeQuery = true)
     UserDetailsDto fetchUserDetails(@Param("patient_id") UUID patient_id);
+
+    @Query(value = """
+    SELECT a.email
+    FROM authservice.users a
+    WHERE a.id = :patient_id
+    """, nativeQuery = true)
+    String findEmail(@Param("patient_id") UUID patient_id);
 }
 

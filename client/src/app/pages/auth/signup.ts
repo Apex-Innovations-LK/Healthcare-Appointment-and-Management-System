@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -59,58 +59,61 @@ import { NotificationService } from '../../service/notification.service';
                                 </p>
                             </span>
                         </div>
-                        <div>
-                            <label for="username1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Username</label>
-                            <input pInputText id="username1" type="text" placeholder="Username" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.username" />
+                        <form (ngSubmit)="registerUser()" #registrationForm="ngForm">
+                            <div>
+                                <label for="username1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Username</label>
+                                <input pInputText id="username1" type="text" placeholder="Username" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.username" name="username" />
 
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <p-password
-                                id="password1"
-                                [(ngModel)]="user.password"
-                                placeholder="Password"
-                                [toggleMask]="true"
-                                styleClass="mb-4"
-                                [fluid]="true"
-                                [feedback]="true"
-                                weakLabel="Weak"
-                                mediumLabel="Medium"
-                                strongLabel="Strong"
-                                styleClass="w-full md:w-[30rem] mb-8"
-                            ></p-password>
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+                                <p-password
+                                    id="password1"
+                                    [(ngModel)]="user.password"
+                                    placeholder="Password"
+                                    [toggleMask]="true"
+                                    styleClass="mb-4"
+                                    [fluid]="true"
+                                    [feedback]="true"
+                                    weakLabel="Weak"
+                                    mediumLabel="Medium"
+                                    strongLabel="Strong"
+                                    styleClass="w-full md:w-[30rem] mb-8"
+                                    name="password"
+                                ></p-password>
 
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Signup As</label>
-                            <p-dropdown [options]="roles" [(ngModel)]="user.role" name="role" #role="ngModel" placeholder="Select Role" class="w-full md:w-[30rem] mb-8"></p-dropdown>
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Signup As</label>
+                                <p-dropdown [options]="roles" [(ngModel)]="user.role" name="role" #role="ngModel" placeholder="Select Role" class="w-full md:w-[30rem] mb-8"></p-dropdown>
 
-                            <div *ngIf="user.role === 'DOCTOR'">
-                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Speciality</label>
-                                <input pInputText id="speciality1" type="text" placeholder="Speciality" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.speciality" />
+                                <div *ngIf="user.role === 'DOCTOR'">
+                                    <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Speciality</label>
+                                    <input pInputText id="speciality1" type="text" placeholder="Speciality" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.speciality" name="speciality" />
 
-                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Title</label>
-                                <input pInputText id="license_number1" type="text" placeholder="ex :- MBBS" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.license_number" />
+                                    <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Title</label>
+                                    <input pInputText id="license_number1" type="text" placeholder="ex :- MBBS" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.license_number" name="license_number" />
+                                </div>
+
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">First Name</label>
+                                <input pInputText id="first_name1" type="text" placeholder="First Name" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.first_name" name="first_name" />
+
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Last Name</label>
+                                <input pInputText id="last_name1" type="text" placeholder="Last Name" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.last_name" name="last_name" />
+
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Date Of Birth</label>
+                                <input pInputText id="date_of_birth1" type="date" placeholder="Date of Birth" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.date_of_birth" name="date_of_birth" />
+
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Gender</label>
+                                <input pInputText id="gender1" type="text" placeholder="Gender" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.gender" name="gender" />
+
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Email</label>
+                                <input pInputText id="email1" type="text" placeholder="Email" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.email" name="email" />
+
+                                <div class="flex flex-col">
+                                    <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Phone</label>
+                                    <input pInputText id="phone_number1" type="text" placeholder="Phone Number" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.phone_number" name="phone_number" />
+
+                                    <p-button type="submit" label="Sign Up" styleClass="w-full md:w-[30rem] mb-8"></p-button>
+                                </div>
                             </div>
-
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">First Name</label>
-                            <input pInputText id="first_name1" type="text" placeholder="First Name" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.first_name" />
-
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Last Name</label>
-                            <input pInputText id="last_name1" type="text" placeholder="Last Name" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.last_name" />
-
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Date Of Birth</label>
-                            <input pInputText id="date_of_birth1" type="date" placeholder="Date of Birth" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.date_of_birth" />
-
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Gender</label>
-                            <input pInputText id="gender1" type="text" placeholder="Gender" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.gender" />
-
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Email</label>
-                            <input pInputText id="email1" type="text" placeholder="Email" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.email" />
-
-                            <div class="flex flex-col">
-                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Phone</label>
-                                <input pInputText id="phone_number1" type="text" placeholder="Phone Number" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.phone_number" />
-
-                                <p-button label="Sign Up" styleClass="w-full md:w-[30rem] mb-8" (click)="registerUser()"></p-button>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -159,6 +162,29 @@ export class Signup {
         { label: 'Doctor', value: 'DOCTOR' },
         { label: 'Staff', value: 'STAFF' }
     ];
+
+    /**
+     * Handles the Enter key press event for form submission
+     * Prevents default form submission behavior and calls registerUser
+     */
+    onEnterKey(event: KeyboardEvent) {
+        event.preventDefault();
+        this.registerUser();
+    }
+
+    /**
+     * Global keyboard event listener for Enter key
+     * This is an alternative approach if the form-based approach doesn't work
+     */
+    @HostListener('window:keydown.enter', ['$event'])
+    handleKeyDown(event: KeyboardEvent) {
+        // Check if the active element is not a button to prevent double submission
+        const activeElement = document.activeElement;
+        if (activeElement && activeElement.tagName !== 'BUTTON') {
+            event.preventDefault();
+            this.registerUser();
+        }
+    }
 
     private redirectUserBasedOnRole(token: string, username: string, role: string, status: string): void {
         localStorage.setItem('token', token);

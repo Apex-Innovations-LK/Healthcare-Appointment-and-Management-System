@@ -68,7 +68,7 @@ import { Observable } from 'rxjs';
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
             </div>
 
-            <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <div *ngIf="error" class="bg-red-100 border border-gray-400 text-red-700 px-4 py-3 rounded mb-4">
                 {{ error }}
             </div>
 
@@ -291,14 +291,14 @@ export class ViewAppointmentComponent implements OnInit {
             },
             error: (error) => {
                 console.error('Error in appointment fetch flow:', error);
-                this.error = 'Failed to load appointment details.';
+                this.error = 'No appointments found.';
                 this.loading = false;
             }
         });
     }
 
     getDoctorDetails(sessionId: string): DoctorSessions | undefined {
-        return this.doctorSessions.find(session => session.session_id === sessionId);
+        return this.doctorSessions.find(session => session.slot_id === sessionId);
     }
 
     getDoctorInfo(sessionId: string): UserDetails | undefined {

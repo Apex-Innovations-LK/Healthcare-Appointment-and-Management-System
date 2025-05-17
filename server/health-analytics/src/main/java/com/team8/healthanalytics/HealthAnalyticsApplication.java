@@ -1,13 +1,13 @@
-package com.team06.appointment_service;
+package com.team8.healthanalytics;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AppointmentServiceApplication {
+public class HealthAnalyticsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AppointmentServiceApplication.class, args);
+        SpringApplication.run(HealthAnalyticsApplication.class, args);
     }
 
 }
