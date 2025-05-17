@@ -32,16 +32,16 @@ public class BlockchainController {
         }
     }
 
-    // Query a health record by record ID
-    @GetMapping("/record/{recordId}")
-    public ResponseEntity<String> queryHealthRecord(@PathVariable String recordId) {
-        try {
-            String result = blockchainService.queryHealthRecord(recordId);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("❌ Failed to query record: " + e.getMessage());
-        }
-    }
+    // // Query a health record by record ID
+    // @GetMapping("/record/{recordId}")
+    // public ResponseEntity<String> queryHealthRecord(@PathVariable String recordId) {
+    //     try {
+    //         String result = blockchainService.queryHealthRecord(recordId);
+    //         return ResponseEntity.ok(result);
+    //     } catch (Exception e) {
+    //         return ResponseEntity.internalServerError().body("❌ Failed to query record: " + e.getMessage());
+    //     }
+    // }
 
     // Query all records for a patient ID
     @GetMapping("/records/patient/{patientId}")

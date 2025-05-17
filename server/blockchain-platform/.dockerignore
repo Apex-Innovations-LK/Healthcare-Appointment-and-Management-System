@@ -1,7 +1,0 @@
-**/target/
-node_modules/
-*.log
-*.pem
-wallet/
-keystore/
-.fabric/
