@@ -22,7 +22,7 @@ public class BlockchainController {
     }
 
     // Register a health record after IPFS hash is created
-    @PostMapping("/record")
+    @PostMapping("blockchain/record")
     public ResponseEntity<String> registerHealthRecord(@RequestBody HealthRecordHashed record) {
         try {
             String result = blockchainService.registerHealthRecord(record);
@@ -44,7 +44,7 @@ public class BlockchainController {
     // }
 
     // Query all records for a patient ID
-    @GetMapping("/records/patient/{patientId}")
+    @GetMapping("/blockchain/patient/{patientId}")
     public ResponseEntity<String> queryRecordsByPatient(@PathVariable String patientId) {
         try {
             String result = blockchainService.queryRecordsByPatient(patientId);
@@ -54,7 +54,7 @@ public class BlockchainController {
         }
     }
 
-    @GetMapping("/record/full/{recordId}")
+    @GetMapping("blockchain/record/{recordId}")
     public ResponseEntity<String> getActualRecordFromIPFS(@PathVariable String recordId) {
         try {
             String fullRecord = blockchainService.queryHealthRecordAndFetch(recordId);
