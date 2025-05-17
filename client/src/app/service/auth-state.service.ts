@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-import { Injectable } from '@angular/core';
-=======
-// src/app/services/auth-state.service.ts
 import { Injectable, OnInit } from '@angular/core';
->>>>>>> d9359364b1b2e581e9b020d35bc5e61addd79f4f
 import { JwtPayload, TokenDecoderService } from './token-decoder.service';
 import { AuthService } from './auth.service';
 import { User } from '../models/user';
