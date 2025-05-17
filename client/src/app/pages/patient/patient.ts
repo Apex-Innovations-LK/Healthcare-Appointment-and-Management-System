@@ -8,11 +8,12 @@ import { HeroWidget } from './components/herowidget';
 import { HighlightsWidget } from './components/highlightswidget';
 import { AboutusWidget } from "./components/aboutuswidget";
 import { ContactusWidget } from "./components/contactuswidget";
+import { AppointmentWidget } from "./components/appointmentWidget";
 
 @Component({
     selector: 'app-patient',
     standalone: true,
-    imports: [RouterModule, HeroWidget, HighlightsWidget, RippleModule, StyleClassModule, ButtonModule, DividerModule, AboutusWidget, ContactusWidget],
+    imports: [RouterModule, HeroWidget, HighlightsWidget, RippleModule, StyleClassModule, ButtonModule, DividerModule, AboutusWidget, ContactusWidget, AppointmentWidget],
     template: `
         <div class="bg-surface-0 dark:bg-surface-900">
             <div id="home" class="landing-wrapper overflow-hidden">
@@ -20,6 +21,7 @@ import { ContactusWidget } from "./components/contactuswidget";
                 <patient-highlights-widget />
                 <patient-aboutus-widget />
                 <patient-contactus-widget />
+                <patient-appointment-widget />
             </div>
         </div>
     `

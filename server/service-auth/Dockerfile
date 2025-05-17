@@ -1,30 +1,27 @@
-# ---------- Build Stage ----------
-FROM maven:3.9.6-eclipse-temurin-21 AS build
-
-WORKDIR /build
-
-# Cache dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
-# Copy source and build
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-# ---------- Run Stage ----------
-FROM eclipse-temurin:21-jdk-jammy AS runtime
+# 1. Build Stage
+FROM maven:3.9.4-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-# Copy built jar
-COPY --from=build /build/target/*.jar app.jar
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
 
-# Set runtime environment variables
-ENV DB_URL=jdbc:postgresql://db.sbihxmjllrogpwipwrbq.supabase.co:5432/postgres \
-    SPRING_PROFILES_ACTIVE=prod
+COPY src ./src
 
-# Expose app port
-EXPOSE 8081
+RUN mvn clean package -DskipTests
 
-# Run application
+# 2. Runtime Stage
+FROM eclipse-temurin:21-jdk-jammy AS runtime
+
+ENV APP_HOME=/opt/auth-service
+WORKDIR $APP_HOME
+
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8088
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
+
+

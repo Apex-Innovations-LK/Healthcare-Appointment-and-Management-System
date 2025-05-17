@@ -57,32 +57,30 @@ import { NotificationService } from '../../service/notification.service';
                                 </p>
                             </span>
                         </div>
+                        <form (ngSubmit)="login()" #loginForm="ngForm">
+                            <div>
+                                <label for="username1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Username</label>
+                                <input pInputText id="username1" type="text" placeholder="Username" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.username" name="username" />
 
-                        <div>
-                            <label for="username1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Username</label>
-                            <input pInputText id="username1" type="text" placeholder="Username" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.username" />
-                            <!-- 
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label> -->
-                            <!-- <p-password id="password1" [(ngModel)]="user.password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="true"></p-password> -->
-                            <!-- <input type="password" pPassword [(ngMo    del)]="user.password" name="password" /> -->
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <p-password id="password1" [(ngModel)]="user.password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false" class="w-full md:w-[30rem] mb-8"></p-password>
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+                                <p-password id="password1" [(ngModel)]="user.password" name="password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false" class="w-full md:w-[30rem] mb-8"></p-password>
 
-                            <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-                                <div class="flex items-center">
-                                    <p-checkbox [(ngModel)]="checked" id="rememberme1" binary class="mr-2"></p-checkbox>
-                                    <label for="rememberme1">Remember me</label>
+                                <div class="flex items-center justify-between mt-2 mb-8 gap-8">
+                                    <div class="flex items-center">
+                                        <p-checkbox [(ngModel)]="checked" id="rememberme1" binary name="rememberMe" class="mr-2"></p-checkbox>
+                                        <label for="rememberme1">Remember me</label>
+                                    </div>
                                 </div>
-                                <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
+
+                                <p-button type="submit" label="Log In" styleClass="w-full"></p-button>
                             </div>
-                            <p-button label="Log In" styleClass="w-full" (click)="login()"></p-button>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     `
-})
+    })
 export class Login {
     user: User = new User(
         '', // username
@@ -135,8 +133,7 @@ export class Login {
     login() {
         this.authService.loginUser(this.user).subscribe({
             next: (data) => {
-                console.log(data);
-                this.authStateService.fetchUserInfo();
+                this.authStateService.fetchUserInfo(data.username);
                 this.notificationService.showSuccess('Login successful!');
                 this.redirectUserBasedOnRole(data.token, data.username, data.role, data.status);
             },

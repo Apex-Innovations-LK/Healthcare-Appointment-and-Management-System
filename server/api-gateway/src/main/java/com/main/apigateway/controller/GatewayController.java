@@ -80,7 +80,6 @@ public class GatewayController {
             case "schedule" -> "89";   // http://localhost:8089
             case "webrtc" -> "90";   // http://localhost:8090
 
-
             default -> throw new IllegalArgumentException("Unknown service: " + service);
         };
     }
