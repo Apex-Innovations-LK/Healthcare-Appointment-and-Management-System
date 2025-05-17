@@ -4,6 +4,7 @@ import { Appointment } from './appointment';
 import { Schedule } from './schedule';
 import { ReportBuilderComponent } from '../doctor/reporting/report-builder/report-builder';
 import { VisualAnalyticsComponent } from '../doctor/reporting/visual-analytics/visual-analytics';
+
 import { Chatbot } from './chatbot';
 
 import { Consult } from './consult';
@@ -17,5 +18,8 @@ export default [
     { path: 'this-week', component: Appointment },
     { path: 'chatbot', component: Chatbot },
     { path: 'next-week', component: Schedule },
-    { path: 'consult', component: Consult }
+    { path: 'consult', component: Consult },
+    { path: 'report-builder', component: ReportBuilderComponent },
+    { path: 'visual-analytics', component: VisualAnalyticsComponent }
+    
 ] as Routes;
