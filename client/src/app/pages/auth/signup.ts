@@ -213,11 +213,7 @@ export class Signup {
             },
             error: (err) => {
                 const errorMsg = err?.error?.message || 'An unexpected error occurred.';
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: errorMsg
-                });
+                this.notificationService.showError('Signup failed! Try again later');
             }
         });
     }
