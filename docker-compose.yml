@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    networks:
+      - healthcare-network
+
+  health-analytics:
+    build:
+      context: ./server/health-analytics
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - healthcare-network
+
+  # Apache Zookeeper (for Kafka)
+  zookeeper:
+    image: bitnami/zookeeper:3.8
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - healthcare-network
+
+  # Kafka broker
+  kafka:
+    image: bitnami/kafka:3.4
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - healthcare-network
+
+  resource-manage-service:
+    build:
+      context: ./server/resource-manage-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - kafka
+    environment:
+      # Database (pooler) connection
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://aws-0-ap-south-1.pooler.supabase.com:5432/postgres?ssl=true&sslmode=require
+      - SPRING_DATASOURCE_USERNAME=postgres.sbihxmjllrogpwipwrbq
+      - SPRING_DATASOURCE_PASSWORD=fJFCrWYnEPLNpVoE
+      # Tell Spring Boot to use the Kafka broker in this compose
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - healthcare-network
+
+networks:
+  healthcare-network:
+    driver: bridge
