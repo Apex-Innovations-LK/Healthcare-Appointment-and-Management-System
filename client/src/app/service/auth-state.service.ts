@@ -1,4 +1,3 @@
-// src/app/services/auth-state.service.ts
 import { Injectable, OnInit } from '@angular/core';
 import { JwtPayload, TokenDecoderService } from './token-decoder.service';
 import { AuthService } from './auth.service';
