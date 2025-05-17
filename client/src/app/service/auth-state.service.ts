@@ -2,20 +2,19 @@
 import { Injectable, OnInit } from '@angular/core';
 import { JwtPayload, TokenDecoderService } from './token-decoder.service';
 import { AuthService } from './auth.service';
-import { User } from '../models/user';
 import { UserDetails } from '../models/userDetails';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthStateService implements OnInit {
-    ngOnInit(): void { 
+    ngOnInit(): void {
         this.loadUserFromToken();
         this.fetchUserInfo();
     }
 
     private userInfo: JwtPayload | null = null;
-    private user: UserDetails | null = null;
+    private userDetails: UserDetails | null = null;
 
     constructor(
         private tokenDecoder: TokenDecoderService,
@@ -33,16 +32,8 @@ export class AuthStateService implements OnInit {
         return this.userInfo;
     }
 
-    getUserDetails(): UserDetails | null {
-        return this.user;
-    }
-
     getUsername(): string | null {
         return this.userInfo?.sub || null;
-    }
-
-    getRole(): string | null {
-        return this.getUserDetails()?.role || null;
     }
 
     isAuthenticated(): boolean {
@@ -54,12 +45,20 @@ export class AuthStateService implements OnInit {
         localStorage.removeItem('token');
     }
 
-    fetchUserInfo(): void {
-        const username = this.getUsername() || '';
-        if (username) {
-            this.authService.getUser(username).subscribe((data) => {
-                console.log("currently logged user", data);
-                this.user = data;
+    getUserDetails(): UserDetails | null {
+        return this.userDetails;
+    }
+
+    getRole(): string | null {
+        return this.getUserDetails()?.role || null;
+    }
+
+    fetchUserInfo(username?: string): void {
+        const userToFetch = username || this.getUsername() || '';
+        if (userToFetch) {
+            this.authService.getUser(userToFetch).subscribe((data) => {
+                console.log('currently logged user', data);
+                this.userDetails = data;
             });
         }
     }

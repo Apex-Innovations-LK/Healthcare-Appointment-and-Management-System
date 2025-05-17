@@ -10,7 +10,7 @@ import { PatientAuthGuard } from './app/service/AuthGuards/patientAuth.guard';
 import { DoctorAuthGuard } from './app/service/AuthGuards/doctorAuth.guard';
 import { StaffAuthGuard } from './app/service/AuthGuards/staffAuth.guard';
 
-import { VideoCallComponent } from './app/video-call/video-call.component';
+import { VideoCallComponent } from './app/pages/telehealth/video-call.component';
 
 export const appRoutes: Routes = [
     {
@@ -20,7 +20,7 @@ export const appRoutes: Routes = [
     {
         path: 'admin',
         component: AppLayout,
- //       canActivate: [AdminAuthGuard],
+        //       canActivate: [AdminAuthGuard],
         children: [
             {
                 path: '',
@@ -31,7 +31,7 @@ export const appRoutes: Routes = [
     {
         path: 'patient',
         component: PatientLayout,
-//        canActivate: [PatientAuthGuard],
+        //        canActivate: [PatientAuthGuard],
         children: [
             {
                 path: '',
@@ -42,7 +42,7 @@ export const appRoutes: Routes = [
     {
         path: 'doctor',
         component: DoctorLayout,
- //       canActivate: [DoctorAuthGuard],
+        //       canActivate: [DoctorAuthGuard],
         children: [
             {
                 path: '',
@@ -54,7 +54,7 @@ export const appRoutes: Routes = [
     {
         path: 'staff',
         component: StaffLayout,
-//        canActivate: [StaffAuthGuard],
+        //        canActivate: [StaffAuthGuard],
         children: [
             {
                 path: '',

@@ -117,6 +117,10 @@ interface AppointmentSlot {
                         <button (click)="onCancel()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
                         <button (click)="bookAppointment()" [disabled]="!selectedSlot" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">Book Appointment</button>
                     </div>
+                    <div *ngIf="isLoading" class="flex justify-center items-center mt-6">
+                        <i class="pi pi-spin pi-spinner text-3xl text-primary"></i>
+                        <span class="ml-3 text-lg text-primary">Booking confirmed! Refreshing...</span>
+                    </div>
                 </div>
 
                 <!-- No doctor selected state -->
@@ -304,13 +308,12 @@ export class AddAppointmentComponent implements OnInit {
         this.isBooking = true;
         this.appointmentService.bookAppointment(makeAppointment).subscribe({
             next: (response: string) => {
+                this.isLoading = true;
                 this.isBooking = false;
                 this.notificationService.showSuccess('Appointment booked successfully!');
-                const currentUrl = this.router.url;
-                this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-                    this.router.navigate([currentUrl]);
-                });
-                this.router.navigate(['/patient/appointments']);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             },
             error: (err) => {
                 this.isBooking = false;
@@ -325,7 +328,7 @@ export class AddAppointmentComponent implements OnInit {
             `Your appointment with Dr. ${this.selectedDoctor.first_name} ${this.selectedDoctor.last_name} has been booked for ${this.formatAppointmentDate(this.selectedSlot.from)} at ${this.formatAppointmentTime(this.selectedSlot.from)}.`
         );
 
-        console.log(notification)
+        console.log(notification);
         this.notificationService.sendNotification(notification).subscribe({
             next: (response) => {
                 console.log('Notification sent successfully:', response);

@@ -1,13 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { ContactUs } from '../../../models/contactUs';
+import { Notification } from '../../../models/Notification';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
     selector: 'patient-contactus-widget',
     standalone: true,
-    imports: [ButtonModule, RippleModule, FormsModule],
+    imports: [ButtonModule, RippleModule, FormsModule, CommonModule],
     template: `
         <div id="contactus" class="py-10 px-6 lg:px-20 mx-0 my-12 lg:mx-20 bg-white dark:bg-gray-900 rounded-xl shadow-md">
             <div class="text-center mb-10">
@@ -17,18 +21,18 @@ import { Router } from '@angular/router';
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 <!-- Contact Form -->
-                <form class="space-y-5">
+                <form class="space-y-5" (ngSubmit)="onSubmit()">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your Name</label>
-                        <input type="text" placeholder="John Doe" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-primary dark:text-white" />
+                        <input type="text" placeholder="John Doe" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-primary dark:text-white" [(ngModel)]="contactUs.name" name="name" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-                        <input type="email" placeholder="you@example.com" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-primary dark:text-white" />
+                        <input type="email" placeholder="you@example.com" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-primary dark:text-white" [(ngModel)]="contactUs.email" name="email" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message</label>
-                        <textarea rows="4" placeholder="How can we help you?" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-primary dark:text-white"></textarea>
+                        <textarea rows="4" placeholder="How can we help you?" class="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-primary dark:text-white" [(ngModel)]="contactUs.message" name="message"></textarea>
                     </div>
                     <button pButton type="submit" label="Send Message" class="w-full p-button-outlined"></button>
                 </form>
@@ -53,24 +57,34 @@ import { Router } from '@angular/router';
                 </div>
             </div>
         </div>
-        <div class="text-center mb-10">
-            <h2 class="text-4xl font-bold text-surface-900 dark:text-white mb-2">Find Your Doctor</h2>
-            <div class="flex flex-col items-center justify-center space-y-4">
-                <span class="text-muted-color text-2xl">Connect with trusted specialists and manage appointments effortlessly.</span>
-                <div class="flex flex-col space-y-4 mt-6">
-                    <p-button label=" Make an Appointment" styleClass="p-button p-component md:w-full text-center block" (click)="navigateToAppointment()"></p-button>
-                    <p-button label=" View your Appointments" styleClass="p-button p-component md:w-full text-center block" (click)="navigateToViewAppointments()"></p-button>
-                </div>
-            </div>
-        </div>
     `
 })
-export class ContactusWidget {
-    constructor(private router: Router) {}
-    navigateToAppointment() {
-        this.router.navigate(['patient/appointment/add']);
+export class ContactusWidget implements OnInit {
+    contactUs: ContactUs = new ContactUs('', '', '');
+
+    constructor(
+        private router: Router,
+        private notificationService: NotificationService
+    ) {}
+    ngOnInit() {
+        // Initialize any data or services if needed
     }
-    navigateToViewAppointments() {
-        this.router.navigate(['patient/appointment/view']);
+
+    onSubmit() {
+        const notification: Notification = new Notification(this.contactUs.email, 'Contact Us Form Submission', this.contactUs.message);
+
+        console.log(notification);
+
+        this.notificationService.sendNotification(notification).subscribe(
+            (response) => {
+                console.log('Notification sent successfully:', response);
+                this.contactUs = new ContactUs('', '', '');
+                this.notificationService.showSuccess('Form submitted successfully!');
+            },
+            (error) => {
+                console.error('Error sending notification:', error);
+                this.notificationService.showError('Form submission failed! Try again later.');
+            }
+        );
     }
 }

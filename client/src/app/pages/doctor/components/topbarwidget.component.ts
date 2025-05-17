@@ -1,18 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { StyleClassModule } from 'primeng/styleclass';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
-import { AppFloatingConfigurator } from "../../admin/components/app.floatingconfigurator";
+import { AppFloatingConfigurator } from '../../admin/components/app.floatingconfigurator';
 import { AuthStateService } from '../../../service/auth-state.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { NotificationService } from '../../../service/notification.service';
+import { filter } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'doctor-topbar-widget',
     providers: [MessageService],
-    imports: [RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator, ToastModule],
+    imports: [CommonModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator, ToastModule],
     template: `<a class="flex items-center" href="/doctor">
             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 mr-2">
                 <path
@@ -41,28 +43,32 @@ import { NotificationService } from '../../../service/notification.service';
         <div class="items-center dark:bg-surface-900 grow justify-between hidden lg:flex absolute lg:static w-full left-0 top-full px-12 lg:px-0 z-20 rounded-border">
             <ul class="list-none p-0 m-0 flex lg:items-center select-none flex-col lg:flex-row cursor-pointer gap-8">
                 <li>
-                    <a (click)="router.navigate(['/doctor'], { fragment: 'hero' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
+                    <a
+                        (click)="navigateTo('/doctor', 'hero')"
+                        pRipple
+                        [ngClass]="{ 'px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl': true, 'active-tab': isActiveRoute('/doctor') && (!currentFragment || currentFragment === 'hero') && !hasSpecificRoute() }"
+                    >
                         <span>Home</span>
                     </a>
                 </li>
                 <li>
-                    <a (click)="router.navigate(['/doctor'], { fragment: 'highlights' })" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
+                    <a (click)="navigateTo('/doctor', 'highlights')" pRipple [ngClass]="{ 'px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl': true, 'active-tab': isActiveRoute('/doctor') && currentFragment === 'highlights' }">
                         <span>Features</span>
                     </a>
                 </li>
                 <li>
-                    <a (click)="router.navigate(['/doctor/this-week'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>This Week</span>
+                    <a (click)="router.navigate(['/doctor/this-week'])" pRipple [ngClass]="{ 'px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl': true, 'active-tab': isActiveRoute('/doctor/this-week') }">
+                        <span>Appointments</span>
                     </a>
                 </li>
                 <li>
-                    <a (click)="router.navigate(['/doctor/consult'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
+                    <a (click)="router.navigate(['/doctor/consult'])" pRipple [ngClass]="{ 'px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl': true, 'active-tab': isActiveRoute('/doctor/consult') }">
                         <span>Consult</span>
                     </a>
                 </li>
                 <li>
-                    <a (click)="router.navigate(['/doctor/next-week'])" pRipple class="px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl">
-                        <span>Next Week</span>
+                    <a (click)="router.navigate(['/doctor/next-week'])" pRipple [ngClass]="{ 'px-0 py-4 text-surface-900 dark:text-surface-0 font-medium text-xl': true, 'active-tab': isActiveRoute('/doctor/next-week') }">
+                        <span>Schedule</span>
                     </a>
                 </li>
             </ul>
@@ -70,15 +76,51 @@ import { NotificationService } from '../../../service/notification.service';
                 <button pButton pRipple label="Logout" [rounded]="true" (click)="logout()"></button>
                 <app-floating-configurator />
             </div>
-        </div> `
+        </div>
+
+        <style>
+            .active-tab {
+                color: var(--primary-color) !important;
+                border-bottom: 2px solid var(--primary-color);
+            }
+        </style>`
 })
-export class TopbarWidget {
+export class TopbarWidget implements OnInit {
+    currentUrl: string = '';
+    currentFragment: string | null = null;
+
     constructor(
         public router: Router,
         private authStateService: AuthStateService,
         private messageService: MessageService,
-         private notificationService: NotificationService
+        private notificationService: NotificationService
     ) {}
+
+    ngOnInit() {
+        // Initialize the current URL
+        this.currentUrl = this.router.url.split('#')[0];
+        this.currentFragment = this.router.url.includes('#') ? this.router.url.split('#')[1] : null;
+
+        // Subscribe to router events to update active tab
+        this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: any) => {
+            this.currentUrl = event.url.split('#')[0];
+            this.currentFragment = event.url.includes('#') ? event.url.split('#')[1] : null;
+        });
+    }
+
+    navigateTo(route: string, fragment: string) {
+        this.router.navigate([route], { fragment: fragment });
+    }
+
+    isActiveRoute(route: string): boolean {
+        return this.currentUrl.startsWith(route);
+    }
+
+    // Helper method to check if we're on a specific route instead of just the base doctor route
+    hasSpecificRoute(): boolean {
+        const specificRoutes = ['/doctor/this-week', '/doctor/consult', '/doctor/next-week'];
+        return specificRoutes.some((route) => this.isActiveRoute(route));
+    }
 
     logout() {
         this.authStateService.clear();
