@@ -42,7 +42,7 @@ ENV JAVA_OPTS="\
  --add-opens=java.base/sun.nio.ch=ALL-UNNAMED"
 
 # expose springboot port
-EXPOSE 8080
+EXPOSE 8084
 
 ## --- run! --------------------------------------------------------------
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar"]
