@@ -13,12 +13,13 @@ import com.team07.ipfs_service.dto.HealthRecord;
 import com.team07.ipfs_service.services.ipfs.IPFSService;
 
 @RestController
+@RequestMapping("/api/ipfs")
 public class IPFSController {
 
     @Autowired
     private IPFSService ipfsService;
 
-    @PostMapping(value = "upload")
+    @PostMapping(value = "/upload")
     public String saveFile(@RequestBody HealthRecord record){
 
         System.out.println("Received request: " + record);
@@ -26,7 +27,7 @@ public class IPFSController {
         return ipfsService.saveFile(record);
     }
 
-    @GetMapping(value = "file/{hash}")
+    @GetMapping(value = "/file/{hash}")
     public ResponseEntity<byte[]> loadFile(@PathVariable("hash") String hash){
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -35,7 +36,7 @@ public class IPFSController {
         return ResponseEntity.status(HttpStatus.OK).headers(httpHeaders).body(file);
     }
 
-    @PostMapping(value = "files/batch")
+    @PostMapping(value = "/files/batch")
     public ResponseEntity<Map<String, String>> loadMultipleFiles(@RequestBody List<String> hashes) {
         System.out.println("Received batch file request for " + hashes.size() + " files");
         

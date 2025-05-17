@@ -1,0 +1,46 @@
+FROM eclipse-temurin:21-jdk AS builder
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    maven \
+    docker.io \
+    python3 \
+    curl \
+    git \
+    bash \
+    unzip \
+    netcat-openbsd \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install docker-compose v2 (standalone binary)
+RUN curl -SL https://github.com/docker/compose/releases/download/v2.27.1/docker-compose-linux-x86_64 \
+    -o /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose && \
+    ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+# Verify installations
+RUN mvn --version && \
+    docker --version && \
+    docker-compose --version
+
+# Set environment variables
+ENV JAVA_HOME=/opt/java/openjdk
+ENV MAVEN_HOME=/usr/share/maven
+ENV PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:/usr/local/bin:$PATH
+
+# Create working directories
+RUN mkdir -p /healthchaincode /fabric-samples && \
+    chmod -R 777 /healthchaincode
+
+# Copy files
+WORKDIR /app
+COPY ./scripts /scripts
+COPY ./healthchaincode /healthchaincode
+COPY ./fabric-samples /fabric-samples
+
+# Make script executable
+RUN chmod +x /scripts/deploy_mycc.sh
+
+# Run as root to avoid permission issues
+CMD ["/scripts/deploy_mycc.sh"]

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/risk-assessment")
+@RequestMapping("/api/analytics/risk-assessment")
 public class RiskAssessmentController {
     @Autowired
     private RiskAssessmentService riskAssessmentService;

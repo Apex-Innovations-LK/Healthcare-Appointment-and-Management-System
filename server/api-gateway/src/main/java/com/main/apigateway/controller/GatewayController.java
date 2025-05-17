@@ -78,7 +78,7 @@ public class GatewayController {
             case "resource" -> "87";   // http://localhost:8087
             case "auth" -> "88";   // http://localhost:8088
             case "schedule" -> "89";   // http://localhost:8089
-            case "webrtc" -> "90";   // http://localhost:80810
+            case "webrtc" -> "90";   // http://localhost:8090
 
             default -> throw new IllegalArgumentException("Unknown service: " + service);
         };

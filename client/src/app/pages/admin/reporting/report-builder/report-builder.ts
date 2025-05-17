@@ -20,6 +20,10 @@ import { TableModule } from 'primeng/table';
     template: `
         <p-toast></p-toast>
         <div class="max-w-7xl mx-auto p-6">
+            <div *ngIf="loading" class="flex justify-center items-center mb-4">
+                <i class="pi pi-spin pi-spinner text-3xl text-blue-600"></i>
+                <span class="ml-2 text-blue-700 font-semibold">Loading...</span>
+            </div>
             <div class="bg-white shadow-md rounded-lg p-6">
                 <h2 class="text-2xl font-bold mb-6">Report Builder</h2>
                 <form [formGroup]="reportForm" class="space-y-6">
@@ -140,6 +144,7 @@ export class ReportBuilderComponent implements OnInit {
 
     reportData: ReportData | null = null;
     displayedColumns: string[] = [];
+    loading = false;
 
     constructor(
         private fb: FormBuilder,
@@ -210,15 +215,18 @@ export class ReportBuilderComponent implements OnInit {
             return;
         }
 
+        this.loading = true;
         const request: ReportRequest = this.formatRequest(this.reportForm.value);
         this.reportService.generateReport(request).subscribe({
             next: (data: ReportData) => {
                 this.reportData = data;
                 this.displayedColumns = this.getDisplayedColumns(request.reportType);
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Report generated successfully' });
+                this.loading = false;
             },
             error: (error: Error) => {
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message });
+                this.loading = false;
             }
         });
     }
@@ -229,14 +237,17 @@ export class ReportBuilderComponent implements OnInit {
             return;
         }
 
+        this.loading = true;
         const request: ReportRequest = this.formatRequest(this.reportForm.value);
         this.reportService.exportCsv(request).subscribe({
             next: (blob: Blob) => {
                 saveAs(blob, `${request.reportType}_${request.startDate || 'all'}_${request.endDate || 'all'}.csv`);
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: 'CSV downloaded successfully' });
+                this.loading = false;
             },
             error: (error: Error) => {
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message });
+                this.loading = false;
             }
         });
     }

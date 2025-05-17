@@ -1,0 +1,82 @@
+[
+  {
+    "condition": "Hypertension",
+    "rule": {
+      "bp_systolic": ">130",
+      "bp_diastolic": ">80",
+      "condition": "Hypertension"
+    },
+    "recommendation": "Initiate ACE inhibitor (e.g., Lisinopril 10mg daily).",
+    "source": "ACC/AHA Guideline",
+    "priority": 1
+  },
+  {
+    "condition": "Chest pain",
+    "rule": {
+      "chief_complaint": "Chest pain"
+    },
+    "recommendation": "Order ECG and troponin levels to rule out acute coronary syndrome.",
+    "source": "AHA Guideline",
+    "priority": 1
+  },
+  {
+    "condition": "Migraine",
+    "rule": {
+      "chief_complaint": ["Headache", "Severe headache"],
+      "problem_list": "Migraine"
+    },
+    "recommendation": "Start patient on triptan therapy and advise lifestyle modifications.",
+    "source": "American Headache Society",
+    "priority": 2
+  },
+  {
+    "condition": "Asthma",
+    "rule": {
+      "problem_list": "Asthma",
+      "chief_complaint": ["Shortness of breath", "Coughing"]
+    },
+    "recommendation": "Prescribe inhaled corticosteroids and provide an asthma action plan.",
+    "source": "GINA Guidelines",
+    "priority": 1
+  },
+  {
+    "condition": "Anemia",
+    "rule": {
+      "problem_list": "Anemia",
+      "lbf_data": {
+        "LBF102": "<13.0"
+      }
+    },
+    "recommendation": "Recommend iron studies and consider oral iron supplementation.",
+    "source": "WHO Guidelines",
+    "priority": 2
+  },
+  {
+    "condition": "Gastroenteritis",
+    "rule": {
+      "chief_complaint": ["Stomach pain", "Vomiting"],
+      "problem_list": "Gastroenteritis"
+    },
+    "recommendation": "Advise oral rehydration therapy and monitor hydration status.",
+    "source": "CDC Guidelines",
+    "priority": 2
+  },
+  {
+    "condition": "Chronic Pain",
+    "rule": {
+      "problem_list": "Chronic pain"
+    },
+    "recommendation": "Consider referral to pain specialist and evaluate for neuropathic components.",
+    "source": "NIH Pain Management Best Practices",
+    "priority": 3
+  },
+  {
+    "condition": "Insomnia",
+    "rule": {
+      "problem_list": "Insomnia"
+    },
+    "recommendation": "Initiate cognitive behavioral therapy for insomnia (CBT-I); consider melatonin.",
+    "source": "AASM Guidelines",
+    "priority": 2
+  }
+]
