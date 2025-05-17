@@ -32,7 +32,7 @@ import { AuthStateService } from '../../../service/auth-state.service';
             </section>
 
             <!-- Features Section -->
-            <section id="features" class="py-16 px-5 md:px-12 text-center bg-white dark:bg-gray-900">
+            <section id="features" class="py-16 px-5 md:px-12 text-center bg-white dark:bg-gray-900 text-lg">
                 <h2 class="text-3xl font-bold text-primary mb-12 relative after:content-[''] after:absolute after:bottom-[-10px] after:left-1/2 after:transform after:-translate-x-1/2 after:w-14 after:h-1 after:bg-primary">Key Features</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
@@ -43,7 +43,7 @@ import { AuthStateService } from '../../../service/auth-state.service';
                             </div>
                         </ng-template>
                         <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Easy Scheduling</h3>
-                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Book, reschedule, or cancel appointments with just a few clicks. Our intuitive interface makes managing your healthcare simple.</p>
+                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Book, reschedule, or cancel appointments with just a few clicks.</p>
                     </p-card>
 
                     <p-card styleClass="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -69,12 +69,10 @@ import { AuthStateService } from '../../../service/auth-state.service';
             </section>
 
             <!-- User Roles Section -->
-            <section class="py-16 px-5 md:px-12 text-center bg-gray-50 dark:bg-gray-900">
-                <h2 class="text-3xl font-bold text-primary mb-12 relative after:content-[''] after:absolute after:bottom-[-10px] after:left-1/2 after:transform after:-translate-x-1/2 after:w-14 after:h-1 after:bg-primary">
-                    Designed For Everyone
-                </h2>
+            <section class="py-16 px-5 md:px-12 text-center bg-gray-50 dark:bg-gray-900 text-lg">
+                <h2 class="text-3xl font-bold text-primary mb-12 relative after:content-[''] after:absolute after:bottom-[-10px] after:left-1/2 after:transform after:-translate-x-1/2 after:w-14 after:h-1 after:bg-primary">Designed For Everyone</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-12 mt-8">
                     <p-card styleClass="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                         <ng-template pTemplate="header">
                             <div class="flex justify-center items-center w-20 h-20 mx-auto mt-6 mb-4 bg-blue-500 text-white rounded-full">
@@ -113,6 +111,18 @@ import { AuthStateService } from '../../../service/auth-state.service';
                             <button pButton label="Login" icon="pi pi-sign-in" class="p-button-outlined" (click)="goToLogin()"></button>
                         </ng-template>
                     </p-card>
+                    <p-card styleClass="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <ng-template pTemplate="header">
+                            <div class="flex justify-center items-center w-20 h-20 mx-auto mt-6 mb-4 bg-blue-500 text-white rounded-full">
+                                <i class="pi pi-users text-4xl"></i>
+                            </div>
+                        </ng-template>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Staffs</h3>
+                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">Easily view your assigned appointments, duties, and shift timings with ease <br>— all in one place.</p>
+                        <ng-template pTemplate="footer">
+                            <button pButton label="Login" icon="pi pi-sign-in" class="p-button-outlined" (click)="goToLogin()"></button>
+                        </ng-template>
+                    </p-card>
                 </div>
             </section>
 
@@ -121,7 +131,7 @@ import { AuthStateService } from '../../../service/auth-state.service';
                 <h2 class="text-3xl font-bold text-primary mb-12 relative after:content-[''] after:absolute after:bottom-[-10px] after:left-1/2 after:transform after:-translate-x-1/2 after:w-14 after:h-1 after:bg-primary-500">What Our Users Say</h2>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-                    <p-card styleClass="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md">
+                    <p-card styleClass="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md text-lg">
                         <div class="text-left p-4">
                             <p class="text-lg italic text-gray-800 dark:text-gray-100 mb-4">"This system has transformed how we manage appointments. No more paperwork or scheduling conflicts!"</p>
                             <div class="text-gray-600 dark:text-gray-300">
@@ -131,7 +141,7 @@ import { AuthStateService } from '../../../service/auth-state.service';
                         </div>
                     </p-card>
 
-                    <p-card styleClass="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md">
+                    <p-card styleClass="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md text-lg">
                         <div class="text-left p-4">
                             <p class="text-lg italic text-gray-800 dark:text-gray-100 mb-4">"I love how easy it is to book appointments and get reminders. Has made managing my healthcare so much simpler."</p>
                             <div class="text-gray-600 dark:text-gray-300">
