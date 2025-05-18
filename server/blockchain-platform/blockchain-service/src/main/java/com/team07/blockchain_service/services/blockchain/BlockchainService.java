@@ -22,6 +22,7 @@
 // import org.bouncycastle.asn1.ASN1Sequence;
 // import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+
 // @Service
 // public class BlockchainService {
 
@@ -62,7 +63,7 @@
 
 //         String cert = new String(Files.readAllBytes(certFile.toPath()));
 //         String keyPem = new String(Files.readAllBytes(keyFiles[0].toPath()));
-
+    
 //         PrivateKey privateKey = getPrivateKeyFromString(keyPem);
 //         return new FileSystemUser("Admin", mspId, cert, privateKey);
 //     }
@@ -72,9 +73,9 @@
 //         PEMParser pemParser = new PEMParser(new StringReader(pemKey));
 //         Object obj = pemParser.readObject();
 //         pemParser.close();
-
+    
 //         JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
-
+    
 //         if (obj instanceof org.bouncycastle.openssl.PEMKeyPair) {
 //             return converter.getKeyPair((org.bouncycastle.openssl.PEMKeyPair) obj).getPrivate();
 //         } else if (obj instanceof PrivateKeyInfo) {
@@ -90,6 +91,7 @@
 //             throw new IllegalArgumentException("Unsupported key format: " + obj.getClass());
 //         }
 //     }
+    
 
 //     private Properties getTlsProperties() {
 //         Properties props = new Properties();
@@ -109,7 +111,7 @@
 //                     record.getPatientId(),
 //                     record.getDoctorId(),
 //                     record.getIpfsHash()
-
+                    
 //             );
 
 //             Collection<ProposalResponse> responses = channel.sendTransactionProposal(request);
@@ -154,15 +156,15 @@
 //             queryRequest.setChaincodeName(chaincodeName);
 //             queryRequest.setFcn("queryRecordsByPatient");
 //             queryRequest.setArgs(patientId);
-
+    
 //             Collection<ProposalResponse> responses = channel.queryByChaincode(queryRequest);
-
+    
 //             for (ProposalResponse response : responses) {
 //                 if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
 //                     return response.getProposalResponse().getResponse().getPayload().toStringUtf8();
 //                 }
 //             }
-
+    
 //             return "⚠️ No records found for Patient ID: " + patientId;
 //         } catch (Exception e) {
 //             throw new RuntimeException("❌ Error querying patient records: " + e.getMessage(), e);
@@ -175,7 +177,7 @@
 //             queryRequest.setChaincodeName(chaincodeName);
 //             queryRequest.setFcn("getRecordHistory");
 //             queryRequest.setArgs(recordId);
-
+    
 //             Collection<ProposalResponse> responses = channel.queryByChaincode(queryRequest);
 //             for (ProposalResponse response : responses) {
 //                 if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
@@ -187,8 +189,10 @@
 //             throw new RuntimeException("❌ Error querying record history: " + e.getMessage(), e);
 //         }
 //     }
-
+    
+    
 // }
+
 
 package com.team07.blockchain_service.services.blockchain;
 
@@ -197,6 +201,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+
 
 import java.net.URI;
 import java.util.regex.Matcher;
@@ -208,28 +213,27 @@ import java.net.http.HttpResponse;
 @Service
 public class BlockchainService {
 
-    private final String scriptPath = "/app/scripts/interact_chaincode.sh";
+    private final String scriptPath = "interact_chaincode.sh";
 
+public String fetchRecordFromIPFS(String ipfsHash) {
+    try {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8085/file/" + ipfsHash))
+                .GET()
+                .build();
 
-    public String fetchRecordFromIPFS(String ipfsHash) {
-        try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://ipfs.io/ipfs/" + ipfsHash))
-                    .GET()
-                    .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                return response.body();
-            } else {
-                throw new RuntimeException("❌ Failed to fetch from IPFS. HTTP status: " + response.statusCode());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("❌ Failed to fetch from IPFS: " + e.getMessage(), e);
+        if (response.statusCode() == 200) {
+            return response.body();
+        } else {
+            throw new RuntimeException("❌ Failed to fetch from IPFS. HTTP status: " + response.statusCode());
         }
+    } catch (Exception e) {
+        throw new RuntimeException("❌ Failed to fetch from IPFS: " + e.getMessage(), e);
     }
+}
 
     private String runShellCommand(String... args) {
         try {
@@ -268,7 +272,7 @@ public class BlockchainService {
 
     public String queryHealthRecordAndFetch(String recordId) {
         String blockchainResponse = queryHealthRecord(recordId);
-
+    
         // Extract IPFS hash from blockchain response
         Pattern pattern = Pattern.compile("\"ipfsHash\":\"(.*?)\"");
         Matcher matcher = pattern.matcher(blockchainResponse);
@@ -278,7 +282,7 @@ public class BlockchainService {
         } else {
             throw new RuntimeException("❌ IPFS hash not found in blockchain response.");
         }
-    }
+    }    
 
     public String updateHealthRecord(HealthRecordHashed record) {
         return runShellCommand("bash", scriptPath, "update", record.getRecordId(),
@@ -294,6 +298,31 @@ public class BlockchainService {
     }
 
     public String queryRecordsByPatient(String patientId) {
-        return runShellCommand("bash", scriptPath, "by-patient", patientId);
+        // Get list of records from blockchain
+        String blockchainResponse = runShellCommand("bash", scriptPath, "by-patient", patientId);
+        
+        // Use regex to extract IPFS hashes from the blockchain response
+        Pattern pattern = Pattern.compile("\"ipfsHash\":\"([^\"]+)\"");
+        Matcher matcher = pattern.matcher(blockchainResponse);
+        StringBuilder allRecords = new StringBuilder();
+        allRecords.append("[\n");
+        
+        boolean firstRecord = true;
+        while (matcher.find()) {
+            String ipfsHash = matcher.group(1);
+            
+            // Fetch actual record data from IPFS
+            String recordData = fetchRecordFromIPFS(ipfsHash);
+            
+            // Add to collection with proper JSON formatting
+            if (!firstRecord) {
+            allRecords.append(",\n");
+            }
+            allRecords.append(recordData);
+            firstRecord = false;
+        }
+        
+        allRecords.append("\n]");
+        return allRecords.toString();
     }
 }

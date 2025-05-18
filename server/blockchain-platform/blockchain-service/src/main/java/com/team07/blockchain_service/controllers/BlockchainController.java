@@ -22,7 +22,7 @@ public class BlockchainController {
     }
 
     // Register a health record after IPFS hash is created
-    @PostMapping("/record")
+    @PostMapping("blockchain/record")
     public ResponseEntity<String> registerHealthRecord(@RequestBody HealthRecordHashed record) {
         try {
             String result = blockchainService.registerHealthRecord(record);
@@ -32,19 +32,19 @@ public class BlockchainController {
         }
     }
 
-    // Query a health record by record ID
-    @GetMapping("/record/{recordId}")
-    public ResponseEntity<String> queryHealthRecord(@PathVariable String recordId) {
-        try {
-            String result = blockchainService.queryHealthRecord(recordId);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("❌ Failed to query record: " + e.getMessage());
-        }
-    }
+    // // Query a health record by record ID
+    // @GetMapping("/record/{recordId}")
+    // public ResponseEntity<String> queryHealthRecord(@PathVariable String recordId) {
+    //     try {
+    //         String result = blockchainService.queryHealthRecord(recordId);
+    //         return ResponseEntity.ok(result);
+    //     } catch (Exception e) {
+    //         return ResponseEntity.internalServerError().body("❌ Failed to query record: " + e.getMessage());
+    //     }
+    // }
 
     // Query all records for a patient ID
-    @GetMapping("/records/patient/{patientId}")
+    @GetMapping("/blockchain/patient/{patientId}")
     public ResponseEntity<String> queryRecordsByPatient(@PathVariable String patientId) {
         try {
             String result = blockchainService.queryRecordsByPatient(patientId);
@@ -54,7 +54,7 @@ public class BlockchainController {
         }
     }
 
-    @GetMapping("/record/full/{recordId}")
+    @GetMapping("blockchain/record/{recordId}")
     public ResponseEntity<String> getActualRecordFromIPFS(@PathVariable String recordId) {
         try {
             String fullRecord = blockchainService.queryHealthRecordAndFetch(recordId);
