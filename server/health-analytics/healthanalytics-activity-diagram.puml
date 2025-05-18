@@ -1,0 +1,98 @@
+@startuml Health Analytics Module - Activity Diagram
+
+' Style and Theming
+skinparam activityBackgroundColor #FEFECE
+skinparam activityBorderColor #666666
+skinparam activityBorderThickness 2
+skinparam activityDiamondBackgroundColor #FEFECE
+skinparam activityDiamondBorderColor #666666
+skinparam activityStartColor #5DADE2
+skinparam activityEndColor #EC7063
+skinparam titleFontSize 18
+skinparam titleFontStyle bold
+
+title "Healthcare Analytics Module - Simplified View"
+
+' Main Analytics Workflow
+|Client|
+start
+:Request Analytics Dashboard;
+
+|Analytics Service|
+:Fetch Health Records from API;
+:Process Data with Spark;
+:Generate Analytics Metrics;
+note right: Patient timelines, diagnoses, demographics
+
+|Client|
+:Display Analytics Dashboard;
+stop
+
+' Risk Assessment Workflow
+|Client|
+start
+:Request Patient Risk Assessment;
+
+|Risk Assessment Service|
+:Fetch Patient Data from API;
+
+if (Valid Data?) then (yes)
+  :Extract Health Metrics;
+  :Process with Python SciPy;
+  
+  |Python Module|
+  :Calculate Risk Score;
+  :Determine Risk Level;
+  note right: Low, Moderate, High
+  
+  |Risk Assessment Service|
+  :Return Risk Assessment;
+else (no)
+  :Return Error;
+endif
+
+|Client|
+:Display Risk Results;
+stop
+
+' Report Generation Flow
+|Client|
+start
+:Request Healthcare Report;
+
+|Report Service|
+:Fetch Data from API;
+:Apply Filters;
+
+if (Report Type?) then (Demographic)
+  :Generate Demographics Report;
+else if (Diagnosis)
+  :Generate Diagnosis Report;
+else (Visit)
+  :Generate Visit Report;
+endif
+
+:Format Output;
+:Return Report;
+
+|Client|
+:View/Download Report;
+stop
+
+' Staff Utilization Flow
+|Client|
+start
+:Request Staff Analytics;
+
+|Staff Service|
+:Fetch Staff Allocation Data;
+:Calculate Utilization Metrics;
+:Generate Utilization Charts;
+
+|Client|
+:View Staff Utilization Dashboard;
+stop
+
+@enduml
+
+@enduml

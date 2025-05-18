@@ -1,0 +1,125 @@
+@startuml Health Analytics Module - Use Case Diagram
+
+' Style and Theming
+skinparam usecase {
+  BackgroundColor #FEFECE
+  BorderColor #333333
+  ArrowColor #333333
+  FontStyle bold
+}
+
+skinparam actor {
+  BackgroundColor #FEFECE
+  BorderColor #333333
+}
+
+skinparam package {
+  BackgroundColor #FEFECE
+  BorderColor #333333
+}
+
+skinparam rectangle {
+  BackgroundColor #EEEEEE
+  BorderColor #333333
+}
+
+skinparam linetype ortho
+skinparam titleFontSize 18
+skinparam titleFontStyle bold
+
+title "Healthcare Appointment and Management System - Health Analytics Use Cases"
+
+' Actors
+actor "Healthcare Administrator" as Admin
+
+' Primary use case package
+rectangle "Health Analytics System" {
+  package "Analytics Dashboard" {
+    usecase "View Patient Analytics" as UC1
+    usecase "View Problem Distribution" as UC2
+    usecase "View Allergy Statistics" as UC3
+    usecase "Generate Analytics Reports" as UC4
+  }
+  
+  package "Risk Assessment" {
+    usecase "Assess Patient Risk" as UC5
+    usecase "View Risk Distribution" as UC6
+    usecase "Batch Process Risk Assessment" as UC7
+    usecase "Configure Risk Thresholds" as UC8
+  }
+  
+  package "Resource Management" {
+    usecase "Allocate Resources" as UC9
+    usecase "Check Resource Availability" as UC10
+    usecase "View Resource Allocation" as UC11
+    usecase "Manage Resource Schedule" as UC12
+  }
+  
+  package "Staff Utilization" {
+    usecase "View Staff Utilization" as UC13
+    usecase "Analyze Staff Performance" as UC14
+    usecase "Identify Over-utilized Staff" as UC15
+    usecase "Generate Staffing Reports" as UC16
+  }
+}
+
+' External systems
+rectangle "External Systems" {
+  usecase "Health Record System" as EX1
+  usecase "Resource Database" as EX2
+  usecase "Staff Management System" as EX3
+  usecase "Notification System" as EX4
+}
+
+' Relationships - Actors to Use Cases
+
+' Administrator connections
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+Admin --> UC6
+Admin --> UC7
+Admin --> UC8
+Admin --> UC9
+Admin --> UC10
+Admin --> UC11
+Admin --> UC12
+Admin --> UC13
+Admin --> UC14
+Admin --> UC15
+Admin --> UC16
+
+' Use case relationships
+
+' Analytics relationships
+UC1 ..> UC2 : includes
+UC1 ..> UC3 : includes
+UC4 ..> UC1 : includes
+
+' Risk Assessment relationships
+UC5 ..> EX1 : uses
+UC6 ..> UC5 : extends
+UC7 ..> UC5 : includes
+UC8 ..> UC5 : affects
+
+' Resource Management relationships
+UC9 ..> UC10 : includes
+UC9 ..> EX2 : uses
+UC11 ..> EX2 : uses
+UC12 ..> UC9 : affects
+UC12 ..> UC10 : uses
+
+' Staff Utilization relationships
+UC13 ..> EX3 : uses
+UC14 ..> UC13 : includes
+UC15 ..> UC13 : extends
+UC16 ..> UC13 : includes
+UC16 ..> UC14 : includes
+
+' Other relationships
+UC5 --> EX4 : notifies if high risk
+UC15 --> EX4 : sends alerts
+
+@enduml

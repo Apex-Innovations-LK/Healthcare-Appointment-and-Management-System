@@ -2,103 +2,67 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReportService } from '../services/report.service';
-import { ReportRequest, ReportData } from '../models/report.model';
+import { ReportRequest, VisualizationData } from '../models/report.model';
 import { MessageService } from 'primeng/api';
-import { saveAs } from 'file-saver';
 import { ToastModule } from 'primeng/toast';
-import { TabViewModule } from 'primeng/tabview';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
+import { ChartModule } from 'primeng/chart';
 
 @Component({
-    selector: 'app-report-builder',
+    selector: 'app-visual-analytics',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, ToastModule, TabViewModule, DropdownModule, CalendarModule, MultiSelectModule, ButtonModule, TableModule],
+    imports: [CommonModule, ReactiveFormsModule, ToastModule, DropdownModule, CalendarModule, ButtonModule, ChartModule],
     template: `
         <p-toast></p-toast>
         <div class="max-w-7xl mx-auto p-6">
-            <div *ngIf="loading" class="flex justify-center items-center mb-4">
-                <i class="pi pi-spin pi-spinner text-3xl text-blue-600"></i>
-                <span class="ml-2 text-blue-700 font-semibold">Loading...</span>
-            </div>
             <div class="bg-white shadow-md rounded-lg p-6">
-                <h2 class="text-2xl font-bold mb-6">Report Builder</h2>
-                <form [formGroup]="reportForm" class="space-y-6">
-                    <p-tabView>
-                        <p-tabPanel header="Configuration">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="reportType" class="block text-sm font-medium text-gray-700">Report Type</label>
-                                    <p-dropdown id="reportType" formControlName="reportType" [options]="reportTypes" optionLabel="label" optionValue="value" placeholder="Select Report Type" class="w-full" [autoDisplayFirst]="false"></p-dropdown>
-                                </div>
-                                <div>
-                                    <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date</label>
-                                    <p-calendar id="startDate" formControlName="startDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" class="w-full" [maxDate]="today"></p-calendar>
-                                </div>
-                                <div>
-                                    <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
-                                    <p-calendar id="endDate" formControlName="endDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" class="w-full" [maxDate]="today"></p-calendar>
-                                </div>
-                                <div>
-                                    <label for="patientType" class="block text-sm font-medium text-gray-700">Patient Type</label>
-                                    <p-dropdown id="patientType" formControlName="patientType" [options]="patientTypes" placeholder="Select Patient Type" class="w-full" [autoDisplayFirst]="false"></p-dropdown>
-                                </div>
-                                <div>
-                                    <label for="patientSex" class="block text-sm font-medium text-gray-700">Sex</label>
-                                    <p-dropdown id="patientSex" formControlName="patientSex" [options]="sexes" placeholder="Select Sex" class="w-full" [autoDisplayFirst]="false"></p-dropdown>
-                                </div>
-                                <div>
-                                    <label for="ageRange" class="block text-sm font-medium text-gray-700">Age Range</label>
-                                    <p-dropdown id="ageRange" formControlName="ageRange" [options]="ageRanges" placeholder="Select Age Range" class="w-full" [autoDisplayFirst]="false"></p-dropdown>
-                                </div>
-                                <div>
-                                    <label for="city" class="block text-sm font-medium text-gray-700">City</label>
-                                    <p-dropdown id="city" formControlName="city" [options]="cities" placeholder="Select City" class="w-full" [autoDisplayFirst]="false"></p-dropdown>
-                                </div>
-                                <div>
-                                    <label for="state" class="block text-sm font-medium text-gray-700">State</label>
-                                    <p-dropdown id="state" formControlName="state" [options]="states" placeholder="Select State" class="w-full" [autoDisplayFirst]="false"></p-dropdown>
-                                </div>
-                                <div>
-                                    <label for="allergies" class="block text-sm font-medium text-gray-700">Allergies</label>
-                                    <p-multiSelect id="allergies" formControlName="allergies" [options]="allergies" placeholder="Select Allergies" class="w-full"></p-multiSelect>
-                                </div>
-                                <div>
-                                    <label for="medications" class="block text-sm font-medium text-gray-700">Medications</label>
-                                    <p-multiSelect id="medications" formControlName="medications" [options]="medications" placeholder="Select Medications" class="w-full"></p-multiSelect>
-                                </div>
-                            </div>
-                            <div class="mt-6 flex space-x-4">
-                                <p-button label="Generate Report" icon="pi pi-check" (click)="generateReport()" styleClass="p-button-primary"></p-button>
-                                <p-button label="Export CSV" icon="pi pi-download" (click)="exportCsv()" styleClass="p-button-secondary"></p-button>
-                            </div>
-                        </p-tabPanel>
-                    </p-tabView>
+                <h2 class="text-2xl font-bold mb-6">Visual Analytics</h2>
+                <form [formGroup]="filterForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date</label>
+                            <p-calendar id="startDate" formControlName="startDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" class="w-full"></p-calendar>
+                        </div>
+                        <div>
+                            <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
+                            <p-calendar id="endDate" formControlName="endDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" class="w-full"></p-calendar>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <p-button label="Load Visualization" icon="pi pi-chart-bar" (click)="loadVisualization()" styleClass="p-button-primary" [disabled]="loading"></p-button>
+                    </div>
                 </form>
             </div>
 
-            <div class="bg-white shadow-md rounded-lg p-6 mt-6" *ngIf="reportData?.data">
-                <h2 class="text-2xl font-bold mb-4 text-gray-800">Report Preview</h2>
-                <p-table [value]="safeReportData" [columns]="displayedColumns" responsiveLayout="scroll" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-striped p-datatable-gridlines" [rowHover]="true">
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th *ngFor="let col of displayedColumns" class="px-4 py-2 text-left" [pSortableColumn]="col">
-                                {{ col.replace('_', ' ') | titlecase }}
-                                <p-sortIcon [field]="col"></p-sortIcon>
-                            </th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-row>
-                        <tr class="hover:bg-gray-100 transition-colors">
-                            <td *ngFor="let col of displayedColumns" class="px-4 py-2">
-                                {{ row[col] }}
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
+            <div *ngIf="loading" class="flex justify-center items-center py-12">
+                <i class="pi pi-spin pi-spinner text-6xl text-blue-600"></i>
+                <span class="ml-4 text-lg text-gray-700">Loading...</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6" *ngIf="chartData && !loading">
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Visits by Month</h3>
+                    <p-chart type="bar" [data]="chartData.visitsByMonth" [options]="chartOptions" class="h-64"></p-chart>
+                </div>
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Diagnosis Distribution</h3>
+                    <p-chart type="bar" [data]="chartData.diagnosis" [options]="chartOptions" class="h-64"></p-chart>
+                </div>
+                
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Age Distribution</h3>
+                    <p-chart type="bar" [data]="chartData.age" [options]="chartOptions" class="h-64"></p-chart>
+                </div>
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">City Distribution</h3>
+                    <p-chart type="bar" [data]="chartData.city" [options]="chartOptions" class="h-64"></p-chart>
+                </div>
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4">Sex Distribution</h3>
+                    <p-chart type="pie" [data]="chartData.sex" [options]="pieChartOptions" class="h-64"></p-chart>
+                </div>
             </div>
         </div>
     `,
@@ -108,129 +72,46 @@ import { TableModule } from 'primeng/table';
             .p-dropdown:focus {
                 outline: none;
             }
-            :host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
-                background-color: #f8fafc;
-                color: #1f2937;
-                font-weight: 600;
-                border-bottom: 2px solid #e5e7eb;
-            }
-            :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
-                border-bottom: 1px solid #e5e7eb;
-            }
-            :host ::ng-deep .p-datatable .p-sortable-column .p-sortIcon {
-                color: #6b7280;
-            }
-            :host ::ng-deep .p-datatable .p-sortable-column:hover .p-sortIcon {
-                color: #1f2937;
+            .custom-spinner .p-progress-spinner-circle {
+                stroke: #4F46E5 !important;
             }
         `
     ],
     providers: [MessageService]
 })
-export class ReportBuilderComponent implements OnInit {
-    reportForm: FormGroup;
-    reportTypes = [
-        { label: 'Patient Visits', value: 'patient_visits' },
-        { label: 'Diagnosis Summary', value: 'diagnosis_summary' },
-        { label: 'Demographic Summary', value: 'demographic_summary' }
-    ];
-    patientTypes = ['Hypertension', 'Diabetes', 'Asthma', 'Migraines', 'Arthritis', 'Cholesterol', 'Anxiety', 'Depression', 'Obesity', 'Back Pain', 'Other'];
-    sexes = ['Male', 'Female'];
-    ageRanges = ['0-30', '30-60', '60+'];
-    cities = ['Colombo', 'Galle', 'Kandy', 'Matara', 'Jaffna', 'Kurunegala'];
-    states = ['Western', 'Southern', 'Central', 'Northern', 'North Western'];
-    allergies = ['Penicillin', 'Pollen', 'Dust', 'Nuts', 'Shellfish', 'Ibuprofen', 'Latex', 'Milk', 'Eggs', 'Soy', 'Other'];
-    medications = ['Paracetamol', 'Amoxicillin', 'Metformin', 'Ibuprofen', 'Atorvastatin', 'Omeprazole', 'Amlodipine', 'Lisinopril', 'Albuterol', 'Prednisone', 'Other'];
-
-    reportData: ReportData | null = null;
-    displayedColumns: string[] = [];
-    loading = false;
-    today = new Date(); // Today's date to use as max date
+export class VisualAnalyticsComponent implements OnInit {
+    filterForm: FormGroup;
+    chartData: any = null;
+    chartOptions: any;
+    pieChartOptions: any;
+    loading: boolean = false;
 
     constructor(
         private fb: FormBuilder,
         private reportService: ReportService,
         private messageService: MessageService
     ) {
-        this.reportForm = this.fb.group({
-            reportType: ['', Validators.required],
-            startDate: ['', this.noFutureDateValidator.bind(this)],
-            endDate: ['', this.noFutureDateValidator.bind(this)],
-            patientType: [''],
-            patientSex: [''],
-            ageRange: [''],
-            city: [''],
-            state: [''],
-            allergies: [[]],
-            medications: [[]]
+        this.filterForm = this.fb.group({
+            reportType: ['patient_visits', Validators.required],
+            startDate: [''],
+            endDate: [''],
+            patientType: ['']
         });
-    }
-
-    ngOnInit(): void {
-        // Add validation for date relationship (start date <= end date)
-        this.reportForm.get('endDate')?.valueChanges.subscribe(() => {
-            this.validateDateRange();
-        });
-
-        this.reportForm.get('startDate')?.valueChanges.subscribe(() => {
-            this.validateDateRange();
-        });
-    }
-
-    // Custom validator to prevent future dates
-    noFutureDateValidator(control: any) {
-        if (!control.value) return null;
-
-        const inputDate = new Date(control.value);
-        const today = new Date();
-
-        // Set hours to 0 for both dates to compare just the dates
-        today.setHours(0, 0, 0, 0);
-        inputDate.setHours(0, 0, 0, 0);
-
-        return inputDate > today ? { futureDate: true } : null;
-    }
-
-    // Validate that start date is before or equal to end date
-    validateDateRange() {
-        const startDate = this.reportForm.get('startDate')?.value;
-        const endDate = this.reportForm.get('endDate')?.value;
-
-        if (startDate && endDate) {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-
-            if (start > end) {
-                this.reportForm.get('endDate')?.setErrors({ invalidDateRange: true });
-                this.messageService.add({
-                    severity: 'warn',
-                    summary: 'Invalid Date Range',
-                    detail: 'End date cannot be earlier than start date'
-                });
-            } else {
-                // Clear error if previously set
-                const currentErrors = this.reportForm.get('endDate')?.errors;
-                if (currentErrors) {
-                    delete currentErrors['invalidDateRange'];
-                    const remainingErrors = Object.keys(currentErrors || {}).length === 0 ? null : currentErrors;
-                    this.reportForm.get('endDate')?.setErrors(remainingErrors);
-                }
+        this.chartOptions = {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
             }
-        }
+        };
+        this.pieChartOptions = {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            }
+        };
     }
 
-    get safeReportData(): Record<string, any>[] {
-        if (!this.reportData?.data) return [];
-        return this.reportData.data.map((row) => {
-            const newRow: Record<string, any> = { ...row };
-            for (const key in newRow) {
-                if (Array.isArray(newRow[key])) {
-                    newRow[key] = newRow[key].join(', ');
-                }
-            }
-            return newRow;
-        });
-    }
+    ngOnInit(): void {}
 
     private formatDate(date: any): string | null {
         if (!date) return null;
@@ -249,55 +130,55 @@ export class ReportBuilderComponent implements OnInit {
             reportType: formValue.reportType,
             startDate: this.formatDate(formValue.startDate) || undefined,
             endDate: this.formatDate(formValue.endDate) || undefined,
-            patientType: formValue.patientType || null,
-            patientSex: formValue.patientSex || null,
-            ageRange: formValue.ageRange || null,
-            city: formValue.city || null,
-            state: formValue.state || null,
-            allergies: formValue.allergies?.length ? formValue.allergies : null,
-            medications: formValue.medications?.length ? formValue.medications : null
+            patientType: formValue.patientType || undefined,
+            patientSex: undefined,
+            ageRange: undefined,
+            city: undefined,
+            state: undefined,
+            allergies: undefined,
+            medications: undefined
         };
-        console.log('Sending request:', request); // Debug payload
+        console.log('Sending request:', request);
         return request;
     }
 
-    generateReport(): void {
-        if (this.reportForm.invalid) {
-            // Check for specific date errors
-            if (this.reportForm.get('startDate')?.hasError('futureDate') || this.reportForm.get('endDate')?.hasError('futureDate')) {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Date Error',
-                    detail: 'Future dates are not allowed'
-                });
-                return;
-            }
-
-            if (this.reportForm.get('endDate')?.hasError('invalidDateRange')) {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Date Error',
-                    detail: 'End date must be after start date'
-                });
-                return;
-            }
-
-            // General form validation error
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Please correct form errors before submitting'
-            });
+    loadVisualization(): void {
+        if (this.filterForm.invalid) {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Please select a report type' });
             return;
         }
 
         this.loading = true;
-        const request: ReportRequest = this.formatRequest(this.reportForm.value);
-        this.reportService.generateReport(request).subscribe({
-            next: (data: ReportData) => {
-                this.reportData = data;
-                this.displayedColumns = this.getDisplayedColumns(request.reportType);
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Report generated successfully' });
+        const request: ReportRequest = this.formatRequest(this.filterForm.value);
+        this.reportService.getVisualizationData(request).subscribe({
+            next: (data: VisualizationData) => {
+                this.chartData = {
+                    visitsByMonth: {
+                        labels: data.visits_by_month_labels,
+                        datasets: [{ label: 'Visits', data: data.visits_by_month_values, backgroundColor: '#3B82F6' }]
+                    },
+                    diagnosis: {
+                        labels: data.diagnosis_labels,
+                        datasets: [{ label: 'Diagnoses', data: data.diagnosis_values, backgroundColor: '#10B981' }]
+                    },
+                    sex: {
+                        labels: data.sex_labels,
+                        datasets: [{ 
+                            label: 'Sex Distribution', 
+                            data: data.sex_values, 
+                            backgroundColor: ['#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#4F46E5', '#10B981'] 
+                        }]
+                    },
+                    age: {
+                        labels: data.age_labels,
+                        datasets: [{ label: 'Age Distribution', data: data.age_values, backgroundColor: '#EF4444' }]
+                    },
+                    city: {
+                        labels: data.city_labels,
+                        datasets: [{ label: 'City Distribution', data: data.city_values, backgroundColor: '#8B5CF6' }]
+                    }
+                };
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Visualization data loaded' });
                 this.loading = false;
             },
             error: (error: Error) => {
@@ -305,49 +186,5 @@ export class ReportBuilderComponent implements OnInit {
                 this.loading = false;
             }
         });
-    }
-
-    exportCsv(): void {
-        if (this.reportForm.invalid) {
-            // Check for specific errors first
-            if (this.reportForm.get('startDate')?.hasError('futureDate') || this.reportForm.get('endDate')?.hasError('futureDate')) {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Date Error',
-                    detail: 'Future dates are not allowed'
-                });
-                return;
-            }
-
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Please correct form errors before exporting' });
-            return;
-        }
-
-        this.loading = true;
-        const request: ReportRequest = this.formatRequest(this.reportForm.value);
-        this.reportService.exportCsv(request).subscribe({
-            next: (blob: Blob) => {
-                saveAs(blob, `${request.reportType}_${request.startDate || 'all'}_${request.endDate || 'all'}.csv`);
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'CSV downloaded successfully' });
-                this.loading = false;
-            },
-            error: (error: Error) => {
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message });
-                this.loading = false;
-            }
-        });
-    }
-
-    private getDisplayedColumns(reportType: string): string[] {
-        switch (reportType) {
-            case 'patient_visits':
-                return ['record_id', 'patient_id', 'patient_name', 'date_of_service', 'chief_complaint', 'problem_list', 'patient_sex', 'city'];
-            case 'diagnosis_summary':
-                return ['record_id', 'patient_id', 'patient_name', 'problem_list', 'medications'];
-            case 'demographic_summary':
-                return ['patient_id', 'patient_name', 'patient_sex', 'patient_dob', 'city', 'state'];
-            default:
-                return ['record_id', 'patient_id', 'patient_name'];
-        }
     }
 }

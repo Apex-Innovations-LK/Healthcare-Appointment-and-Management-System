@@ -57,7 +57,7 @@ Chart.register(...registerables);
             
             <!-- Loading Indicator -->
             <div *ngIf="isLoading" class="flex justify-content-center align-items-center" style="min-height: 400px;">
-                <p-progressSpinner strokeWidth="4" animationDuration=".5s"></p-progressSpinner>
+                <i class="pi pi-spin pi-spinner text-6xl text-blue-600"></i>
                 <span class="ml-3 font-medium">Loading analytics data...</span>
             </div>
             

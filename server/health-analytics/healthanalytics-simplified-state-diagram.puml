@@ -1,0 +1,99 @@
+@startuml Health Analytics Module - Simplified State Diagram
+
+' Style and Theming
+skinparam state {
+  BackgroundColor #FEFECE
+  BorderColor #666666
+  BorderThickness 2
+  FontStyle bold
+}
+
+title "Healthcare Analytics Module - Simplified State Diagram"
+
+' Starting state
+[*] --> Idle
+
+' Main States
+state Idle
+state "Data Loading" as Loading
+state "Processing" as Processing
+state "Results Ready" as Results
+state "Error" as Error
+
+' Analytics Flow
+Idle --> Loading : Request Analytics
+Loading --> Processing : Data Retrieved
+Processing --> Results : Processing Complete
+Loading --> Error : API Failure
+Processing --> Error : Processing Failure
+
+' Risk Assessment States
+state "Calculating Risk" as Risk
+Idle --> Loading : Request Risk Assessment
+Loading --> Risk : Patient Data Retrieved
+Risk --> Results : Risk Calculated
+
+' Resource and Staff Utilization States
+state "Collecting Allocation Data" as CollectingAllocationData
+state "Analyzing Utilization" as AnalyzingUtilization {
+  state "Staff Utilization Analysis" as StaffUtilization
+  state "Resource Allocation Analysis" as ResourceAllocation
+  
+  StaffUtilization --> ResourceAllocation : Switch Analysis View
+  ResourceAllocation --> StaffUtilization : Switch Analysis View
+}
+
+Idle --> Loading : Request Utilization Analytics
+Loading --> CollectingAllocationData : Resource and Staff Data Retrieved
+CollectingAllocationData --> AnalyzingUtilization : Resource/Staff Data Processed
+AnalyzingUtilization --> Results : Utilization Analysis Complete
+
+' Results States
+state Results {
+  state "Analytics View" as AnalyticsView
+  state "Risk Assessment View" as RiskView
+  state "Report View" as ReportView
+  state "Staff Utilization View" as StaffUtilizationView
+  state "Resource Allocation View" as ResourceAllocationView
+  
+  AnalyticsView --> RiskView : Switch View
+  RiskView --> ReportView : Switch View
+  ReportView --> StaffUtilizationView : Switch View
+  StaffUtilizationView --> ResourceAllocationView : Switch View
+  ResourceAllocationView --> AnalyticsView : Switch View
+}
+
+' Staff Utilization Details
+note bottom of StaffUtilizationView
+  Displays:
+  - Average staff utilization (%)
+  - Over-utilized staff count
+  - Utilization by role (Doctors/Staff)
+  - Utilization state distribution (Low/Normal/High)
+end note
+
+' Resource Allocation Details
+note bottom of ResourceAllocationView
+  Displays:
+  - Resource allocation timelines
+  - Resource availability status
+  - Session resource allocations
+  - Upcoming resource allocations
+end note
+
+' Report Generation States
+state "Generating Report" as GenReport
+Idle --> Loading : Request Report
+Loading --> GenReport : Data Retrieved
+GenReport --> Results : Report Generated
+GenReport --> Error : Generation Error
+
+' Common Transitions
+Results --> Idle : Close View
+Error --> Idle : Reset
+
+' Final state
+Results --> [*] : Session End
+Error --> [*] : Session End
+
+@enduml
