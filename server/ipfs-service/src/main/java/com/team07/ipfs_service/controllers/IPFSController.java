@@ -1,5 +1,10 @@
 package com.team07.ipfs_service.controllers;
 
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +33,21 @@ public class IPFSController {
         httpHeaders.add("Content-type", MediaType.ALL_VALUE);
         byte[] file = ipfsService.loadFile(hash);
         return ResponseEntity.status(HttpStatus.OK).headers(httpHeaders).body(file);
+    }
+
+    @PostMapping(value = "files/batch")
+    public ResponseEntity<Map<String, String>> loadMultipleFiles(@RequestBody List<String> hashes) {
+        System.out.println("Received batch file request for " + hashes.size() + " files");
+        
+        Map<String, byte[]> filesMap = ipfsService.loadMultipleFiles(hashes);
+        
+        Map<String, String> encodedFiles = new HashMap<>();
+        filesMap.forEach((hash, content) -> {
+            String base64Content = Base64.getEncoder().encodeToString(content);
+            encodedFiles.put(hash, base64Content);
+        });
+        
+        return ResponseEntity.ok(encodedFiles);
     }
 
 

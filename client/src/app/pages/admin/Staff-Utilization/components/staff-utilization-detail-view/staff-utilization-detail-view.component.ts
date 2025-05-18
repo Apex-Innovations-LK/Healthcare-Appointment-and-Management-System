@@ -35,10 +35,14 @@ export class StaffUtilizationDetailViewComponent {
   pieDataUtilization: any;
   pieOptionsUtilization: any;
   
+
   
   constructor(private route: ActivatedRoute , private utilizationService: UtilizationService) {}
 
   ngOnInit(): void {
+
+    const documentStyle = getComputedStyle(document.documentElement);
+
     this.staffAllocationId = this.route.snapshot.paramMap.get('id')!;
     const avgUtilStr = this.route.snapshot.paramMap.get('avgUtilization');
     this.avgUtilization = avgUtilStr ? Number(avgUtilStr) : 0; // or handle null appropriately
@@ -48,15 +52,22 @@ export class StaffUtilizationDetailViewComponent {
     this.utilizationService.getUtilizationDataById(this.staffAllocationId).subscribe((data) => {
       this.utilizationRecord = data || null;
       this.pieData = {
-        labels: ['Idle Time', 'Active Time'],
-        datasets: [
-            {
-                data: [ this.utilizationRecord?.idle_time , this.utilizationRecord?.active_time],
-                // backgroundColor: [documentStyle.getPropertyValue('--p-indigo-500'), documentStyle.getPropertyValue('--p-purple-500'), documentStyle.getPropertyValue('--p-teal-500')],
-                // hoverBackgroundColor: [documentStyle.getPropertyValue('--p-indigo-400'), documentStyle.getPropertyValue('--p-purple-400'), documentStyle.getPropertyValue('--p-teal-400')]
-            }
-        ]
+          labels: ['Idle Time', 'Active Time'],
+          datasets: [
+              {
+                  data: [ this.utilizationRecord?.idle_time , this.utilizationRecord?.active_time],
+                  backgroundColor: [
+                      documentStyle.getPropertyValue('--p-indigo-500'), // Idle Time
+                      documentStyle.getPropertyValue('--p-green-500')   // Active Time
+                  ],
+                  hoverBackgroundColor: [
+                      documentStyle.getPropertyValue('--p-indigo-400'),
+                      documentStyle.getPropertyValue('--p-green-400')
+                  ]
+              }
+          ]
       };
+
 
       this.pieOptions = {
         plugins: {
@@ -73,12 +84,18 @@ export class StaffUtilizationDetailViewComponent {
         labels: ['Average Staff', 'This Staff'],
         datasets: [
             {
-                data: [ this.avgUtilization , this.utilizationRecord?.utilization],
-                // backgroundColor: [documentStyle.getPropertyValue('--p-indigo-500'), documentStyle.getPropertyValue('--p-purple-500'), documentStyle.getPropertyValue('--p-teal-500')],
-                // hoverBackgroundColor: [documentStyle.getPropertyValue('--p-indigo-400'), documentStyle.getPropertyValue('--p-purple-400'), documentStyle.getPropertyValue('--p-teal-400')]
+            data: [this.avgUtilization, this.utilizationRecord?.utilization],
+            backgroundColor: [
+                documentStyle.getPropertyValue('--p-blue-500'),   // Average Staff
+                documentStyle.getPropertyValue('--p-purple-500')  // This Staff
+            ],
+            hoverBackgroundColor: [
+                documentStyle.getPropertyValue('--p-blue-400'),
+                documentStyle.getPropertyValue('--p-purple-400')
+            ]
             }
         ]
-      };
+    };
 
       this.pieOptionsUtilization = {
         plugins: {

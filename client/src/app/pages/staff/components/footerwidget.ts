@@ -54,7 +54,7 @@ import { Router, RouterModule } from '@angular/router';
                             <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">Event</a>
                             <a class="leading-normal text-xl block cursor-pointer mb-2 text-surface-700 dark:text-surface-100">FAQ</a>
                             <a class="leading-normal text-xl block cursor-pointer text-surface-700 dark:text-surface-100">Blog</a>
-                        </div> 
+                        </div>
 
                         <div class="col-span-12 md:col-span-3">
                             <h4 class="font-medium text-2xl leading-normal mb-6 text-surface-900 dark:text-surface-0">Legal</h4>
@@ -66,8 +66,10 @@ import { Router, RouterModule } from '@angular/router';
                 </div>
             </div>
         </div>
+      
     `
 })
 export class FooterWidget {
     constructor(public router: Router) {}
 }
+

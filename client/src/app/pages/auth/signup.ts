@@ -13,6 +13,8 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../service/auth.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { AuthStateService } from '../../service/auth-state.service';
+import { NotificationService } from '../../service/notification.service';
 
 @Component({
     selector: 'app-signup',
@@ -73,7 +75,7 @@ import { ToastModule } from 'primeng/toast';
                                 weakLabel="Weak"
                                 mediumLabel="Medium"
                                 strongLabel="Strong"
-                                class="w-full md:w-[30rem] mb-8"
+                                styleClass="w-full md:w-[30rem] mb-8"
                             ></p-password>
 
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Signup As</label>
@@ -83,8 +85,8 @@ import { ToastModule } from 'primeng/toast';
                                 <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Speciality</label>
                                 <input pInputText id="speciality1" type="text" placeholder="Speciality" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.speciality" />
 
-                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">License Number</label>
-                                <input pInputText id="license_number1" type="text" placeholder="License Number" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.license_number" />
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Title</label>
+                                <input pInputText id="license_number1" type="text" placeholder="ex :- MBBS" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.license_number" />
                             </div>
 
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">First Name</label>
@@ -102,10 +104,12 @@ import { ToastModule } from 'primeng/toast';
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Email</label>
                             <input pInputText id="email1" type="text" placeholder="Email" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.email" />
 
-                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Phone</label>
-                            <input pInputText id="phone_number1" type="text" placeholder="Phone Number" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.phone_number" />
+                            <div class="flex flex-col">
+                                <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Phone</label>
+                                <input pInputText id="phone_number1" type="text" placeholder="Phone Number" class="w-full md:w-[30rem] mb-8" [(ngModel)]="user.phone_number" />
 
-                            <p-button label="Sign Up" styleClass="w-full" (click)="registerUser()"></p-button>
+                                <p-button label="Sign Up" styleClass="w-full md:w-[30rem] mb-8" (click)="registerUser()"></p-button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -132,7 +136,9 @@ export class Signup {
     constructor(
         private router: Router,
         private authService: AuthService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private authStateService: AuthStateService,
+        private notificationService: NotificationService
     ) {}
 
     email: string = '';
@@ -156,6 +162,7 @@ export class Signup {
 
     private redirectUserBasedOnRole(token: string, username: string, role: string, status: string): void {
         localStorage.setItem('token', token);
+        this.authStateService.fetchUserInfo();
         const routesByRole: Record<string, string> = {
             PATIENT: '/patient',
             ADMIN: '/admin',
@@ -165,21 +172,12 @@ export class Signup {
 
         const route = routesByRole[role] || '/auth/access';
         this.router.navigate([route]);
-    
     }
 
     registerUser() {
         this.authService.registerUser(this.user).subscribe({
             next: (data) => {
-                // console.log(data);
-                // if (!data.token) {
-                //     this.messageService.add({
-                //         severity: 'error',
-                //         summary: 'Error',
-                //         detail: data.message || 'Signup failed.'
-                //     });
-                //     return;
-                // }
+                this.notificationService.showSuccess('Signup successful!');
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',

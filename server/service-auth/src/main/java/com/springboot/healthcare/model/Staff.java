@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "staff")
+@Table(name = "staff", schema = "authservice")
 public class Staff {
 
     @Id

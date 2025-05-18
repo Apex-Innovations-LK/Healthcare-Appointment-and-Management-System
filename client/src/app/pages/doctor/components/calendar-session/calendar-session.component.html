@@ -1,0 +1,34 @@
+<div
+    class="calendar-session w-[94%] p-3 flex flex-col items-center justify-evenly overflow-hidden rounded-md absolute hover:scale-105"
+    [style.top]="getTopOffset()"
+    [style.height]="height"
+    (mouseenter)="onMouseEnter($event)"
+    (mouseleave)="onMouseLeave($event)"
+    #componentRef2
+>
+    <p class="time-duration text-lg m-0 font-bold">{{ fromTime | date: 'shortTime' }} - {{ toTime | date: 'shortTime' }}</p>
+    <!-- <div class="flex flex-row items-center justify-start mt-1 w-full flex-wrap">
+        <p class="key-staff text-md m-0">Staff member :</p>
+        <p-chip label="Ayodya Madumali" class="ml-4 mt-2 cursor-pointer value-staff text-large"></p-chip>
+    </div> -->
+    <p class="appointments-key mt-2 text-md w-full text-left">
+        Appointments <span class="text-lime-500 ml-5 text-2xl font-semibold">{{ getBookedCount() }}</span
+        ><span class="full-count"> /{{ session.number_of_patients }}</span>
+    </p>
+
+    @if (expanded) {
+        @if (slots.length>0) {
+            <div class="ml-5 flex flex-row flex-wrap gap-1 w-full">
+                @for (slot of slots; track $index) {
+                    <div [class]="'text-gray-600 font-semibold w-[25px] h-[30px] ' + (slot.status === 'booked' ? 'bg-lime-400 border-lime-700' : (slot.status === 'available') ? 'bg-gray-400 border-gray-600' : 'bg-orange-500 border-red-700') + ' border-2 rounded-md border-solid flex items-center justify-center'">
+                        {{ $index + 1 }}
+                    </div>
+                }
+            </div>
+        }
+        <p-button class="mt-4" label="View HRs" severity="info" raised (click)="goToConsult()" />
+        <!-- @if (!isExpired()) {
+            <p-button class="mt-2" label="Reject Appointments" severity="warn" raised />
+        } -->
+    }
+</div>

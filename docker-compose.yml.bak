@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    networks:
+      - healthcare-network
+
+  health-analytics:
+    build:
+      context: ./server/health-analytics
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db.sbihxmjllrogpwipwrbq.supabase.co:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=fJFCrWYnEPLNpVoE
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL=true
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+    networks:
+      - healthcare-network
+    depends_on:
+      - supabase
+
+  resource-manage-service:
+    build:
+      context: ./server/resource-manage-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db.sbihxmjllrogpwipwrbq.supabase.co:5432/postgres?sslmode=require
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=fJFCrWYnEPLNpVoE
+      - JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true -Djavax.net.ssl.trustStore=/tmp/supabase-truststore.jks -Djavax.net.ssl.trustStorePassword=changeit
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL=true
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+    volumes:
+      - ./server/resource-manage-service/truststore:/tmp
+    networks:
+      - healthcare-network
+    depends_on:
+      - supabase
+
+  # This is a placeholder for Supabase.
+  # You should replace this with your actual Supabase setup or use Supabase's managed service.
+  # For local development, you might use a local Postgres instance configured similarly to Supabase.
+  supabase:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=fJFCrWYnEPLNpVoE # Make sure this matches your actual Supabase password if connecting to a local instance
+      - POSTGRES_DB=postgres
+    volumes:
+      - supabase_data:/var/lib/postgresql/data
+    networks:
+      - healthcare-network
+
+networks:
+  healthcare-network:
+    driver: bridge
+
+volumes:
+  supabase_data: # Persists Postgres data across container restarts
