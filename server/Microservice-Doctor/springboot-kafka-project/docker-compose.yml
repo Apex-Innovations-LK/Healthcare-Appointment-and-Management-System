@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"       # For host to access Kafka
+      - "29092:29092"     # For containers to access Kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  doctor-app:
+    container_name: doctor-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      # Kafka bootstrap for internal network
+      SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:29092
+
+      # Supabase DB config
+      SPRING_DATASOURCE_URL: jdbc:postgresql://aws-0-ap-south-1.pooler.supabase.com:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres.sbihxmjllrogpwipwrbq
+      SPRING_DATASOURCE_PASSWORD: fJFCrWYnEPLNpVoE
+
+      # Optional - override default schema
+      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: doctorService

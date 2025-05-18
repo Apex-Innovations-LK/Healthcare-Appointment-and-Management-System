@@ -211,7 +211,7 @@ export class Chatbot implements OnInit {
   isTyping: boolean = false;
   selectedImage: string | null = null;
   selectedFile: File | null = null;
-  readonly API_ENDPOINT = 'http://localhost:8080/api/chat/message?sessionId=test123';
+  readonly API_ENDPOINT = 'http://localhost:8083/api/chat/message?sessionId=test123';
   
   constructor(private http: HttpClient, private messageService: MessageService) {}
   

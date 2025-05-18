@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -8,13 +9,30 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
 import { TabViewModule } from 'primeng/tabview';
-import { PatientService, RiskAssessment, PatientRecord } from './service/patient.service';
+import { TableModule } from 'primeng/table';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { PatientService, RiskAssessment, PatientRecord, ClinicalRecommendation } from './service/patient.service';
 
 @Component({
     selector: 'app-risk-assessment',
     standalone: true,
-    imports: [CommonModule, CardModule, ChartModule, ProgressBarModule, ButtonModule, TooltipModule, DividerModule, TabViewModule],
+    imports: [
+        CommonModule, 
+        FormsModule,
+        CardModule, 
+        ChartModule, 
+        ProgressBarModule, 
+        ButtonModule, 
+        TooltipModule, 
+        DividerModule, 
+        TabViewModule,
+        TableModule,
+        ToastModule
+    ],
+    providers: [MessageService],
     template: `
+    <p-toast></p-toast>
     <div class="grid space-y-4">
         <div class="col-12">
             <div class="flex-col align-items-center mb-3">
@@ -107,6 +125,23 @@ import { PatientService, RiskAssessment, PatientRecord } from './service/patient
                             >
                                 {{medication}}
                             </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="block text-500 font-medium mb-1">Problem List</label>
+                        <div *ngIf="patient.problemList && patient.problemList.length > 0">
+                            <div class="flex flex-wrap gap-2 mt-1">
+                                <span 
+                                    *ngFor="let problem of patient.problemList"
+                                    class="inline-flex align-items-center px-2 py-1 text-xs font-medium rounded-pill text-blue-800 bg-blue-50"
+                                >
+                                    {{problem}}
+                                </span>
+                            </div>
+                        </div>
+                        <div *ngIf="!patient.problemList || patient.problemList.length === 0" class="mt-1">
+                            <span class="text-500">No active problems recorded</span>
                         </div>
                     </div>
                 </div>
@@ -233,23 +268,49 @@ import { PatientService, RiskAssessment, PatientRecord } from './service/patient
                                 </div>
                             </div>
                         </p-tabPanel>
-                        
-                        <p-tabPanel header="Problem List">
-                            <div *ngIf="patient">
-                                <h4>Active Problem List</h4>
-                                <div *ngIf="patient.problemList && patient.problemList.length > 0">
-                                    <div class="flex flex-wrap gap-2 mt-3">
-                                        <span 
-                                            *ngFor="let problem of patient.problemList"
-                                            class="inline-flex align-items-center px-3 py-2 text-sm rounded-pill bg-blue-50 text-blue-800"
-                                        >
-                                            {{problem}}
-                                        </span>
+
+                        <!-- Clinical Recommendations Tab -->
+                        <p-tabPanel header="Clinical Guidelines">
+                            <div class="grid">
+                                <div class="col-12">
+                                    <div class="flex justify-content-between align-items-center mb-3">
+                                        <h4>Clinical Recommendations</h4>
                                     </div>
-                                </div>
-                                <div *ngIf="!patient.problemList || patient.problemList.length === 0" class="p-4 text-center">
-                                    <i class="pi pi-info-circle text-blue-500 text-2xl mb-3 block"></i>
-                                    <span>No active problems recorded for this patient</span>
+                                    
+                                    <div *ngIf="loadingRecommendations" class="flex justify-content-center align-items-center p-5">
+                                        <i class="pi pi-spin pi-spinner text-primary text-4xl mr-3"></i>
+                                        <span>Loading clinical recommendations...</span>
+                                    </div>
+                                    
+                                    <p-table *ngIf="!loadingRecommendations" [value]="recommendations" styleClass="p-datatable-sm">
+                                        <ng-template pTemplate="header">
+                                            <tr>
+                                                <th>Condition</th>
+                                                <th>Recommendation</th>
+                                                <th>Source</th>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="body" let-recommendation>
+                                            <tr>
+                                                <td>{{recommendation.condition}}</td>
+                                                <td>{{recommendation.recommendation}}</td>
+                                                <td>{{recommendation.source}}</td>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="emptymessage">
+                                            <tr>
+                                                <td colspan="3" class="text-center p-4">
+                                                    <div class="flex flex-column align-items-center">
+                                                        <i class="pi pi-info-circle text-blue-500 text-3xl mb-3"></i>
+                                                        <span>No clinical recommendations available</span>
+                                                        <button pButton label="Load Recommendations" 
+                                                                class="p-button-text p-button-sm mt-2"
+                                                                (click)="loadRecommendations()"></button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </ng-template>
+                                    </p-table>
                                 </div>
                             </div>
                         </p-tabPanel>
@@ -266,6 +327,33 @@ import { PatientService, RiskAssessment, PatientRecord } from './service/patient
         .probability-high { background: linear-gradient(90deg, #ffcdd2 0%, #e53935 100%); }
         .probability-moderate { background: linear-gradient(90deg, #fff9c4 0%, #fbc02d 100%); }
         .probability-low { background: linear-gradient(90deg, #c8e6c9 0%, #43a047 100%); }
+        
+        .p-tag-danger {
+            background-color: #f44336;
+            color: #ffffff;
+        }
+        
+        .p-tag-warning {
+            background-color: #ff9800;
+            color: #ffffff;
+        }
+        
+        .p-tag-info {
+            background-color: #2196f3;
+            color: #ffffff;
+        }
+        
+        .p-tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
     `]
 })
 export class RiskAssessmentComponent implements OnInit {
@@ -276,10 +364,15 @@ export class RiskAssessmentComponent implements OnInit {
     chartOptions: any;
     radarOptions: any;
     
+    // Clinical guideline properties
+    recommendations: ClinicalRecommendation[] = [];
+    loadingRecommendations = false;
+    
     constructor(
         private route: ActivatedRoute, 
         private patientService: PatientService,
-        private router: Router
+        private router: Router,
+        private messageService: MessageService
     ) {}
 
     ngOnInit() {
@@ -297,10 +390,90 @@ export class RiskAssessmentComponent implements OnInit {
                 if (this.patient) {
                     this.metricsChartData = this.buildMetricsChart(this.patient);
                     this.zScoreChartData = this.buildZScoreChart(this.patient);
+                    
+                    // Automatically load clinical recommendations
+                    this.loadRecommendations();
                 }
             });
         }
     }
+    
+    loadRecommendations() {
+        if (!this.patient) return;
+        
+        this.loadingRecommendations = true;
+        
+        // Convert PatientRecord to the format expected by the API
+        const patientData = {
+            patient_id: this.patient.patientId,
+            patient_name: this.patient.patientName,
+            patient_dob: this.patient.patientDob,
+            patient_sex: this.patient.patientSex,
+            chief_complaint: this.patient.chiefComplaint,
+            allergies: this.patient.allergies,
+            medications: this.patient.medications,
+            problem_list: this.patient.problemList,
+            lbf_data: this.patient.lbfData,
+            his_data: this.patient.hisData
+        };
+        
+        this.patientService.evaluatePatient(patientData).subscribe({
+            next: (recommendations) => {
+                this.recommendations = recommendations;
+                this.loadingRecommendations = false;
+            },
+            error: (error) => {
+                console.error('Error loading recommendations:', error);
+                this.loadingRecommendations = false;
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to load recommendations. Please try again later.',
+                    life: 5000
+                });
+                
+                // Provide fallback recommendations based on patient data
+                this.recommendations = this.getFallbackRecommendations();
+            }
+        });
+    }
+    
+    getFallbackRecommendations(): ClinicalRecommendation[] {
+        if (!this.patient) return [];
+        
+        const fallbackRecs: ClinicalRecommendation[] = [];
+        
+        // Example logic for generating fallback recommendations based on patient data
+        if (this.isHighRisk()) {
+            fallbackRecs.push({
+                condition: 'High Risk Patient',
+                recommendation: 'Schedule follow-up within 2 weeks',
+                source: 'System Default'
+            });
+        }
+        
+        // Check for common medications and provide recommendations
+        if (this.patient.medications?.includes('aspirin')) {
+            fallbackRecs.push({
+                condition: 'Aspirin Therapy',
+                recommendation: 'Monitor for GI bleeding, consider proton pump inhibitor',
+                source: 'Standard Guidelines'
+            });
+        }
+        
+        // Check for common problems and provide recommendations
+        if (this.patient.problemList?.some(problem => problem.toLowerCase().includes('diabetes'))) {
+            fallbackRecs.push({
+                condition: 'Diabetes Management',
+                recommendation: 'HbA1c testing every 3-6 months, annual eye and foot exams',
+                source: 'ADA Guidelines'
+            });
+        }
+        
+        return fallbackRecs;
+    }
+    
+    
     
     navigateBack() {
         this.router.navigate(['/admin/patients']);

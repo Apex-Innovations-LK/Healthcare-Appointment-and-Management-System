@@ -117,7 +117,7 @@ export class Consult {
     }
 
     goToTelehealth(){
-        this.router.navigate(['/doctor/telehealth']);
+        this.router.navigate(['/telehealth']);
     }
 
     isNowBetweenTimes(startTime: string, endTime: string): boolean {

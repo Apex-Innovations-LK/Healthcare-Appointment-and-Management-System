@@ -54,7 +54,7 @@ export class DoctorService {
   }
 
   uploadHr(hr: HealthRecord){
-    const apiUrl = "http://127.0.0.1:8086/upload";
+    const apiUrl = "http://127.0.0.1:8080/api/ipfs/upload";
     return this.httpClient.post(apiUrl, hr, { responseType: 'text' });
   }
 

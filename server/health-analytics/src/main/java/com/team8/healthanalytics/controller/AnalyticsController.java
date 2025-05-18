@@ -16,7 +16,7 @@ public class AnalyticsController {
         this.analyticsService = analyticsService;
     }
 
-    @GetMapping("/api/analytics")
+    @GetMapping("/api/analytics/data")
     public AnalyticsData analytics() {
         return analyticsService.fetchAnalytics();
     }
