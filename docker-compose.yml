@@ -15,7 +15,7 @@ services:
       context: ./server/health-analytics
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8084:8084"
     networks:
       - healthcare-network
 
@@ -50,7 +50,7 @@ services:
       context: ./server/resource-manage-service
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"
+      - "8087:8087"
     depends_on:
       - kafka
     environment:

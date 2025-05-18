@@ -8,7 +8,7 @@ import { Observable } from "rxjs";
 })
 
 export class ResourceDetailService {
-    private apiServerUrl = 'http://localhost:8081/resource-allocation'; // Replace with your API server URL
+    private apiServerUrl = 'http://localhost:8087/api/resource/resource-allocation'; // Replace with your API server URL
 
     constructor(private http: HttpClient) {}
 
