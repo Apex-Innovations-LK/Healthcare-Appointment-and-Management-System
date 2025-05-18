@@ -88,7 +88,7 @@ services:
 
   chat-history-service:
     build:
-      context: ./server/chat-service
+      context: ./server/chat-history-service
       dockerfile: Dockerfile
     container_name: chat-history-service
     ports:
