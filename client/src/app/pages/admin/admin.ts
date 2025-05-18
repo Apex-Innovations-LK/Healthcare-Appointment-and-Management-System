@@ -9,12 +9,11 @@ import { PatientService } from './service/patient.service';
 import { AnalyticsService, AnalyticsData } from './service/admin.patient.analytics';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
     selector: 'app-admin',
     standalone: true,
-    imports: [CommonModule, CardModule, ChartModule, ButtonModule, TableModule, TabViewModule, ProgressSpinnerModule],
+    imports: [CommonModule, CardModule, ChartModule, ButtonModule, TableModule, TabViewModule],
     template: `
         <div class="grid">
             <div class="col-12">
@@ -29,8 +28,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
                                 <div class="flex justify-content-between mb-3">
                                     <div>
                                         <span class="block text-500 font-medium mb-3">Total Patients</span>
-                                        <div *ngIf="loading" class="flex justify-content-center">
-                                            <p-progressSpinner [style]="{width: '30px', height: '30px'}" styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+                                        <div *ngIf="loading" class="flex items-center mb-4">
+                                            <i class="pi pi-spin pi-spinner text-3xl text-blue-600"></i>
                                         </div>
                                         <div *ngIf="!loading" class="text-900 font-medium text-xl">{{stats.totalPatients}}</div>
                                     </div>
@@ -46,8 +45,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
                                 <div class="flex justify-content-between mb-3">
                                     <div>
                                         <span class="block text-500 font-medium mb-3">High Risk Patients</span>
-                                        <div *ngIf="loading" class="flex justify-content-center">
-                                            <p-progressSpinner [style]="{width: '30px', height: '30px'}" styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+                                        <div *ngIf="loading" class="flex items-center mb-4">
+                                            <i class="pi pi-spin pi-spinner text-3xl text-blue-600"></i>
                                         </div>
                                         <div *ngIf="!loading" class="text-900 font-medium text-xl">{{stats.highRiskCount}}</div>
                                     </div>
@@ -65,8 +64,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
                                 <div class="flex justify-content-between mb-3">
                                     <div>
                                         <span class="block text-500 font-medium mb-3">Moderate Risk Patients</span>
-                                        <div *ngIf="loading" class="flex justify-content-center">
-                                            <p-progressSpinner [style]="{width: '30px', height: '30px'}" styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+                                        <div *ngIf="loading" class="flex items-center mb-4">
+                                            <i class="pi pi-spin pi-spinner text-3xl text-blue-600"></i>
                                         </div>
                                         <div *ngIf="!loading" class="text-900 font-medium text-xl">{{stats.moderateRiskCount}}</div>
                                     </div>
@@ -84,8 +83,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
                                 <div class="flex justify-content-between mb-3">
                                     <div>
                                         <span class="block text-500 font-medium mb-3">Low Risk Patients</span>
-                                        <div *ngIf="loading" class="flex justify-content-center">
-                                            <p-progressSpinner [style]="{width: '30px', height: '30px'}" styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+                                        <div *ngIf="loading" class="flex items-center mb-4">
+                                            <i class="pi pi-spin pi-spinner text-3xl text-blue-600"></i>
                                         </div>
                                         <div *ngIf="!loading" class="text-900 font-medium text-xl">{{stats.lowRiskCount}}</div>
                                     </div>
@@ -167,6 +166,84 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
                                         <div class="ml-4">
                                             <h4 class="mt-0 mb-1">Patient Demographics</h4>
                                             <p class="mt-0 mb-0 text-700">View patient data breakdown by demographics</p>
+                                        </div>
+                                    </div>
+                                </p-card>
+                            </div>
+                        </div>
+                    </p-tabPanel>
+
+                    <!-- Reporting Tab -->
+                    <p-tabPanel header="Reporting & Visualization">
+                        <div class="grid">
+                            <!-- Reporting Card -->
+                            <div class="col-12 lg:col-6 mb-4">
+                                <p-card styleClass="h-full shadow-4 cursor-pointer" (click)="navigateToReporting()">
+                                    <div class="flex align-items-center">
+                                        <div class="flex justify-content-center align-items-center bg-indigo-100 border-round" style="width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="pi pi-file-pdf text-indigo-600 text-3xl"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h4 class="mt-0 mb-1">Report Builder</h4>
+                                            <p class="mt-0 mb-0 text-700">
+                                                Create custom reports based on patient data and analytics
+                                            </p>
+                                        </div>
+                                    </div>
+                                </p-card>
+                            </div>
+                            
+                            <!-- Visulaization Card -->
+                            <div class="col-12 lg:col-6 mb-4">
+                                <p-card styleClass="h-full shadow-4 cursor-pointer" (click)="navigateToVisualization()">
+                                    <div class="flex align-items-center">
+                                        <div class="flex justify-content-center align-items-center bg-orange-100 border-round" style="width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="pi pi-chart-line text-orange-600 text-3xl"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h4 class="mt-0 mb-1">Visualization</h4>
+                                            <p class="mt-0 mb-0 text-700">
+                                                Visualize patient data and analytics in interactive charts
+                                            </p>
+                                        </div>
+                                    </div>
+                                </p-card>
+                            </div>
+                        </div>
+                    </p-tabPanel>
+
+                    <!-- Resource Management Tab -->
+                    <p-tabPanel header="Resource Management Overview">
+                        <div class="grid">
+                            <!-- Health Analytics Navigation Card -->
+                            <div class="col-12 lg:col-6 mb-4">
+                                <p-card styleClass="h-full shadow-4 cursor-pointer" (click)="navigateToResourceManagement()">
+                                    <div class="flex align-items-center">
+                                        <div class="flex justify-content-center align-items-center bg-teal-100 border-round" style="width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="pi pi-briefcase text-teal-600 text-3xl"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h4 class="mt-0 mb-1">Resource Management</h4>
+                                            <p class="mt-0 mb-0 text-700">
+                                                Manage and allocate resources effectively across departments
+                                            </p>
+                                        </div>
+                                    </div>
+                                </p-card>
+                            </div>
+                            
+                            <!-- Staff Utilization Card -->
+                            <div class="col-12 lg:col-6 mb-4">
+                                <p-card styleClass="h-full shadow-4 cursor-pointer" (click)="navigateToStaffUtilization()">
+                                    <div class="flex align-items-center">
+                                        <div class="flex justify-content-center align-items-center bg-cyan-100 border-round" style="width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="pi pi-id-card text-cyan-600 text-3xl"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h4 class="mt-0 mb-1">Staff Utilization</h4>
+                                            <p class="mt-0 mb-0 text-700">
+                                                Monitor and optimize staff utilization across departments
+                                            </p>
                                         </div>
                                     </div>
                                 </p-card>
@@ -256,5 +333,21 @@ export class Admin implements OnInit {
     
     navigateToAnalytics() {
         this.router.navigate(['/admin/analytics']);
+    }
+
+    navigateToReporting() {
+        this.router.navigate(['/admin/report-builder']);
+    }
+
+    navigateToVisualization() {
+        this.router.navigate(['/admin/report-visualizer']);
+    }
+
+    navigateToResourceManagement() {
+        this.router.navigate(['/admin/resource-allocation']);
+    }
+
+    navigateToStaffUtilization() {
+        this.router.navigate(['/admin/staff-utilization']);
     }
 }
