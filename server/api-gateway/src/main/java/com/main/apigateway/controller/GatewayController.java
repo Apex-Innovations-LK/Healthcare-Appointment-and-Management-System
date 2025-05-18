@@ -30,8 +30,8 @@ public class GatewayController {
             String basePath = "/api/" + service + "/";
             String relativePath = requestURI.substring(basePath.length());
 
-            // Final destination URL
-            String destinationUrl = "http://localhost:808" + getPort(service) + "/api/" + service + "/" + relativePath;
+            // Final destination URL - use Docker service name
+            String destinationUrl = "http://" + getServiceHost(service) + "/api/" + service + "/" + relativePath;
 
             HttpMethod httpMethod = HttpMethod.valueOf(request.getMethod());
 
@@ -67,12 +67,12 @@ public class GatewayController {
         }
     }
 
-    private String getPort(String service) {
+    private String getServiceHost(String service) {
         return switch (service.toLowerCase()) {
-            case "auth" -> "1";   // http://localhost:8081
-            case "schedule" -> "2";   // http://localhost:8082
-            case "appointment" -> "3"; // http://localhost:8083
-            case "doctors" -> "5"; // http://localhost:8085
+            case "auth" -> "auth-service:8081";
+            case "schedule" -> "schedule-service:8082";
+            case "appointment" -> "appointment-service:8083";
+            case "doctors" -> "doctor-service:8080";
             default -> throw new IllegalArgumentException("Unknown service: " + service);
         };
     }
