@@ -117,21 +117,21 @@ Set your environment variables in `docker-compose.yml` under the `resource-manag
 
 | Method | Endpoint              | Description           |
 | ------ | --------------------- | --------------------- |
-| GET    | `/resource/all`       | List all resources    |
-| POST   | `/resource/add`       | Create a new resource |
-| GET    | `/resource/find/{id}` | Get a resource by ID  |
+| GET    | `/api/resource/all`       | List all resources    |
+| POST   | `/api/resource/add`       | Create a new resource |
+| GET    | `/api/resource/find/{id}` | Get a resource by ID  |
 
 ### ResourceAllocationController
 
 | Method | Endpoint                                               | Description                               |
 | ------ | ------------------------------------------------------ | ----------------------------------------- |
-| GET    | `/resource-allocation/all`                             | List all session allocations              |
-| GET    | `/resource-allocation/find/{sessionId}`                | Get allocation details by session ID      |
-| GET    | `/resource-allocation/upcoming/{resourceId}`           | Get upcoming allocations for a resource   |
-| GET    | `/resource-allocation/busy/{from}/{to}`                | List busy resource IDs between timestamps |
-| GET    | `/resource-allocation/available/{from}/{to}`           | Get available rooms & equipment           |
-| POST   | `/resource-allocation/add`                             | Add a new resource allocation             |
-| DELETE | `/resource-allocation/delete/{sessionId}/{resourceId}` | Delete an allocation entry                |
+| GET    | `/api/resource-allocation/all`                         | List all session allocations              |
+| GET    | `/api/resource-allocation/find/{sessionId}`            | Get allocation details by session ID      |
+| GET    | `/api/resource-allocation/upcoming/{resourceId}`     | Get upcoming allocations for a resource   |
+| GET    | `/api/resource-allocation/busy/{from}/{to}`           | List busy resource IDs between timestamps |
+| GET    | `/api/resource-allocation/available/{from}/{to}`      | Get available rooms & equipment           |
+| POST   | `/api/resource-allocation/add`                             | Add a new resource allocation             |
+| DELETE | `/api/resource-allocation/delete/{sessionId}/{resourceId}` | Delete an allocation entry                |
 
 ### StaffAllocationController
 
