@@ -9,7 +9,7 @@ import { HttpClient } from "@angular/common/http"
 })
 export class UtilizationService {
 
-  private apiUrl = "http://localhost:8087/api/staff/staff-utilization" // Replace with your API server URL
+  private apiUrl = "http://localhost:8087/api/resource/staff-utilization" // Replace with your API server URL
 
   
   constructor(private http : HttpClient) {}
