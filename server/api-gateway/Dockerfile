@@ -1,36 +1,18 @@
-# 1) BUILD THE APPLICATION
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+# Use a base image with Java 21
+#FROM maven:3.9.6-eclipse-temurin-21
+FROM amazoncorretto:21-alpine-jdk
 
-# Set working directory inside container
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy the pom.xml separately to resolve dependencies first
-COPY pom.xml .
-RUN mvn -q dependency:go-offline
+# Copy the JAR file into the container
+COPY target/api-gateway-0.0.1-SNAPSHOT.jar /app/app.jar
 
-# Now copy the full source code
-COPY src ./src
+# Copy the .env file into the container
+#COPY /docker/.env /app/.env
 
-# Build the Spring Boot fat JAR (skip tests for faster build)
-RUN mvn clean package -DskipTests
-
-# 2) RUNTIME IMAGE
-FROM eclipse-temurin:21-jdk-jammy AS runtime
-
-# App home inside container
-ENV APP_HOME=/opt/apigateway
-WORKDIR $APP_HOME
-
-# Copy the generated JAR from build stage
-COPY --from=build /app/target/*.jar app.jar
-
-# Set JVM options if needed (optional, can be removed)
-ENV JAVA_OPTS="\
- --add-opens=java.base/java.lang=ALL-UNNAMED \
- --add-opens=java.base/java.util=ALL-UNNAMED"
-
-# Expose port for Spring Boot application
+# Expose the port that your Spring Boot application runs on (default is 8080, but change if needed)
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+# Command to run the JAR file.  We don't need to specify the .env here, as the app loads it.
+CMD ["java", "-jar", "app.jar"]

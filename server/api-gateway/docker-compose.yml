@@ -1,0 +1,13 @@
+services:
+  app:
+    image: api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    
+    #depends_on:
+    #  - kafka
+    restart: always
+    #networks:
+     # - app-network
+  # ... (Kafka and Zookeeper remain mostly the same, but ensure they are on app-network)
