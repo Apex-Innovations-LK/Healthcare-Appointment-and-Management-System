@@ -23,25 +23,25 @@ import { ChartModule } from 'primeng/chart';
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date</label>
-                            <p-calendar id="startDate" formControlName="startDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" class="w-full"></p-calendar>
+                            <p-calendar id="startDate" formControlName="startDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" [maxDate]="today" class="w-full"></p-calendar>
                         </div>
                         <div>
                             <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
-                            <p-calendar id="endDate" formControlName="endDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" class="w-full"></p-calendar>
+                            <p-calendar id="endDate" formControlName="endDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" [maxDate]="today" class="w-full"></p-calendar>
                         </div>
                     </div>
                     <div class="mt-6">
-                        <p-button label="Load Visualization" icon="pi pi-chart-bar" (click)="loadVisualization()" styleClass="p-button-primary" [disabled]="loading"></p-button>
+                        <p-button label="Load Visualization" icon="pi pi-chart-bar" (click)="loadVisualization()" styleClass="p-button-primary"></p-button>
                     </div>
                 </form>
             </div>
 
-            <div *ngIf="loading" class="flex justify-center items-center py-12">
-                <i class="pi pi-spin pi-spinner text-6xl text-blue-600"></i>
-                <span class="ml-4 text-lg text-gray-700">Loading...</span>
+            <div *ngIf="isLoading" class="flex justify-center items-center mt-8">
+                <span class="pi pi-spin pi-spinner text-4xl text-blue-500"></span>
+                <span class="ml-3 text-lg text-blue-600">Loading data...</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6" *ngIf="chartData && !loading">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6" *ngIf="chartData && !isLoading">
                 <div class="bg-white shadow-md rounded-lg p-6">
                     <h3 class="text-xl font-semibold mb-4">Visits by Month</h3>
                     <p-chart type="bar" [data]="chartData.visitsByMonth" [options]="chartOptions" class="h-64"></p-chart>
@@ -50,7 +50,6 @@ import { ChartModule } from 'primeng/chart';
                     <h3 class="text-xl font-semibold mb-4">Diagnosis Distribution</h3>
                     <p-chart type="bar" [data]="chartData.diagnosis" [options]="chartOptions" class="h-64"></p-chart>
                 </div>
-                
                 <div class="bg-white shadow-md rounded-lg p-6">
                     <h3 class="text-xl font-semibold mb-4">Age Distribution</h3>
                     <p-chart type="bar" [data]="chartData.age" [options]="chartOptions" class="h-64"></p-chart>
@@ -61,7 +60,7 @@ import { ChartModule } from 'primeng/chart';
                 </div>
                 <div class="bg-white shadow-md rounded-lg p-6">
                     <h3 class="text-xl font-semibold mb-4">Sex Distribution</h3>
-                    <p-chart type="pie" [data]="chartData.sex" [options]="pieChartOptions" class="h-64"></p-chart>
+                    <p-chart type="pie" [data]="chartData.sex" [options]="chartOptions" class="h-64"></p-chart>
                 </div>
             </div>
         </div>
@@ -72,9 +71,6 @@ import { ChartModule } from 'primeng/chart';
             .p-dropdown:focus {
                 outline: none;
             }
-            .custom-spinner .p-progress-spinner-circle {
-                stroke: #4F46E5 !important;
-            }
         `
     ],
     providers: [MessageService]
@@ -83,8 +79,17 @@ export class VisualAnalyticsComponent implements OnInit {
     filterForm: FormGroup;
     chartData: any = null;
     chartOptions: any;
-    pieChartOptions: any;
-    loading: boolean = false;
+    isLoading: boolean = false;
+    today: Date = new Date(); // Current date to restrict future date selection
+
+    // Array of colors for charts
+    chartColors = {
+        primary: ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD'],
+        diagnosis: ['#17BECF', '#BCBD22', '#E377C2', '#7F7F7F', '#8C564B'],
+        sex: ['#FF9896', '#98DF8A', '#C5B0D5', '#FFBB78', '#AEC7E8'],
+        age: ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD'],
+        city: ['#8C564B', '#E377C2', '#7F7F7F', '#BCBD22', '#17BECF']
+    };
 
     constructor(
         private fb: FormBuilder,
@@ -103,15 +108,22 @@ export class VisualAnalyticsComponent implements OnInit {
                 legend: { position: 'top' }
             }
         };
-        this.pieChartOptions = {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' }
-            }
-        };
     }
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        // Add date validation
+        this.filterForm.get('endDate')?.valueChanges.subscribe((endDate) => {
+            const startDate = this.filterForm.get('startDate')?.value;
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                this.messageService.add({
+                    severity: 'warn',
+                    summary: 'Invalid Date Range',
+                    detail: 'End date cannot be before start date'
+                });
+                this.filterForm.get('endDate')?.setValue(null);
+            }
+        });
+    }
 
     private formatDate(date: any): string | null {
         if (!date) return null;
@@ -147,8 +159,7 @@ export class VisualAnalyticsComponent implements OnInit {
             this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Please select a report type' });
             return;
         }
-
-        this.loading = true;
+        this.isLoading = true;
         const request: ReportRequest = this.formatRequest(this.filterForm.value);
         this.reportService.getVisualizationData(request).subscribe({
             next: (data: VisualizationData) => {
@@ -163,28 +174,24 @@ export class VisualAnalyticsComponent implements OnInit {
                     },
                     sex: {
                         labels: data.sex_labels,
-                        datasets: [{ 
-                            label: 'Sex Distribution', 
-                            data: data.sex_values, 
-                            backgroundColor: ['#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#4F46E5', '#10B981'] 
-                        }]
+                        datasets: [{ label: 'Sex Distribution', data: data.sex_values, backgroundColor: this.chartColors.sex }]
                     },
                     age: {
                         labels: data.age_labels,
-                        datasets: [{ label: 'Age Distribution', data: data.age_values, backgroundColor: '#EF4444' }]
+                        datasets: [{ label: 'Age Distribution', data: data.age_values, backgroundColor: this.chartColors.age }]
                     },
                     city: {
                         labels: data.city_labels,
                         datasets: [{ label: 'City Distribution', data: data.city_values, backgroundColor: '#8B5CF6' }]
                     }
                 };
+                this.isLoading = false;
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Visualization data loaded' });
-                this.loading = false;
             },
             error: (error: Error) => {
+                this.isLoading = false;
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message });
-                this.loading = false;
             }
-        });
-    }
+        });
+    }
 }
