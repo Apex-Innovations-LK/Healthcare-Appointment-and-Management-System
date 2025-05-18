@@ -114,10 +114,3 @@ peer lifecycle chaincode querycommitted --channelID mychannel --name "$CHAINCODE
 
 echo "✅ Chaincode deployment complete."
 
-
-
-# {"recordId": "rec001", "patientId": "pat001", "doctorId": "doc001", "ipfsHash": "QmOldHashToRemove"}
-# {"recordId": "rec002", "patientId": "pat002", "doctorId": "doc002", "ipfsHash": "QmNewHashToAdd"}
-# {"recordId": "rec003", "patientId": "pat001", "doctorId": "doc003", "ipfsHash": "QmAnotherNewHashToAdd"}
-# {"recordId": "rec004", "patientId": "pat004", "doctorId": "doc004", "ipfsHash": "QmYetAnotherNewHashToAdd"}
-# {"recordId": "rec005", "patientId": "pat005", "doctorId": "doc005", "ipfsHash": "QmFinalNewHashToAdd"}
