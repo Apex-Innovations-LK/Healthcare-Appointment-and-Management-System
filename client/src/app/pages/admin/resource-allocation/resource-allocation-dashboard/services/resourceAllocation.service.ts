@@ -8,7 +8,7 @@ import { Injectable } from "@angular/core";
 })
 
 export class ResourceAllocationService {
-    private apiServerUrl = "http://localhost:8081"; // Replace with your API server URL
+    private apiServerUrl = "http://localhost:8080/api/resource"; // Replace with your API server URL
 
     constructor(private http: HttpClient) {}
 
@@ -17,7 +17,7 @@ export class ResourceAllocationService {
     }
 
     public getNumberOfResources(): Observable<number> {
-        return this.http.get<number>(`${this.apiServerUrl}/resource/count`);
+        return this.http.get<number>(`${this.apiServerUrl}/count`);
     }
 
 }

@@ -22,7 +22,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/resource-allocation")
+@RequestMapping("api/resource/resource-allocation")
 @CrossOrigin(origins = "http://localhost:4200")
 public class ResourceAllocationController {
     private final ResourceAllocationService resourceAllocationService;

@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api") // Base path for API versioning and clarity
+@RequestMapping("/api/blockchain") // Base path for API versioning and clarity
 public class BlockchainController {
 
     private final BlockchainService blockchainService;
@@ -22,7 +22,7 @@ public class BlockchainController {
     }
 
     // Register a health record after IPFS hash is created
-    @PostMapping("blockchain/record")
+    @PostMapping("/record")
     public ResponseEntity<String> registerHealthRecord(@RequestBody HealthRecordHashed record) {
         try {
             String result = blockchainService.registerHealthRecord(record);
@@ -44,7 +44,7 @@ public class BlockchainController {
     // }
 
     // Query all records for a patient ID
-    @GetMapping("/blockchain/patient/{patientId}")
+    @GetMapping("/patient/{patientId}")
     public ResponseEntity<String> queryRecordsByPatient(@PathVariable String patientId) {
         try {
             String result = blockchainService.queryRecordsByPatient(patientId);
@@ -54,7 +54,7 @@ public class BlockchainController {
         }
     }
 
-    @GetMapping("blockchain/record/{recordId}")
+    @GetMapping("/record/{recordId}")
     public ResponseEntity<String> getActualRecordFromIPFS(@PathVariable String recordId) {
         try {
             String fullRecord = blockchainService.queryHealthRecordAndFetch(recordId);
