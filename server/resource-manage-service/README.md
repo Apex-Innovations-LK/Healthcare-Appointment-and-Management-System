@@ -137,6 +137,6 @@ Set your environment variables in `docker-compose.yml` under the `resource-manag
 
 | Method | Endpoint                       | Description                         |
 | ------ | ------------------------------ | ----------------------------------- |
-| GET    | `/staff-utilization/overall`   | Get overall staff utilization stats |
-| GET    | `/staff-utilization/all`       | List all staff allocations          |
-| GET    | `/staff-utilization/find/{id}` | Get staff allocation by ID          |
+| GET    | `/api/staff/staff-utilization/overall`   | Get overall staff utilization stats |
+| GET    | `/api/staff/staff-utilization/all`       | List all staff allocations          |
+| GET    | `/api/staff/staff-utilization/find/{id}` | Get staff allocation by ID          |
