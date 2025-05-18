@@ -8,7 +8,7 @@ import { Injectable } from "@angular/core";
 })
 
 export class ResourceAllocationService {
-    private apiServerUrl = "http://localhost:8081"; // Replace with your API server URL
+    private apiServerUrl = "http://localhost:8087"; // Replace with your API server URL
 
     constructor(private http: HttpClient) {}
 
