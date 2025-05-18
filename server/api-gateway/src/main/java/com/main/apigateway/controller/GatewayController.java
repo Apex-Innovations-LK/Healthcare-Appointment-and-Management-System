@@ -31,7 +31,7 @@ public class GatewayController {
             String relativePath = requestURI.substring(basePath.length());
 
             // Final destination URL
-            String destinationUrl = "http://localhost:80" + getPort(service) + "/api/" + service + "/" + relativePath;
+            String destinationUrl = "http://" + service + "-service:80" + getPort(service) + "/api/" + service + "/" + relativePath;
 
             HttpMethod httpMethod = HttpMethod.valueOf(request.getMethod());
 
