@@ -9,6 +9,8 @@ public class ChatSession {
 
     public ChatSession(String sessionId) {
         this.sessionId = sessionId;
+        messages.add(new ChatMessage("system", "You are a health assistant."));
+
     }
 
     public String getSessionId() {
