@@ -31,7 +31,7 @@ public interface ScheduleSlotRepository extends JpaRepository<ScheduleSlot, UUID
     """)
     List<ScheduleSlot> findBySessionId(@Param("sessionId") UUID sessionId);
 
-    @Transactional
+
     @Modifying
     @Query("DELETE FROM ScheduleSlot ss WHERE ss.session_id = :sessionId")
     void deleteBySessionId(@Param("sessionId") UUID sessionId);
