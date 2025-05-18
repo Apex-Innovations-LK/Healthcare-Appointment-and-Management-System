@@ -44,10 +44,10 @@ interface ApiChatMessage {
   selector: 'app-patient-appointment',
   standalone: true,
   imports: [
-    RouterModule, 
-    RippleModule, 
-    StyleClassModule, 
-    ButtonModule, 
+    RouterModule,
+    RippleModule,
+    StyleClassModule,
+    ButtonModule,
     DividerModule,
     InputTextModule,
     AvatarModule,
@@ -293,21 +293,21 @@ export class Chatbot implements OnInit {
   isTyping: boolean = false;
   selectedImage: string | null = null;
   selectedFile: File | null = null;
-  
+
   // Session management
   chatSessions: ChatSession[] = [];
   currentSessionId: string = '';
   readonly apiBaseUrl = 'http://localhost:8080/api';
   readonly historyBaseUrl = 'http://localhost:8080/api';
   readonly userId = 'guest';
-  
+
   constructor(
-    private http: HttpClient, 
+    private http: HttpClient,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) { }
 
-    // Get the auth token from localStorage
+  // Get the auth token from localStorage
   private getAuthToken(): string | null {
     return localStorage.getItem('token');
   }
@@ -326,16 +326,16 @@ export class Chatbot implements OnInit {
       'Authorization': `Bearer ${token}`
     });
   }
-  
+
   ngOnInit() {
     // Load available chat sessions
     this.loadChatSessions();
   }
-  
+
   loadChatSessions() {
     const headers = this.getAuthHeaders();
-    this.http.get<any[]>(`${this.historyBaseUrl}/chat-history/sessions/${this.userId}`, { 
-      headers: headers 
+    this.http.get<any[]>(`${this.historyBaseUrl}/chat-history/sessions/${this.userId}`, {
+      headers: headers
     }).subscribe({
       next: (data) => {
         this.chatSessions = data.map(session => ({
@@ -343,12 +343,12 @@ export class Chatbot implements OnInit {
           timestamp: session[1],
           lastMessage: ''
         }));
-        
+
         // Sort sessions by timestamp (newest first)
-        this.chatSessions.sort((a, b) => 
+        this.chatSessions.sort((a, b) =>
           new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         );
-        
+
         // If there are sessions, load the most recent one
         if (this.chatSessions.length > 0) {
           this.loadSession(this.chatSessions[0].sessionId);
@@ -364,20 +364,20 @@ export class Chatbot implements OnInit {
           summary: 'Error Loading Sessions',
           detail: 'Failed to load chat sessions. Please try again later.'
         });
-        
+
         // Create a new session as fallback
         this.createNewSession();
       }
     });
   }
-  
+
   loadSession(sessionId: string) {
     this.currentSessionId = sessionId;
     this.messages = [];
-    
+
     // Load chat history for the selected session
     const headers = this.getAuthHeaders();
-    this.http.get<ApiChatMessage[]>(`${this.historyBaseUrl}/chat-history/session/${sessionId}`, { 
+    this.http.get<ApiChatMessage[]>(`${this.historyBaseUrl}/chat-history/session/${sessionId}`, {
       headers: headers
     }).subscribe({
       next: (data) => {
@@ -386,10 +386,10 @@ export class Chatbot implements OnInit {
           text: msg.message,
           timestamp: new Date(msg.timestamp)
         }));
-        
+
         // Sort messages by timestamp
         this.messages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-        
+
         this.scrollToBottom();
       },
       error: (error) => {
@@ -399,7 +399,7 @@ export class Chatbot implements OnInit {
           summary: 'Error Loading Chat',
           detail: 'Failed to load chat history. Please try again later.'
         });
-        
+
         // Add a welcome message as fallback
         if (this.messages.length === 0) {
           this.addBotMessage('Hello! I\'m your health assistant. How can I help you with your appointment today?');
@@ -407,23 +407,23 @@ export class Chatbot implements OnInit {
       }
     });
   }
-  
+
   createNewSession() {
     // Generate a new session ID
     const newSessionId = `session${Math.floor(Math.random() * 10000)}`;
-    
+
     // Add to local sessions list
     const newSession: ChatSession = {
       sessionId: newSessionId,
       timestamp: new Date().toISOString()
     };
-    
+
     this.chatSessions.unshift(newSession);
     this.loadSession(newSessionId);
-    
+
     // Send a welcome message to initialize the session on the server
     const headers = this.getAuthHeaders();
-    this.http.post<{role: string, content: string}>(
+    this.http.post<{ role: string, content: string }>(
       `${this.apiBaseUrl}/chat/message?sessionId=${newSessionId}`,
       { question: 'init_session' },
       { headers: headers }
@@ -439,13 +439,13 @@ export class Chatbot implements OnInit {
       }
     });
   }
-  
+
   refreshCurrentSession() {
     if (this.currentSessionId) {
       this.loadSession(this.currentSessionId);
     }
   }
-  
+
   confirmClearSession() {
     this.confirmationService.confirm({
       message: 'Are you sure you want to clear this chat session?',
@@ -455,23 +455,23 @@ export class Chatbot implements OnInit {
       }
     });
   }
-  
+
   sendMessage() {
     if (!this.currentSessionId) {
       this.createNewSession();
       return;
     }
-    
+
     if ((this.newMessage && this.newMessage.trim()) || this.selectedImage) {
       // Add user message
       this.addUserMessage(this.newMessage, this.selectedImage);
-      
+
       const userMessage = this.newMessage;
       this.newMessage = '';
-      
+
       // Show typing indicator
       this.isTyping = true;
-      
+
       // Call API with text and/or image
       this.callChatApi(userMessage, this.selectedFile)
         .subscribe({
@@ -483,7 +483,7 @@ export class Chatbot implements OnInit {
               this.addBotMessage('Sorry, I couldn\'t process your request. Please try again.');
             }
             this.scrollToBottom();
-            
+
             // Update the session list with the latest message
             this.updateSessionLastMessage(userMessage);
           },
@@ -499,48 +499,48 @@ export class Chatbot implements OnInit {
             });
           }
         });
-        
+
       // Clear the selected image after sending
       this.clearSelectedImage();
     }
   }
-  
+
   updateSessionLastMessage(message: string) {
     const sessionIndex = this.chatSessions.findIndex(s => s.sessionId === this.currentSessionId);
     if (sessionIndex !== -1) {
       // Update the last message and timestamp
       this.chatSessions[sessionIndex].lastMessage = message;
       this.chatSessions[sessionIndex].timestamp = new Date().toISOString();
-      
+
       // Move the session to the top of the list
       const updatedSession = this.chatSessions.splice(sessionIndex, 1)[0];
       this.chatSessions.unshift(updatedSession);
     }
   }
-  
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       this.selectedFile = file;
-      
+
       // Convert to base64 for preview
       const reader = new FileReader();
       reader.onload = () => {
         this.selectedImage = reader.result as string;
       };
       reader.readAsDataURL(file);
-      
+
       // Reset the input so the same file can be selected again
       input.value = '';
     }
   }
-  
+
   clearSelectedImage() {
     this.selectedImage = null;
     this.selectedFile = null;
   }
-  
+
   focusMessageInput() {
     setTimeout(() => {
       const inputElement = document.querySelector('input[type="text"]') as HTMLInputElement;
@@ -549,28 +549,32 @@ export class Chatbot implements OnInit {
       }
     }, 100);
   }
-  
+
   private callChatApi(message: string, image: File | null) {
     const formData = new FormData();
     formData.append('question', message || 'Analyze this image');
-    
+
     if (image) {
       formData.append('image', image);
     }
-    
+
     const token = this.getAuthToken();
-    const headers = new HttpHeaders();
+    let options = {};
     if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
+      options = {
+        headers: new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        })
+      };
     }
-    
-    return this.http.post<{role: string, content: string}>(
-      `${this.apiBaseUrl}/chat/message?sessionId=${this.currentSessionId}`, 
+
+    return this.http.post<{ role: string, content: string }>(
+      `${this.apiBaseUrl}/chat/message?sessionId=${this.currentSessionId}`,
       formData,
-      { headers: headers }
+      options
     );
   }
-  
+
   private addUserMessage(text: string, image: string | null = null) {
     this.messages.push({
       sender: 'user',
@@ -578,22 +582,22 @@ export class Chatbot implements OnInit {
       timestamp: new Date(),
       image: image || undefined
     });
-    
+
     // Scroll to bottom after adding message
     this.scrollToBottom();
   }
-  
+
   private addBotMessage(text: string) {
     this.messages.push({
       sender: 'bot',
       text: text,
       timestamp: new Date()
     });
-    
+
     // Scroll to bottom after adding message
     this.scrollToBottom();
   }
-  
+
   private scrollToBottom() {
     setTimeout(() => {
       const chatContainer = document.querySelector('.overflow-y-auto');
@@ -602,22 +606,22 @@ export class Chatbot implements OnInit {
       }
     }, 100);
   }
-  
+
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();
-    
+
     // If the date is today, just show the time
     if (date.toDateString() === now.toDateString()) {
-      return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
-    
+
     // If the date is this year, show the month and day
     if (date.getFullYear() === now.getFullYear()) {
-      return date.toLocaleDateString([], {month: 'short', day: 'numeric'});
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
     }
-    
+
     // Otherwise show the full date
-    return date.toLocaleDateString([], {year: 'numeric', month: 'short', day: 'numeric'});
+    return date.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
   }
 }
