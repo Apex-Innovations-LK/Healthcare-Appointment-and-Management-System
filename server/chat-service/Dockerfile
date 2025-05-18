@@ -1,31 +1,27 @@
-
-FROM eclipse-temurin:17-jdk-alpine
+# 1. Build Stage
+FROM maven:3.9.4-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-COPY target/chat-service-1.0.0.jar app.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
-# ---- Stage 1: Build the app ----
-FROM maven:3.9-eclipse-temurin-21 AS builder
-WORKDIR /app
-
-# Copy only necessary files first (for layer caching)
 COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
 COPY src ./src
 
-# Build the JAR
 RUN mvn clean package -DskipTests
 
-# ---- Stage 2: Run the app ----
-FROM eclipse-temurin:21
-WORKDIR /app
+# 2. Runtime Stage
+FROM eclipse-temurin:21-jdk-jammy AS runtime
 
-# Copy the JAR from the builder stage
-COPY --from=builder /app/target/chat-service-1.0.0.jar app.jar
+ENV APP_HOME=/opt/chat-service
+WORKDIR $APP_HOME
 
-# Run the Spring Boot app
-CMD ["java", "-jar", "app.jar"]
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8083
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
+
 

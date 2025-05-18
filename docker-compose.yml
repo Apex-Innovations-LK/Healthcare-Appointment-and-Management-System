@@ -86,6 +86,16 @@ services:
     networks:
       - healthcare-network
 
+  chat-history-service:
+    build:
+      context: ./server/chat-service
+      dockerfile: Dockerfile
+    container_name: chat-history-service
+    ports:
+      - "8091:8091"
+    networks:
+      - healthcare-network
+
   # # Apache Zookeeper (for Kafka)
   # zookeeper:
   #   image: bitnami/zookeeper:3.8
