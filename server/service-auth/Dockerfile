@@ -1,30 +1,18 @@
-# ---------- Build Stage ----------
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+# Use a base image with Java 21
+#FROM maven:3.9.6-eclipse-temurin-21
+FROM amazoncorretto:21-alpine-jdk
 
-WORKDIR /build
-
-# Cache dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
-# Copy source and build
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-# ---------- Run Stage ----------
-FROM eclipse-temurin:21-jdk-jammy AS runtime
-
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy built jar
-COPY --from=build /build/target/*.jar app.jar
+# Copy the JAR file into the container
+COPY target/HealthCare-0.0.1-SNAPSHOT.jar /app/app.jar
 
-# Set runtime environment variables
-ENV DB_URL=jdbc:postgresql://db.sbihxmjllrogpwipwrbq.supabase.co:5432/postgres \
-    SPRING_PROFILES_ACTIVE=prod
+# Copy the .env file into the container
+COPY /docker/.env /app/.env
 
-# Expose app port
+# Expose the port that your Spring Boot application runs on (default is 8080, but change if needed)
 EXPOSE 8081
 
-# Run application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Command to run the JAR file.  We don't need to specify the .env here, as the app loads it.
+CMD ["java", "-jar", "app.jar"]
