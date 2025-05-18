@@ -3,6 +3,10 @@
 set -e  # Exit immediately if any command fails
 cd "$(dirname "$0")"  # Ensure we're in the blockchain-platform directory
 
+find . -type f -name "*.sh" -exec chmod +x {} \;
+chmod +x fabric-samples/bin/*
+export PATH=$PATH:./fabric-samples/bin
+
 
 echo "🔨 Building Spring Boot service..."
 cd blockchain-service
