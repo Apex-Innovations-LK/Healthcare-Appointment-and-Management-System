@@ -23,7 +23,13 @@ A fully integrated and semi-automated blockchain-based healthcare records platfo
 - Maven (or use the included `mvnw`)
 - Hyperledger Fabric binaries (already inside `fabric-samples/`)
 - (Optional) IPFS service running from the related `ipfs-service` directory
+- jq
 
+    ```bash
+    sudo apt install jq
+
+    ```
+   
 ---
 
 ### 1. Clone the repository and enter the platform
