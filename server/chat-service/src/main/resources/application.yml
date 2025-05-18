@@ -6,7 +6,17 @@ spring:
     allow-bean-definition-overriding: true
   application:
     name: chat-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        acks: all
+        retries: 3
 
 logging:
   level:
     root: INFO
+    com.healthcare.chat: DEBUG
+    org.springframework.kafka: INFO
