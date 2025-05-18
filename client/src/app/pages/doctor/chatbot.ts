@@ -10,7 +10,7 @@ import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { CardModule } from 'primeng/card';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ToastModule } from 'primeng/toast';
 import { SidebarModule } from 'primeng/sidebar';
@@ -297,8 +297,8 @@ export class Chatbot implements OnInit {
   // Session management
   chatSessions: ChatSession[] = [];
   currentSessionId: string = '';
-  readonly apiBaseUrl = 'http://localhost:8080/api/chat';
-  readonly historyBaseUrl = 'http://localhost:8080/api/chat-history';
+  readonly apiBaseUrl = 'http://localhost:8080/api';
+  readonly historyBaseUrl = 'http://localhost:8080/api';
   readonly userId = 'guest';
   
   constructor(
@@ -306,6 +306,26 @@ export class Chatbot implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {}
+
+    // Get the auth token from localStorage
+  private getAuthToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.getAuthToken();
+    if (!token) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Authentication Error',
+        detail: 'You are not logged in. Please log in again.'
+      });
+      return new HttpHeaders();
+    }
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
   
   ngOnInit() {
     // Load available chat sessions
@@ -313,7 +333,10 @@ export class Chatbot implements OnInit {
   }
   
   loadChatSessions() {
-    this.http.get<any[]>(`${this.historyBaseUrl}/sessions/${this.userId}`).subscribe({
+    const headers = this.getAuthHeaders();
+    this.http.get<any[]>(`${this.historyBaseUrl}/chat-history/sessions/${this.userId}`, { 
+      headers: headers 
+    }).subscribe({
       next: (data) => {
         this.chatSessions = data.map(session => ({
           sessionId: session[0],
@@ -353,7 +376,10 @@ export class Chatbot implements OnInit {
     this.messages = [];
     
     // Load chat history for the selected session
-    this.http.get<ApiChatMessage[]>(`${this.historyBaseUrl}/session/${sessionId}`).subscribe({
+    const headers = this.getAuthHeaders();
+    this.http.get<ApiChatMessage[]>(`${this.historyBaseUrl}/chat-history/session/${sessionId}`, { 
+      headers: headers
+    }).subscribe({
       next: (data) => {
         this.messages = data.map(msg => ({
           sender: msg.sender === 'user' ? 'user' : 'bot',
@@ -396,9 +422,11 @@ export class Chatbot implements OnInit {
     this.loadSession(newSessionId);
     
     // Send a welcome message to initialize the session on the server
+    const headers = this.getAuthHeaders();
     this.http.post<{role: string, content: string}>(
-      `${this.apiBaseUrl}/message?sessionId=${newSessionId}`,
-      { question: 'init_session' }
+      `${this.apiBaseUrl}/chat/message?sessionId=${newSessionId}`,
+      { question: 'init_session' },
+      { headers: headers }
     ).subscribe({
       next: (response) => {
         if (response && response.content) {
@@ -530,9 +558,16 @@ export class Chatbot implements OnInit {
       formData.append('image', image);
     }
     
+    const token = this.getAuthToken();
+    const headers = new HttpHeaders();
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    
     return this.http.post<{role: string, content: string}>(
-      `${this.apiBaseUrl}/message?sessionId=${this.currentSessionId}`, 
-      formData
+      `${this.apiBaseUrl}/chat/message?sessionId=${this.currentSessionId}`, 
+      formData,
+      { headers: headers }
     );
   }
   
