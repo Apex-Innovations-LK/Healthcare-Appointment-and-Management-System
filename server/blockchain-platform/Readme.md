@@ -45,6 +45,7 @@ cd Healthcare-Appointment-and-Management-System/server/blockchain-platform
 ### 2. Start the Platform
 
 ```bash
+chmod +x ./start_blockchain_service.sh
 ./start_blockchain_service.sh
 
 ```
