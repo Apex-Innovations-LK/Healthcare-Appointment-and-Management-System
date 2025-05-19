@@ -1,0 +1,108 @@
+services:
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: yes
+    networks:
+      - backend-network
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092 # Change this
+      ALLOW_PLAINTEXT_LISTENER: yes
+    depends_on:
+      - zookeeper
+    networks:
+      - backend-network
+
+  api-gateway:
+    image: api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - appointment-service
+      - scheduler-service
+      - auth-service
+      - doctor-service
+    restart: always
+    networks:
+      - backend-network
+
+  appointment-service:
+    image: appointment-microservice
+    container_name: appointment-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - kafka
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.dexlhxblzzhcfxqtleii
+      - DATABASE_PASSWORD=qwgfyqyg979
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    restart: always
+    networks:
+      - backend-network
+
+  scheduler-service:
+    image: scheduler-microservice
+    container_name: scheduler-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - kafka
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.jreaxqbfwvelfqfrftvr
+      - DATABASE_PASSWORD=gwkf747234bfk
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    restart: always
+    networks:
+      - backend-network
+
+  auth-service:
+    image: auth-microservice
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - kafka
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.cxttvjpbejlbnwecnjcf
+      - DATABASE_PASSWORD=98214578tskl
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    restart: always
+    networks:
+      - backend-network
+
+  doctor-service:
+    image: doctor-microservice
+    container_name: doctor-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - kafka
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.qesabwhgqqmllzxxgcot
+      - DATABASE_PASSWORD=87uyh632389bsd
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    restart: always
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge
