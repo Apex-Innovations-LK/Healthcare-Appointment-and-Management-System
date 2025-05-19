@@ -58,9 +58,9 @@ export class CalendarViewComponent {
 
     ngOnInit() {
         if (this.type === 'schedule') {
-            this.generateNextWeek();
+            this.generateCurrentWeek();
         } else if (this.type === 'plan') {
-            this.generateNextWeek();
+            this.generateCurrentWeek();
         }
     }
 
@@ -130,21 +130,26 @@ export class CalendarViewComponent {
     submitAddForm() {
         if (this.sessionForm.valid) {
             const sessionData = this.sessionForm.value;
-
+    
             const sessionId = uuid();
             const userDetails = this.authStateService.getUserDetails();
-            const doctorId = userDetails ? userDetails.id : '';
-            //const doctorId = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
+    
+            if (!userDetails || !userDetails.id) {
+                this.notificationService.showError('Failed to retrieve doctor details. Please log in again.', 'Error');
+                return; // Exit the function if doctorId is invalid
+            }
+    
+            const doctorId = userDetails.id;
             const date = this.weekDates[this.addModalData.dateId];
             const startTime = new Date(date);
             const endTime = new Date(date);
-
+    
             const [startHour, startMinute] = sessionData.startTime.split(':').map(Number);
             const [endHour, endMinute] = sessionData.endTime.split(':').map(Number);
-
+    
             startTime.setHours(startHour, startMinute, 0, 0);
             endTime.setHours(endHour, endMinute, 0, 0);
-
+    
             const availability: DoctorAvailability = {
                 session_id: sessionId,
                 doctor_id: doctorId,
@@ -152,9 +157,9 @@ export class CalendarViewComponent {
                 to: endTime.toISOString(),
                 number_of_patients: sessionData.numPatients
             };
-
+    
             console.log('Availability:', availability);
-
+    
             this.doctorService.addAvailability(availability).subscribe({
                 next: (response) => {
                     console.log('Availability added successfully', response);
@@ -165,8 +170,7 @@ export class CalendarViewComponent {
                         numPatients: 1
                     });
                     this.refreshColIndex = this.addModalData.dateId;
-
-                    // Optional: Reset the trigger if you want to allow retriggering the same action
+    
                     setTimeout(() => (this.refreshColIndex = 10), 0);
                 },
                 error: (error) => {
