@@ -81,8 +81,8 @@ public class DoctorSessionServiceImpl implements DoctorSessionService {
     public List<DoctorAvailabilityDto> getSessions(ScheduleSlotSearchRequest request) {
         List<DoctorAvailability> slots = doctorSessionRepository.findByDoctorIdAndDateInSessions(request.getDoctorId(),request.getDate());
         return slots.stream()
-                .map(slot -> new DoctorAvailabilityDto(slot.getSession_id(), slot.getDoctor_id(), slot.getTo(),
-                        slot.getFrom(), slot.getNumber_of_patients()))
+                .map(slot -> new DoctorAvailabilityDto(slot.getSession_id(), slot.getDoctor_id(), slot.getFrom(), slot.getTo(),
+                        slot.getNumber_of_patients()))
                 .collect(Collectors.toList());
     }
     
