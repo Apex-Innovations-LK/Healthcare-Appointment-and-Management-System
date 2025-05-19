@@ -203,7 +203,7 @@ services:
 
   doctor-service:
     image: doctor-microservice
-    container_name: doctor-service
+    container_name: doctors-service
     ports:
       - "8086:8086"
     depends_on:
