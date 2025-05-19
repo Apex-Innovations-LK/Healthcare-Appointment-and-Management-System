@@ -5,8 +5,10 @@ import com.team07.blockchain_service.services.blockchain.BlockchainService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/api/blockchain") // Base path for API versioning and clarity
+@CrossOrigin(origins = "*") // Allow all origins for CORS
 public class BlockchainController {
 
     private final BlockchainService blockchainService;
