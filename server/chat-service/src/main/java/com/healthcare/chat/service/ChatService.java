@@ -30,6 +30,15 @@ public class ChatService {
                 .build();
     }
 
+    private String buildPromptFromMessages(ChatSession session) {
+        StringBuilder sb = new StringBuilder();
+        for (ChatMessage msg : session.getMessages()) {
+            sb.append(msg.getRole()).append(": ").append(msg.getContent()).append("\n");
+        }
+        return sb.toString();
+    }
+
+
     public ChatMessage sendMessage(String sessionId, String userID, String userMessage, MultipartFile imageFile) {
         ChatSession session = sessionMap.computeIfAbsent(sessionId, ChatSession::new);
 
@@ -48,8 +57,14 @@ public class ChatService {
                     .subList(session.getMessages().size() - 20, session.getMessages().size()));
         }
 
+
+
+        //System.out.print(session.getMessages());
+
         // Send image to Flask API only, not Kafka
-        String aiResponse = callAIModel(userMessage, imageFile);
+        String promptWithContext = buildPromptFromMessages(session);
+        //String aiResponse = callAIModel(userMessage, imageFile);
+        String aiResponse = callAIModel(promptWithContext, imageFile);
         ChatMessage assistantReply = new ChatMessage("assistant", aiResponse);
         session.getMessages().add(assistantReply);
         kafkaProducer.sendChatMessage(sessionId,userID, "assistant", assistantReply); // Send to Kafka
