@@ -69,7 +69,7 @@ export class DoctorService {
   }
 
   getPatientGeneralInfo(patient_id: string) {
-    const apiUrl = "http://localhost:8080/api/auth/fetch-userinfo";
+    const apiUrl = "http://localhost:8080/api/auth/fetch-user-info";
     return this.httpClient.post<PatientGeneralInfo>(apiUrl, patient_id);
   }
 }

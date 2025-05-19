@@ -54,7 +54,7 @@ public class UserController {
         return userService.fetchAllDoctors();
     }
 
-    @PostMapping("/fetch-userInfo")
+    @PostMapping("/fetch-user-info")
     public UserDetailsDto fetchUserInfo(@RequestBody String id) {
         String cleanId = id.replace("\"", "").trim();
         System.out.println("id: " + cleanId);
