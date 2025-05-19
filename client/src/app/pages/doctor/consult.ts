@@ -13,6 +13,7 @@ import { DoctorService } from '../../service/doctor.service';
 import { Router } from '@angular/router';
 import { DoctorSession, SessionSlot } from '../../models/doctor';
 import { AuthStateService } from '../../service/auth-state.service';
+import { NotificationService } from '../../service/notification.service';
 
 @Component({
     selector: 'app-consult',
@@ -29,7 +30,7 @@ import { AuthStateService } from '../../service/auth-state.service';
                             </div>
                             <div class="mb-3 gap-5 flex flex-1 flex-col">
                                 <label for="session">Session:</label>
-                                <p-dropdown class="ml-5" id="session" [options]="sessions" [(ngModel)]="selectedSessionID" (ngModelChange)="onSessionChange($event)" optionLabel="name" optionValue="code" placeholder="Select a Session"></p-dropdown>
+                                <p-dropdown class="ml-5" id="session" [options]="sessionsList" [(ngModel)]="selectedSessionID" (ngModelChange)="onSessionChange($event)" optionLabel="name" optionValue="code" placeholder="Select a Session" [disabled]="!selectedDate"></p-dropdown>
                             </div>
                             <!-- <div class="mb-3 gap-5 flex flex-1 flex-col">
                                 <label for="session">Slot:</label>
@@ -40,8 +41,8 @@ import { AuthStateService } from '../../service/auth-state.service';
                         </div>
                         <div class="flex justify-between gap-4 mt-4">
                             <button pButton class="w-[100px]" type="button" icon="pi pi-arrow-left" label="Previous" (click)="prevSlot()" [disabled]="currentPatientIndex <= 0"></button>
-                            <button pButton class="" type="button" icon="pi pi-phone" label="Start Teleconsultation" (click)="goToTelehealth()" [disabled]="isVirtual"></button>
-                            <button pButton class="w-[100px]" type="button" icon="pi pi-arrow-right" label="Next" (click)="nextSlot()" iconPos="right" [disabled]="currentPatientIndex >= slots.length"></button>
+                            <button pButton class="" type="button" icon="pi pi-phone" label="Start Teleconsultation" (click)="goToTelehealth()" [disabled]="!isVirtual"></button>
+                            <button pButton class="w-[100px]" type="button" icon="pi pi-arrow-right" label="Next" (click)="nextSlot()" iconPos="right" [disabled]="currentPatientIndex >= slots.length-1"></button>
                         </div>
                     </ng-template>
                 </p-card>
@@ -50,6 +51,17 @@ import { AuthStateService } from '../../service/auth-state.service';
 
         <div class="card w-[96%] px-5  drop-shadow-md border-slate-200 border-2 border-solid rounded-lg mb-8">
             <p class="w-full text-center text-2xl font-semibold mb-8">Patient</p>
+            
+            <!-- Overlay -->
+    <div *ngIf="(!selectedDate) || (!selectedSessionID) || slotIsRejected || slotIsNotBooked" class="overlay">
+        <div class="overlay-content">
+            <p *ngIf="slotIsRejected">This slot has been rejected by you.</p>
+            <p *ngIf="slotIsNotBooked">This slot is not booked by any patient.</p>
+            <p *ngIf="!selectedDate || !selectedSessionID">Please select respectively a date and a session to view deatils. Then you can move among slots of the selected session using next and previous buttons.</p>
+
+        </div>
+    </div>
+            
             <p-splitter [style]="{ height: '60vh' }" [panelSizes]="[30, 40, 30]" [minSizes]="[10, 10, 10]" styleClass="mb-8">
                 <ng-template #panel class="overflow-y-auto p-0">
                     <app-patient-info class="w-full" [patientInfo]="patientGeneralInfo"></app-patient-info>
@@ -63,7 +75,30 @@ import { AuthStateService } from '../../service/auth-state.service';
             </p-splitter>
         </div>
     </div>`,
-    styles: []
+    styles: [`
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            border-radius: 0.5rem; /* Match the card's border radius */
+        }
+        
+        .overlay-content {
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.7); /* Slightly darker background for text */
+            border-radius: 0.5rem;
+        }
+    `]
 })
 export class Consult {
     receivedData?: any;
@@ -77,29 +112,35 @@ export class Consult {
     sessions: DoctorSession[] = [];
     slots: SessionSlot[] = [];
 
+    slotIsRejected = false;
+    slotIsNotBooked = false;
+
     sessionsList: any[] = [];
 
     currentPatientIndex = 0;
 
     patientGeneralInfo = {
-        patient_id: 'PAT-2342342',
-        name: 'John Doe',
-        dob: '1990-01-01',
-        sex: 'male',
-        phone: '1234567890'
+        patient_id: '',
+        name: '',
+        dob: '',
+        sex: '',
+        phone: ''
     };
 
     constructor(
         private doctorService: DoctorService,
         private router: Router,
-        private authStateService: AuthStateService
+        private authStateService: AuthStateService,
+        private notificationService: NotificationService
     ) {
         const navigation = this.router.getCurrentNavigation();
         this.receivedData = navigation?.extras.state?.['sessionData'] ?? null;
         if (this.receivedData) {
             this.selectedSession = this.receivedData;
             this.selectedDate = this.getStartOfDayTimestamp(new Date(this.selectedSession.from));
+            this.loadSessions();
             this.selectedSessionID = this.selectedSession.session_id;
+            this.loadSessionSlots();
         }
     }
 
@@ -116,8 +157,8 @@ export class Consult {
         return date;
     }
 
-    goToTelehealth(){
-        this.router.navigate(['/telehealth']);
+    goToTelehealth() {
+        this.router.navigate(['/doctor/telehealth']);
     }
 
     isNowBetweenTimes(startTime: string, endTime: string): boolean {
@@ -140,15 +181,25 @@ export class Consult {
 
     loadSessions(): void {
         const userDetails = this.authStateService.getUserDetails();
-        const doctor_id = userDetails ? userDetails.id : '';
+
+        if (!userDetails || !userDetails.id) {
+            this.notificationService.showError('Failed to retrieve doctor details. Please log in again.', 'Error');
+            return; // Exit the function if doctorId is invalid
+        }
+        const doctor_id = userDetails.id;
         //const doctor_id = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
+
         this.doctorService.getSessionsForDate(doctor_id, this.toLocalISOString(this.selectedDate ?? new Date())).subscribe({
             next: (response) => {
                 this.sessions = response;
-                this.sessionsList = this.sessions.map((session) => ({
-                    name: `${session.from}-${session.to}`,
-                    code: session.session_id
-                }));
+                this.sessionsList = this.sessions.map((session) => {
+                    const from = new Date(session.from).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+                    const to = new Date(session.to).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+                    return {
+                        name: `${from}-${to}`,
+                        code: session.session_id
+                    };
+                });
                 console.log(this.toLocalISOString(this.selectedDate ?? new Date()), this.sessions);
             },
             error: (error) => {
@@ -162,7 +213,7 @@ export class Consult {
             next: (response) => {
                 this.slots = response;
                 this.currentPatientIndex = 0;
-                console.log('Session slots for session ' + this.selectedSession.session_id + ': ', this.slots);
+                //console.log('Session slots for session ' + this.selectedSession.session_id + ': ', this.slots);
                 this.loadPatient();
             },
             error: (error) => {
@@ -184,30 +235,41 @@ export class Consult {
     }
 
     loadPatient() {
-        const slot_id = this.slots[this.currentPatientIndex].slot_id;
-        this.doctorService.getSlotDataBySlotId(slot_id).subscribe({
-            next: (response) => {
-                const patient_id = response.patient_id;
-                this.isVirtual = this.isNowBetweenTimes(this.selectedSession.from, this.selectedSession.to) && response.appoinment_type=='VIRTUAL';
-                // console.log(' for session ' + this.session.session_id + ': ', this.slots);
-                this.loadPatientData(patient_id);
-            },
-            error: (error) => {
-                console.error('Error fetching patient for slot - ' + slot_id + ': ', error);
-            }
-        });
+        const selectedSlot = this.slots[this.currentPatientIndex];
+        const slot_id = selectedSlot.slot_id;
+
+        if (selectedSlot.status === 'rejected') {
+            this.slotIsRejected = true;
+        } else if (selectedSlot.status === 'available') {
+            this.slotIsNotBooked = true;
+        } else {
+            this.slotIsRejected = false;
+            this.slotIsNotBooked = false;
+
+            this.doctorService.getSlotDataBySlotId(slot_id).subscribe({
+                next: (response) => {
+                    const patient_id = response.patient_id;
+                    this.isVirtual = this.isNowBetweenTimes(this.selectedSession.from, this.selectedSession.to) && response.appoinment_type == 'VIRTUAL';
+                    // console.log(' for session ' + this.session.session_id + ': ', this.slots);
+                    this.loadPatientData(patient_id);
+                },
+                error: (error) => {
+                    console.error('Error fetching patient for slot - ' + slot_id + ': ', error);
+                }
+            });
+        }
     }
 
     onDateChange(newDate: Date | null) {
-        console.log('Date changed:', this.selectedDate);
-        // this.loadSessions();
+        //console.log('Date changed:', this.selectedDate);
+        this.loadSessions();
     }
 
     onSessionChange(newSessionId: string | null) {
         let filteredSessions = this.sessions.filter((session) => session.session_id === newSessionId);
         if (filteredSessions.length > 0) {
             this.selectedSession = filteredSessions[0];
-            // this.loadSessionSlots();
+            this.loadSessionSlots();
         }
         // console.log('Session changed:', newSessionId);
     }

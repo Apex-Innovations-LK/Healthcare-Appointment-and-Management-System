@@ -141,6 +141,22 @@ services:
     networks:
       - healthcare-network
 
+  appointment-service:
+    image: appointment-microservice
+    container_name: appointment-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - broker
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.dexlhxblzzhcfxqtleii
+      - DATABASE_PASSWORD=qwgfyqyg979
+      - KAFKA_BOOTSTRAP_SERVERS=broker:29092
+    restart: always
+    networks:
+      - healthcare-network
+
   auth-service:
     build:
       context: ./server/service-auth
@@ -169,27 +185,37 @@ services:
     networks:
       - healthcare-network
 
-  doctor-app:
-    build:
-      context: ./server/Microservice-Doctor/springboot-kafka-project
-      dockerfile: Dockerfile
-    container_name: doctor-service
+  schedule-service:
+    image: scheduler-microservice
+    container_name: schedule-service
+    ports:
+      - "8089:8089"
     depends_on:
       - broker
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.jreaxqbfwvelfqfrftvr
+      - DATABASE_PASSWORD=gwkf747234bfk
+      - KAFKA_BOOTSTRAP_SERVERS=broker:29092
+    restart: always
+    networks:
+      - healthcare-network
+
+  doctor-service:
+    image: doctor-microservice
+    container_name: doctor-service
     ports:
       - "8086:8086"
-    environment:
-      # Kafka bootstrap for internal network
-      SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS: broker:29092
-      SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: broker:29092
-
-      # Supabase DB config
-      SPRING_DATASOURCE_URL: jdbc:postgresql://aws-0-ap-south-1.pooler.supabase.com:5432/postgres
-      SPRING_DATASOURCE_USERNAME: postgres.sbihxmjllrogpwipwrbq
-      SPRING_DATASOURCE_PASSWORD: fJFCrWYnEPLNpVoE
-
-      # Optional - override default schema
-      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: doctorService
+    depends_on:
+      - broker
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.qesabwhgqqmllzxxgcot
+      - DATABASE_PASSWORD=87uyh632389bsd
+      - KAFKA_BOOTSTRAP_SERVERS=broker:29092
+    restart: always
+    networks:
+      - healthcare-network
 
 volumes:
   ipfs_data:

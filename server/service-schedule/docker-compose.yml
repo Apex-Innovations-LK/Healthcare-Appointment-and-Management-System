@@ -1,10 +1,9 @@
-version: '3.8'
 services:
   app:
-    image: doctor-microservice
-    container_name: doctor-app
+    image: scheduler-microservice
+    container_name: scheduler-service
     ports:
-      - "8081:8080"
+      - "8082:8082"
     depends_on:
       - kafka
     environment: # Make sure these match your .env file

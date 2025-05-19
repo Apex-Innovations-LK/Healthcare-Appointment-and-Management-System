@@ -297,7 +297,7 @@ export class Chatbot implements OnInit {
   // Session management
   chatSessions: ChatSession[] = [];
   currentSessionId: string = '';
-  readonly apiBaseUrl = 'http://localhost:8080/api';
+  readonly apiBaseUrl = 'http://localhost:8083/api';
   readonly historyBaseUrl = 'http://localhost:8080/api';
   readonly userId = 'guest';
 

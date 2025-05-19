@@ -20,7 +20,13 @@ import { Router } from '@angular/router';
             <div class="font-semibold text-xl mb-4">Health Records</div>
 
             <div class="p-4 h-[50vh] overflow-y-auto">
-                <p-accordion [multiple]="true">
+            
+            <!-- Show message if hrs array is empty -->
+            <p *ngIf="hrs.length === 0" class="text-center text-gray-500">
+                There are no health records relevant to this patient.
+            </p>
+            
+            <p-accordion [multiple]="true">
                     <p-accordionTab *ngFor="let record of hrs" [header]="'Record: ' + record.record_id + ' (' + (record.date_of_service | date: 'medium') + ')'">
                         <p-fieldset legend="Issued Doctor">
                             <p class="mb-2">{{ record.referring_doctor }}</p>
@@ -59,95 +65,14 @@ import { Router } from '@angular/router';
 export class HRViewComponent {
     @Input() patientInfo!: PatientGeneralInfo;
 
-    hrs: HealthRecord[] = [
-        {
-            record_id: 'HR-001',
-            patient_id: 'PAT-33810',
-            patient_name: 'Jesse Hatfield',
-            patient_dob: '1966-09-12',
-            date_of_service: '2025-03-17T22:33:43.643152+0000',
-            referring_doctor: 'DR-45691',
-            chief_complaint: ['Nausea', 'Headache'],
-            allergies: ['Milk', 'Other', 'Eggs'],
-            medications: ['Amlodipine', 'Metformin', 'Albuterol'],
-            problem_list: ['Cholesterol', 'Arthritis', 'Asthma'],
-            patient_sex: 'Female',
-            address: '9241 Austin Well',
-            city: 'Colombo',
-            state: 'Western',
-            zip: '00700',
-            patient_phone: '0784059631',
-            lbf_data: ['LBF101:5.3', 'LBF102:13.4', 'LBF103:123/85'],
-            his_data: ['HIS006', 'HIS009']
-        },
-        {
-            record_id: 'HR-002',
-            patient_id: 'PAT-56505',
-            patient_name: 'Elijah Sullivan',
-            patient_dob: '1993-10-19',
-            date_of_service: '2024-09-12T22:33:43.643152+0000',
-            referring_doctor: 'DR-49454',
-            chief_complaint: ['Nausea', 'Headache'],
-            allergies: ['Dust', 'Pollen', 'Eggs'],
-            medications: ['Other', 'Ibuprofen', 'Amoxicillin'],
-            problem_list: ['Depression', 'Obesity', 'Other'],
-            patient_sex: 'Female',
-            address: '0831 Scott Harbors',
-            city: 'Colombo',
-            state: 'Western',
-            zip: '00700',
-            patient_phone: '0793623852',
-            lbf_data: ['LBF101:6.1', 'LBF102:13.0', 'LBF103:113/83'],
-            his_data: ['HIS003', 'HIS008']
-        },
-        {
-            record_id: 'HR-003',
-            patient_id: 'PAT-40322',
-            patient_name: 'Diana Meza',
-            patient_dob: '1965-03-23',
-            date_of_service: '2024-12-13T22:33:43.644283+0000',
-            referring_doctor: 'DR-90813',
-            chief_complaint: ['Fever', 'Nausea'],
-            allergies: ['Soy', 'Shellfish', 'Latex'],
-            medications: ['Albuterol', 'Paracetamol', 'Lisinopril'],
-            problem_list: ['Hypertension', 'Other', 'Anxiety'],
-            patient_sex: 'Female',
-            address: '47070 Perkins Lock Apt. 489',
-            city: 'Colombo',
-            state: 'Western',
-            zip: '00700',
-            patient_phone: '0751609845',
-            lbf_data: ['LBF101:6.1', 'LBF102:12.0', 'LBF103:124/70'],
-            his_data: ['HIS008', 'HIS005']
-        },
-        {
-            record_id: 'HR-004',
-            patient_id: 'PAT-18022',
-            patient_name: 'Julie Gomez',
-            patient_dob: '1934-08-31',
-            date_of_service: '2024-05-04T22:33:43.644283+0000',
-            referring_doctor: 'DR-74905',
-            chief_complaint: ['Fatigue', 'Nausea'],
-            allergies: ['Soy', 'Shellfish', 'Milk'],
-            medications: ['Omeprazole', 'Amlodipine', 'Paracetamol'],
-            problem_list: ['Arthritis', 'Anxiety', 'Hypertension'],
-            patient_sex: 'Male',
-            address: '96981 Anthony Spurs',
-            city: 'Colombo',
-            state: 'Western',
-            zip: '00700',
-            patient_phone: '0762844922',
-            lbf_data: ['LBF101:4.3', 'LBF102:12.7', 'LBF103:100/89'],
-            his_data: ['HIS009', 'HIS007']
-        }
-    ]; // Fetched from API
+    hrs: HealthRecord[] = []; // Fetched from API
 
     @Input() refreshView!: boolean;
 
-   
+
 
     constructor(private doctorService: DoctorService) {
-        
+
     }
 
     loadHrs() {

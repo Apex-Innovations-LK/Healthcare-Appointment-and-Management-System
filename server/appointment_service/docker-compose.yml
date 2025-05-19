@@ -1,10 +1,10 @@
 version: '3.8'
 services:
   app:
-    image: doctor-microservice
-    container_name: doctor-app
+    image: appointment-microservice
+    container_name: appointment-app
     ports:
-      - "8081:8080"
+      - "8083:8083"
     depends_on:
       - kafka
     environment: # Make sure these match your .env file
