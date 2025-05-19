@@ -1,18 +1,23 @@
-# Use a base image with Java 21
-#FROM maven:3.9.6-eclipse-temurin-21
+# ---------- Build Stage ----------
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+
+WORKDIR /build
+# cache deps
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# compile & package
+COPY src ./src
+RUN mvn clean package -DskipTests -B
+
+# ---------- Run Stage ----------
 FROM amazoncorretto:21-alpine-jdk
 
-# Set the working directory in the container
 WORKDIR /app
+COPY --from=build /build/target/service-schedule-0.0.1-SNAPSHOT.jar app.jar
+COPY .env .env
+COPY entrypoint.sh entrypoint.sh
+RUN chmod +x entrypoint.sh
 
-# Copy the JAR file into the container
-COPY target/service-schedule-0.0.1-SNAPSHOT.jar /app/app.jar
-
-# Copy the .env file into the container
-COPY /docker/.env /app/.env
-
-# Expose the port that your Spring Boot application runs on (default is 8080, but change if needed)
 EXPOSE 8089
-
-# Command to run the JAR file.  We don't need to specify the .env here, as the app loads it.
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["./entrypoint.sh"]
