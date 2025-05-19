@@ -60,7 +60,7 @@ COPY target/springboot-kafka-project-0.0.1-SNAPSHOT.jar /app/app.jar
 COPY /docker/.env /app/.env
 
 # Expose the port that your Spring Boot application runs on (default is 8080, but change if needed)
-EXPOSE 8084
+EXPOSE 8086
 
 # Command to run the JAR file.  We don't need to specify the .env here, as the app loads it.
 CMD ["java", "-jar", "app.jar"]
