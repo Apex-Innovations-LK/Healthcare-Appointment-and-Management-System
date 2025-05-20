@@ -158,7 +158,7 @@ export class AddAppointmentComponent implements OnInit {
         private authService: AuthService,
         private authStateService: AuthStateService,
         private notificationService: NotificationService
-    ) {}
+    ) { }
 
     ngOnInit() {
         console.log('Token in localStorage:', localStorage.getItem('token'));
@@ -188,10 +188,11 @@ export class AddAppointmentComponent implements OnInit {
         this.isLoading = true;
         this.appointmentService.getAppointments().subscribe({
             next: (data: any) => {
-                console.log('slots', data);
+                // console.log('slots', data);
                 // Parse the appointment data from the backend format
                 this.allAppointments = this.parseAppointmentData(data);
                 this.isLoading = false;
+                console.log("All appointments are " + this.parseAppointmentData(data));
             },
             error: (err) => {
                 console.error('Failed to fetch appointments:', err);
@@ -231,6 +232,8 @@ export class AddAppointmentComponent implements OnInit {
                         from: item[2],
                         to: item[3]
                     });
+                } else if (typeof item == 'object') {
+                    appointments.push(item);
                 }
             });
         }
@@ -252,8 +255,24 @@ export class AddAppointmentComponent implements OnInit {
         this.selectedDoctor = doctor;
         this.selectedSlot = null;
 
+        const seen = new Set();
+
+        this.doctorAppointments = this.allAppointments.filter((appointment) => {
+            const isDoctorMatch = appointment.doctor_id === doctor.doctor_id;
+
+            if (!isDoctorMatch) return false;
+
+            const key = `${appointment.from}-${appointment.to}`;
+
+            if (seen.has(key)) {
+                return false;
+            }
+
+            seen.add(key);
+            return true;
+        });
         // Filter appointments for this doctor
-        this.doctorAppointments = this.allAppointments.filter((appointment) => appointment.doctor_id === doctor.doctor_id);
+        // this.doctorAppointments = this.allAppointments.filter((appointment) => appointment.doctor_id === doctor.doctor_id);
     }
 
     selectSlot(slot: AppointmentSlot) {
@@ -310,7 +329,7 @@ export class AddAppointmentComponent implements OnInit {
             }
         });
 
-        const notification : Notification = new Notification(
+        const notification: Notification = new Notification(
             this.authStateService.getUserDetails()?.email || '',
             'Appointment Confirmation',
             `Your appointment with Dr. ${this.selectedDoctor.first_name} ${this.selectedDoctor.last_name} has been booked for ${this.formatAppointmentDate(this.selectedSlot.from)} at ${this.formatAppointmentTime(this.selectedSlot.from)}.`
@@ -323,7 +342,7 @@ export class AddAppointmentComponent implements OnInit {
             error: (error) => {
                 console.error('Error sending notification:', error);
                 this.notificationService.showError('Failed to send notification. Please try again later.');
-             }
+            }
         })
 
         this.selectedSlot = null;
