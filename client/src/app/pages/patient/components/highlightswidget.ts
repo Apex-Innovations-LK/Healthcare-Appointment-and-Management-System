@@ -18,7 +18,7 @@ import { Component } from '@angular/core';
                     <div class="flex items-center justify-center bg-primary-100  self-center lg:self-end" style="width: 4.2rem; height: 4.2rem; border-radius: 10px">
                         <i class="pi pi-fw pi-calendar-plus !text-4xl text-primary"></i>
                     </div>
-                    <div class="leading-none text-surface-900 dark:text-surface-0 text-3xl font-normal">Book Appointments Easily</div>
+                    <div class="leading-none text-surface-900 dark:text-surface-0 text-3xl font-bold">Book Appointments Easily</div>
                     <span class="text-surface-700 dark:text-surface-100 text-2xl leading-normal ml-0 md:ml-2" style="max-width: 650px"> Choose your preferred doctor and time slot in seconds. No long queues or calls — just a few taps. </span>
                 </div>
             </div>
@@ -28,7 +28,7 @@ import { Component } from '@angular/core';
                     <div class="flex items-center justify-center bg-primary-100  self-center lg:self-start" style="width: 4.2rem; height: 4.2rem; border-radius: 10px">
                         <i class="pi pi-fw pi-clock !text-3xl text-primary"></i>
                     </div>
-                    <div class="leading-none text-surface-900 dark:text-surface-0 text-3xl font-normal">Track Appointments in Real-Time</div>
+                    <div class="leading-none text-surface-900 dark:text-surface-0 text-3xl font-bold">Track Appointments in Real-Time</div>
                     <span class="text-surface-700 dark:text-surface-100 text-2xl leading-normal mr-0 md:mr-2" style="max-width: 650px"> Get notified when your appointment is scheduled, rescheduled, or canceled. Stay informed, always. </span>
                 </div>
 
@@ -46,7 +46,7 @@ import { Component } from '@angular/core';
                     <div class="flex items-center justify-center bg-primary-100 self-center lg:self-end" style="width: 4.2rem; height: 4.2rem; border-radius: 10px">
                         <i class="pi pi-fw pi-user !text-4xl text-primary"></i>
                     </div>
-                    <div class="leading-none text-surface-900 dark:text-surface-0 text-3xl font-normal">Trusted Doctors, Transparent Profiles</div>
+                    <div class="leading-none text-surface-900 dark:text-surface-0 text-3xl font-bold">Trusted Doctors, Transparent Profiles</div>
                     <span class="text-surface-700 dark:text-surface-100 text-2xl leading-normal ml-0 md:ml-2" style="max-width: 650px"> View credentials, specialties, and availability before you book. Feel confident in every choice. </span>
                 </div>
             </div>

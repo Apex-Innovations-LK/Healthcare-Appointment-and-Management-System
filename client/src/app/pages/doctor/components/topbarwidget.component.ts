@@ -10,12 +10,26 @@ import { ToastModule } from 'primeng/toast';
 import { NotificationService } from '../../../service/notification.service';
 import { filter } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
     selector: 'doctor-topbar-widget',
-    providers: [MessageService],
-    imports: [CommonModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator, ToastModule],
-    template: `<a class="flex items-center" href="/doctor">
+    providers: [MessageService, ConfirmationService],
+    imports: [CommonModule, RouterModule, StyleClassModule, ButtonModule, RippleModule, AppFloatingConfigurator, ToastModule, ConfirmDialogModule],
+    template: `<p-confirmDialog 
+            [style]="{width: '450px'}" 
+            acceptLabel="Yes, Logout" 
+            rejectLabel="No, Stay" 
+            icon="pi pi-exclamation-triangle"
+            acceptIcon="pi pi-check"
+            rejectIcon="pi pi-times"
+            acceptButtonStyleClass="p-button-danger p-button-rounded"
+            rejectButtonStyleClass="p-button-secondary p-button-rounded"
+            [styleClass]="'custom-confirm-dialog'"
+        ></p-confirmDialog>
+
+        <a class="flex items-center" href="/doctor">
             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 mr-2">
                 <path
                     fill-rule="evenodd"
@@ -84,7 +98,7 @@ import { CommonModule } from '@angular/common';
 
             </ul>
             <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0">
-                <button pButton pRipple label="Logout" [rounded]="true" (click)="logout()"></button>
+                <button pButton pRipple label="Logout" [rounded]="true" (click)="confirmLogout()"></button>
                 <app-floating-configurator />
             </div>
         </div>
@@ -93,6 +107,130 @@ import { CommonModule } from '@angular/common';
             .active-tab {
                 color: var(--primary-color) !important;
                 border-bottom: 2px solid var(--primary-color);
+            }
+
+            /* Custom Confirmation Dialog Styles */
+            :host ::ng-deep .custom-confirm-dialog {
+                .p-dialog-header {
+                    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                    border-radius: 12px 12px 0 0;
+                    padding: 1.5rem;
+                    border-bottom: 2px solid rgba(0,0,0,0.1);
+
+                    .p-dialog-title {
+                        font-size: 1.5rem;
+                        font-weight: 600;
+                        color: #2c3e50;
+                    }
+
+                    .p-dialog-header-icon {
+                        color: #e74c3c;
+                        font-size: 1.2rem;
+                        transition: all 0.3s ease;
+
+                        &:hover {
+                            transform: scale(1.1);
+                            color: #c0392b;
+                        }
+                    }
+                }
+
+                .p-dialog-content {
+                    padding: 2rem;
+                    background: white;
+                    border-radius: 0 0 12px 12px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+                    .p-confirm-dialog-message {
+                        font-size: 1.1rem;
+                        color: #34495e;
+                        margin: 0;
+                        padding: 1rem;
+                        background: #f8f9fa;
+                        border-radius: 8px;
+                        border-left: 4px solid #e74c3c;
+                    }
+
+                    .p-confirm-dialog-icon {
+                        color: #e74c3c;
+                        font-size: 2rem;
+                        margin-right: 1rem;
+                        animation: pulse 2s infinite;
+                    }
+                }
+
+                .p-dialog-footer {
+                    padding: 1.5rem;
+                    background: #f8f9fa;
+                    border-top: 1px solid rgba(0,0,0,0.1);
+                    border-radius: 0 0 12px 12px;
+
+                    .p-button {
+                        padding: 0.75rem 1.5rem;
+                        font-weight: 600;
+                        transition: all 0.3s ease;
+
+                        &:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                        }
+
+                        &.p-button-danger {
+                            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+                            border: none;
+
+                            &:hover {
+                                background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+                            }
+                        }
+
+                        &.p-button-secondary {
+                            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+                            border: none;
+
+                            &:hover {
+                                background: linear-gradient(135deg, #7f8c8d 0%, #6c7a7d 100%);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.1);
+                }
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            /* Dark mode styles */
+            :host ::ng-deep .dark .custom-confirm-dialog {
+                .p-dialog-header {
+                    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+                    
+                    .p-dialog-title {
+                        color: #ecf0f1;
+                    }
+                }
+
+                .p-dialog-content {
+                    background: #2c3e50;
+
+                    .p-confirm-dialog-message {
+                        color: #ecf0f1;
+                        background: #34495e;
+                    }
+                }
+
+                .p-dialog-footer {
+                    background: #2c3e50;
+                    border-top: 1px solid rgba(255,255,255,0.1);
+                }
             }
         </style>`
 })
@@ -104,7 +242,8 @@ export class TopbarWidget implements OnInit {
         public router: Router,
         private authStateService: AuthStateService,
         private messageService: MessageService,
-        private notificationService: NotificationService
+        private notificationService: NotificationService,
+        private confirmationService: ConfirmationService
     ) {}
 
     ngOnInit() {
@@ -131,6 +270,22 @@ export class TopbarWidget implements OnInit {
     hasSpecificRoute(): boolean {
         const specificRoutes = ['/doctor/this-week', '/doctor/consult', '/doctor/next-week'];
         return specificRoutes.some((route) => this.isActiveRoute(route));
+    }
+
+    confirmLogout() {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to logout?',
+            header: 'Logout Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes, Logout',
+            rejectLabel: 'No, Stay',
+            accept: () => {
+                this.logout();
+            },
+            reject: () => {
+                // Do nothing if user cancels
+            }
+        });
     }
 
     logout() {
