@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DoctorAvailability, DoctorSession, ExtraSlotInfo, HealthRecord, PatientGeneralInfo, SessionSlot } from '../models/doctor';
+import { DoctorAvailability, DoctorSession, ExtraSlotInfo, HealthRecord, PatientGeneralInfo, SessionSlot, Slot } from '../models/doctor';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,7 +10,7 @@ export class DoctorService {
   private baseURL = 'http://localhost:8080/api/doctors';
   constructor(private httpClient: HttpClient) { }
 
-  getSessionsForDate(doctor_id:string, date: string) {
+  getSessionsForDate(doctor_id: string, date: string) {
     const body = {
       doctorId: doctor_id,
       date: date,
@@ -20,7 +20,7 @@ export class DoctorService {
     return this.httpClient.post<DoctorSession[]>(apiUrl, body);
   }
 
-  getAvailabilityForDate(doctor_id:string, date: string) {
+  getAvailabilityForDate(doctor_id: string, date: string) {
     const body = {
       doctorId: doctor_id,
       date: date,
@@ -30,7 +30,7 @@ export class DoctorService {
     return this.httpClient.post<DoctorAvailability[]>(apiUrl, body);
   }
 
-  deleteAvailability(availability:DoctorAvailability){
+  deleteAvailability(availability: DoctorAvailability) {
     const apiUrl = this.baseURL + '/deleteSession';
     return this.httpClient.request('delete', apiUrl, {
       body: availability,
@@ -38,22 +38,22 @@ export class DoctorService {
     });
   }
 
-  updateAvailability(availability:DoctorAvailability){
+  updateAvailability(availability: DoctorAvailability) {
     const apiUrl = this.baseURL + '/updateAvailability';
     return this.httpClient.put(apiUrl, availability);
   }
 
-  addAvailability(availability:DoctorAvailability){
+  addAvailability(availability: DoctorAvailability) {
     const apiUrl = this.baseURL + '/addAvailability';
     return this.httpClient.post(apiUrl, availability);
   }
 
-  getSlotsForSession(session_id:string) {
+  getSlotsForSession(session_id: string) {
     const apiUrl = this.baseURL + '/getScheduleSlotsBySessionId';
-    return this.httpClient.post<SessionSlot[]>(apiUrl, { sessionId: session_id });
+    return this.httpClient.post<Slot[]>(apiUrl, { sessionId: session_id });
   }
 
-  uploadHr(hr: HealthRecord){
+  uploadHr(hr: HealthRecord) {
     const apiUrl = "http://127.0.0.1:8086/upload";
     return this.httpClient.post(apiUrl, hr, { responseType: 'text' });
   }
@@ -63,13 +63,16 @@ export class DoctorService {
     return this.httpClient.post<HealthRecord[]>(apiUrl, { patientId: patient_id });
   }
 
-  getSlotDataBySlotId(slot_id: string){
+  getSlotDataBySlotId(slot_id: string) {
     const apiUrl = "http://localhost:8080/api/appointment/get-patient";
-    return this.httpClient.post<ExtraSlotInfo>(apiUrl, slot_id);
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    return this.httpClient.post<ExtraSlotInfo>(apiUrl, JSON.stringify(slot_id), { headers });
   }
 
   getPatientGeneralInfo(patient_id: string) {
-    const apiUrl = "http://localhost:8080/api/auth/fetch-userinfo";
-    return this.httpClient.post<PatientGeneralInfo>(apiUrl, patient_id);
+    const apiUrl = "http://localhost:8080/api/auth/fetch-userInfo";
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.httpClient.post<PatientGeneralInfo>(apiUrl, JSON.stringify(patient_id), { headers });
   }
 }

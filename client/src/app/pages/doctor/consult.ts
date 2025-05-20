@@ -11,7 +11,7 @@ import { HRViewComponent } from './components/hr-view.component';
 import { ButtonModule } from 'primeng/button';
 import { DoctorService } from '../../service/doctor.service';
 import { Router } from '@angular/router';
-import { DoctorSession, SessionSlot } from '../../models/doctor';
+import { DoctorSession, Slot } from '../../models/doctor';
 import { AuthStateService } from '../../service/auth-state.service';
 import { NotificationService } from '../../service/notification.service';
 
@@ -110,7 +110,7 @@ export class Consult {
 
     isVirtual = false;
     sessions: DoctorSession[] = [];
-    slots: SessionSlot[] = [];
+    slots: Slot[] = [];
 
     slotIsRejected = false;
     slotIsNotBooked = false;
@@ -120,11 +120,12 @@ export class Consult {
     currentPatientIndex = 0;
 
     patientGeneralInfo = {
-        patient_id: '',
-        name: '',
-        dob: '',
-        sex: '',
-        phone: ''
+        id: '',
+        first_name: '',
+        last_name: '',
+        date_of_birth: '',
+        gender: '',
+        phone_number: ''
     };
 
     constructor(
@@ -213,7 +214,7 @@ export class Consult {
             next: (response) => {
                 this.slots = response;
                 this.currentPatientIndex = 0;
-                //console.log('Session slots for session ' + this.selectedSession.session_id + ': ', this.slots);
+                console.log('Session slots for session ' + this.selectedSession.session_id + ': ', this.slots);
                 this.loadPatient();
             },
             error: (error) => {
@@ -226,17 +227,17 @@ export class Consult {
         this.doctorService.getPatientGeneralInfo(patient_id).subscribe({
             next: (response) => {
                 this.patientGeneralInfo = response;
-                console.log('Successfully fetched patient info relevant to slot');
+                console.log('Successfully fetched patient info relevant to slot ',response);
             },
             error: (error) => {
-                console.error('Error fetching patient info relevant to slot' + this.slots[this.currentPatientIndex].slot_id + ': ', error);
+                console.error('Error fetching patient info relevant to slot' + this.slots[this.currentPatientIndex].slotId + ': ', error);
             }
         });
     }
 
     loadPatient() {
         const selectedSlot = this.slots[this.currentPatientIndex];
-        const slot_id = selectedSlot.slot_id;
+        const slot_id = selectedSlot.slotId;
 
         if (selectedSlot.status === 'rejected') {
             this.slotIsRejected = true;
@@ -245,9 +246,11 @@ export class Consult {
         } else {
             this.slotIsRejected = false;
             this.slotIsNotBooked = false;
+            console.log('selected slot id'+selectedSlot+ "index "+this.currentPatientIndex+this.slots);
 
             this.doctorService.getSlotDataBySlotId(slot_id).subscribe({
                 next: (response) => {
+                    console.log("Slot extra info : ", response);
                     const patient_id = response.patient_id;
                     this.isVirtual = this.isNowBetweenTimes(this.selectedSession.from, this.selectedSession.to) && response.appoinment_type == 'VIRTUAL';
                     // console.log(' for session ' + this.session.session_id + ': ', this.slots);
@@ -283,6 +286,7 @@ export class Consult {
         if (this.currentPatientIndex < this.slots.length - 1) {
             this.currentPatientIndex++;
             this.loadPatient();
+            // console.log('selected slot '+this.selected)
         }
     }
 
