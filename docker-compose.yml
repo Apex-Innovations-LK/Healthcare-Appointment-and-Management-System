@@ -1,0 +1,226 @@
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    networks:
+      - healthcare-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - healthcare-network
+
+  broker:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: broker
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - healthcare-network
+
+  ipfs:
+    image: ipfs/go-ipfs:latest
+    container_name: ipfs-node
+    ports:
+      - "4001:4001"
+      - "5001:5001"
+      - "8070:8070"
+    volumes:
+      - ipfs_data:/data/ipfs
+      - ipfs_staging:/export
+    networks:
+      - healthcare-network
+
+  ipfs-service:
+    build:
+      context: ./server/ipfs-service
+      dockerfile: Dockerfile
+    container_name: ipfs-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - broker
+      - ipfs
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - IPFS_NODE_HOST=ipfs-node
+      - IPFS_NODE_PORT=5001
+    restart: on-failure
+    networks:
+      - healthcare-network
+
+  health-analytics:
+    build:
+      context: ./server/health-analytics
+      dockerfile: Dockerfile
+    container_name: analytics-service
+    ports:
+      - "8084:8084"
+    networks:
+      - healthcare-network
+
+  chat-service:
+    build:
+      context: ./server/chat-service
+      dockerfile: Dockerfile
+    container_name: chat-service
+    ports:
+      - "8083:8083"
+    networks:
+      - healthcare-network
+
+  chat-history-service:
+    build:
+      context: ./server/chat-history-service
+      dockerfile: Dockerfile
+    container_name: chat-history-service
+    ports:
+      - "8091:8091"
+    networks:
+      - healthcare-network
+
+  # # Apache Zookeeper (for Kafka)
+  # zookeeper:
+  #   image: bitnami/zookeeper:3.8
+  #   ports:
+  #     - "2181:2181"
+  #   environment:
+  #     - ALLOW_ANONYMOUS_LOGIN=yes
+  #   networks:
+  #     - healthcare-network
+
+  # # Kafka broker
+  # kafka:
+  #   image: bitnami/kafka:3.4
+  #   ports:
+  #     - "9093:9093"
+  #   depends_on:
+  #     - zookeeper
+  #   environment:
+  #     - KAFKA_BROKER_ID=1
+  #     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+  #     - KAFKA_LISTENERS=PLAINTEXT://:9093
+  #     - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9093
+  #     - ALLOW_PLAINTEXT_LISTENER=yes
+  #   networks:
+  #     - healthcare-network
+
+  resource-manage-service:
+    build:
+      context: ./server/resource-manage-service
+      dockerfile: Dockerfile
+    container_name: resource-service
+    ports:
+      - "8087:8087"
+    depends_on:
+      - broker
+    environment:
+      # Database (pooler) connection
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://aws-0-ap-south-1.pooler.supabase.com:5432/postgres?ssl=true&sslmode=require
+      - SPRING_DATASOURCE_USERNAME=postgres.sbihxmjllrogpwipwrbq
+      - SPRING_DATASOURCE_PASSWORD=fJFCrWYnEPLNpVoE
+      # Tell Spring Boot to use the Kafka broker in this compose
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=broker:29092
+    networks:
+      - healthcare-network
+
+  appointment-service:
+    image: appointment-microservice
+    container_name: appointment-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - broker
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.dexlhxblzzhcfxqtleii
+      - DATABASE_PASSWORD=qwgfyqyg979
+      - KAFKA_BOOTSTRAP_SERVERS=broker:29092
+    restart: always
+    networks:
+      - healthcare-network
+
+  auth-service:
+    build:
+      context: ./server/service-auth
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8088:8088"
+    env_file:
+      - ./server/service-auth/.env
+    depends_on:
+      - broker
+    networks:
+      - healthcare-network
+
+  api-gateway:
+    build:
+      context: ./server/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./server/api-gateway/.env
+    depends_on:
+      - auth-service
+    networks:
+      - healthcare-network
+
+  schedule-service:
+    image: scheduler-microservice
+    container_name: schedule-service
+    ports:
+      - "8089:8089"
+    depends_on:
+      - broker
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.jreaxqbfwvelfqfrftvr
+      - DATABASE_PASSWORD=gwkf747234bfk
+      - KAFKA_BOOTSTRAP_SERVERS=broker:29092
+    restart: always
+    networks:
+      - healthcare-network
+
+  doctor-service:
+    image: doctor-microservice
+    container_name: doctors-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      - broker
+    environment: # Make sure these match your .env file
+      - DATABASE_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - DATABASE_USERNAME=postgres.qesabwhgqqmllzxxgcot
+      - DATABASE_PASSWORD=87uyh632389bsd
+      - KAFKA_BOOTSTRAP_SERVERS=broker:29092
+    restart: always
+    networks:
+      - healthcare-network
+
+volumes:
+  ipfs_data:
+  ipfs_staging:
+
+networks:
+  healthcare-network:
+    driver: bridge
