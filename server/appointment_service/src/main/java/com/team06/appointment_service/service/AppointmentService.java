@@ -37,7 +37,7 @@ public class AppointmentService {
         PatientDto patientId = appointmentRepo.findPatientBySlotId(slotId);
         if(patientId != null) {
             Map<String, String> map = new HashMap<>();
-            map.put("patient_id", patientId.getPatient_id());
+            map.put("patient_id", patientId.getPatient_id().toString());
             map.put("appointment_type", patientId.getAppointmemt_type());
             return ResponseEntity.ok(map);
         } else {
