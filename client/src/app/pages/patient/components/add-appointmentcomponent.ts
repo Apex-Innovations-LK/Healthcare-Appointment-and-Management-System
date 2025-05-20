@@ -163,7 +163,7 @@ export class AddAppointmentComponent implements OnInit {
         private authService: AuthService,
         private authStateService: AuthStateService,
         private notificationService: NotificationService
-    ) {}
+    ) { }
 
     ngOnInit() {
         console.log('Token in localStorage:', localStorage.getItem('token'));
@@ -197,6 +197,7 @@ export class AddAppointmentComponent implements OnInit {
                 // Parse the appointment data from the backend format
                 this.allAppointments = this.parseAppointmentData(data);
                 this.isLoading = false;
+                console.log("All appointments are " + this.parseAppointmentData(data));
             },
             error: (err) => {
                 console.error('Failed to fetch appointments:', err);
@@ -228,12 +229,21 @@ export class AddAppointmentComponent implements OnInit {
 
         if (Array.isArray(data) && data.length > 0) {
             data.forEach((item: any) => {
-                appointments.push({
-                    slot_id: item.slot_id,
-                    doctor_id: item.doctor_id,
-                    from: item.from,
-                    to: item.to
-                });
+                if (Array.isArray(item) && item.length >= 4) {
+                    appointments.push({
+                        slot_id: item[0],
+                        doctor_id: item[1],
+                        from: item[2],
+                        to: item[3]
+                    });
+                } else if (typeof item == 'object') {
+                    appointments.push({
+                        slot_id: item.session_id,
+                        doctor_id: item.doctor_id,
+                        from: item.from,
+                        to: item.to
+                    });
+                }
             });
         }
         console.log('Parsed appointments:', appointments);
@@ -255,18 +265,33 @@ export class AddAppointmentComponent implements OnInit {
         this.selectedDoctor = doctor;
         this.selectedSlot = null;
 
-        if (this.allAppointments.length === 0) {
-            // Appointments haven't loaded yet
-            this.notificationService.showWarning('Appointments are still loading. Please wait a moment.');
-            return;
-        }
+        this.doctorAppointments.forEach(a => {
+            console.log(a.slot_id); // or console.log(a) to inspect everything
+        });
 
-        console.log('Selected doctor:', doctor);
-        console.log('All appointments:', this.allAppointments);
-        console.log('doctor appointments before:', this.doctorAppointments);
+        const seen = new Set();
+
+        this.doctorAppointments = this.allAppointments.filter((appointment) => {
+            const isDoctorMatch = appointment.doctor_id === doctor.doctor_id;
+
+            if (!isDoctorMatch) return false;
+
+            const key = `${appointment.from}-${appointment.to}`;
+
+            if (seen.has(key)) {
+                return false;
+            }
+
+            seen.add(key);
+            return true;
+        });
+
+        this.doctorAppointments.map((item)=>{
+            console.log("Doctor session: "+item.from+"-"+item.to+"/"+item.doctor_id+">"+item.slot_id)
+        });
+        // console.log("Doctor appointments: "+)
         // Filter appointments for this doctor
-        this.doctorAppointments = this.allAppointments.filter((appointment) => appointment.doctor_id === doctor.doctor_id);
-        console.log('doctor appointments after:', this.doctorAppointments);
+        // this.doctorAppointments = this.allAppointments.filter((appointment) => appointment.doctor_id === doctor.doctor_id);
     }
 
     selectSlot(slot: AppointmentSlot) {
@@ -322,22 +347,21 @@ export class AddAppointmentComponent implements OnInit {
             }
         });
 
-        const notification: Notification = new Notification(
-            this.authStateService.getUserDetails()?.email || '',
-            'Appointment Confirmation',
-            `Your appointment with Dr. ${this.selectedDoctor.first_name} ${this.selectedDoctor.last_name} has been booked for ${this.formatAppointmentDate(this.selectedSlot.from)} at ${this.formatAppointmentTime(this.selectedSlot.from)}.`
-        );
+        // const notification: Notification = new Notification(
+        //     this.authStateService.getUserDetails()?.email || '',
+        //     'Appointment Confirmation',
+        //     `Your appointment with Dr. ${this.selectedDoctor.first_name} ${this.selectedDoctor.last_name} has been booked for ${this.formatAppointmentDate(this.selectedSlot.from)} at ${this.formatAppointmentTime(this.selectedSlot.from)}.`
+        // )
 
-        console.log(notification);
-        this.notificationService.sendNotification(notification).subscribe({
-            next: (response) => {
-                console.log('Notification sent successfully:', response);
-            },
-            error: (error) => {
-                console.error('Error sending notification:', error);
-                this.notificationService.showError('Failed to send notification. Please try again later.');
-            }
-        });
+        // this.notificationService.sendNotification(notification).subscribe({
+        //     next: (response) => {
+        //         console.log('Notification sent successfully:', response);
+        //     },
+        //     error: (error) => {
+        //         console.error('Error sending notification:', error);
+        //         this.notificationService.showError('Failed to send notification. Please try again later.');
+        //     }
+        // })
 
         this.selectedSlot = null;
     }

@@ -42,12 +42,19 @@ export interface SessionSlot {
     status: 'booked' | 'available' | 'rejected';
 }
 
+export interface Slot {
+    slotId: string;
+    session_id: string;
+    status: 'booked' | 'available' | 'rejected';
+}
+
 export interface PatientGeneralInfo {
-        patient_id: string;
-        name: string;
-        dob: string;
-        sex: string;
-        phone: string;
+        id: string;
+        first_name: string;
+        last_name: string;
+        date_of_birth: string;
+        gender: string;
+        phone_number: string;
 }
 
 export interface HealthRecord {

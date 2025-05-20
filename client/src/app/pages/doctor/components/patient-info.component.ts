@@ -12,23 +12,23 @@ import { PatientGeneralInfo } from '../../../models/doctor';
             <div class="flex flex-col gap-4">
                 <div>
                     <label class="patient-key block text-sm font-bold mb-1" for="id"> Id </label>
-                    <div class="mt-4 ml-10 border rounded-md py-2 px-3">{{ patientInfo.patient_id }}</div>
+                    <div class="mt-4 ml-10 border rounded-md py-2 px-3">{{ patientInfo.id }}</div>
                 </div>
                 <div>
                     <label class="patient-key block text-sm font-bold mb-1" for="name"> Name </label>
-                    <div class="mt-4 ml-10 border rounded-md py-2 px-3">{{ patientInfo.name }}</div>
+                    <div class="mt-4 ml-10 border rounded-md py-2 px-3">{{ patientInfo.first_name + " " + patientInfo.last_name }}</div>
                 </div>
                 <div>
                     <label class="patient-key block text-sm font-bold mb-1" for="dob"> Date of Birth </label>
-                    <div class="mt-4 ml-10 border rounded-md py-2 px-3">{{ patientInfo.dob }} (Age: {{ getAge(patientInfo.dob) }})</div>
+                    <div class="mt-4 ml-10 border rounded-md py-2 px-3">{{ patientInfo.date_of_birth }} (Age: {{ getAge(patientInfo.date_of_birth) }})</div>
                 </div>
                 <div>
                     <label class="patient-key block text-sm font-bold mb-1" for="sex"> Sex </label>
-                    <div class="mt-4 ml-10 border rounded-md py-2 px-3 capitalize">{{ patientInfo.sex }}</div>
+                    <div class="mt-4 ml-10 border rounded-md py-2 px-3 capitalize">{{ patientInfo.gender }}</div>
                 </div>
                 <div>
                     <label class="patient-key block text-sm font-bold mb-1" for="phone"> Phone </label>
-                    <div class="mt-4 ml-10 border rounded-md py-2 px-3">{{ patientInfo.phone }}</div>
+                    <div class="mt-4 ml-10 border rounded-md py-2 px-3">{{ patientInfo.phone_number }}</div>
                 </div>
             </div>
         </div>

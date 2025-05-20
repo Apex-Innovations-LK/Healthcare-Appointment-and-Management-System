@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import DoctorMicroservice.dto.ScheduleSlotBySessionId;
 import DoctorMicroservice.dto.ScheduleSlotDto;
+import DoctorMicroservice.dto.KafkaConsumerDto;
 import DoctorMicroservice.dto.ScheduleSlotSearchRequest;
 import DoctorMicroservice.entity.DoctorAvailability;
 import DoctorMicroservice.entity.ScheduleSlot;
@@ -46,7 +47,7 @@ public class ScheduleSlotServiceImpl implements ScheduleSlotService {
     }
     
     @Override
-    public ScheduleSlotDto updateScheduleSlot(ScheduleSlotDto scheduleSlotDto) {
+    public ScheduleSlotDto updateScheduleSlot(KafkaConsumerDto scheduleSlotDto) {
         UUID slotId = scheduleSlotDto.getSlotId();
 
         ScheduleSlot slot = scheduleSlotRepository.findBySlotId(slotId)
