@@ -1,18 +1,27 @@
-# Use a base image with Java 21
-#FROM maven:3.9.6-eclipse-temurin-21
-FROM amazoncorretto:21-alpine-jdk
+# 1. Build Stage
+FROM maven:3.9.4-eclipse-temurin-21 AS build
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the JAR file into the container
-COPY target/api-gateway-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
 
-# Copy the .env file into the container
-#COPY /docker/.env /app/.env
+COPY src ./src
 
-# Expose the port that your Spring Boot application runs on (default is 8080, but change if needed)
+RUN mvn clean package -DskipTests
+
+# 2. Runtime Stage
+FROM eclipse-temurin:21-jdk-jammy AS runtime
+
+ENV APP_HOME=/opt/api-gateway
+WORKDIR $APP_HOME
+
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Command to run the JAR file.  We don't need to specify the .env here, as the app loads it.
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
+
+
