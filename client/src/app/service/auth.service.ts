@@ -10,7 +10,7 @@ import { UserDetails } from '../models/userDetails';
     providedIn: 'root'
 })
 export class AuthService {
-    private baseURL = 'http://localhost:8080/api/auth';
+    private baseURL = 'http://35.184.60.72:8080/api/auth';
 
     constructor(private httpClient: HttpClient) {}
 
