@@ -32,7 +32,7 @@ services:
       - "8080:8080"
     depends_on:
       - appointment-service
-      - scheduler-service
+      - schedule-service
       - auth-service
       - doctor-service
     restart: always
@@ -55,9 +55,9 @@ services:
     networks:
       - backend-network
 
-  scheduler-service:
+  schedule-service:
     image: scheduler-microservice
-    container_name: scheduler-service
+    container_name: schedule-service
     ports:
       - "8082:8082"
     depends_on:
@@ -91,7 +91,7 @@ services:
     image: doctor-microservice
     container_name: doctor-service
     ports:
-      - "8084:8084"
+      - "8084:8080"
     depends_on:
       - kafka
     environment: # Make sure these match your .env file
