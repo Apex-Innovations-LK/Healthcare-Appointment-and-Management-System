@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
-@CrossOrigin(origins ="http://35.184.60.72:4200")
+@CrossOrigin(origins ="http://35.184.60.72")
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {

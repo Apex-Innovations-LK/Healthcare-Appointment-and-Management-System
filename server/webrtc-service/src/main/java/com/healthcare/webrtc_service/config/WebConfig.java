@@ -19,7 +19,7 @@ public class WebConfig {
         config.setAllowCredentials(true);
         
         // When using withCredentials:true, you MUST specify exact origins (not wildcards)
-        config.addAllowedOrigin("http://35.184.60.72:4200");
+        config.addAllowedOrigin("http://35.184.60.72");
         
         // Allow all headers and methods
         config.addAllowedHeader("*");

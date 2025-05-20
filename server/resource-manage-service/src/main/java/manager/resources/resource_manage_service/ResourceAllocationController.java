@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/resource/resource-allocation")
-@CrossOrigin(origins = "http://35.184.60.72:4200")
+@CrossOrigin(origins = "http://35.184.60.72")
 public class ResourceAllocationController {
     private final ResourceAllocationService resourceAllocationService;
     private final ResourceService resourceService;

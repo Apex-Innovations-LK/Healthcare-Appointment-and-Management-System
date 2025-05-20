@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/analytics/reports")
-@CrossOrigin(origins = "http://35.184.60.72:4200")
+@CrossOrigin(origins = "http://35.184.60.72")
 @Validated
 public class ReportController {
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);

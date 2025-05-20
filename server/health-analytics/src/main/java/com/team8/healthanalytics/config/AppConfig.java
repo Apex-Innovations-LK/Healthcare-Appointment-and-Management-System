@@ -71,7 +71,7 @@ public class AppConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")  // Allow CORS for all endpoints
-                .allowedOrigins("http://35.184.60.72:4200")  // Allow requests from 35.184.60.72:4200
+                .allowedOrigins("http://35.184.60.72")  // Allow requests from 35.184.60.72:4200
                 .allowedMethods("GET", "POST", "PUT", "DELETE")  // Allow specific HTTP methods
                 .allowedHeaders("*")  // Allow all headers
                 .allowCredentials(true);  // Allow credentials if necessary (e.g., cookies)

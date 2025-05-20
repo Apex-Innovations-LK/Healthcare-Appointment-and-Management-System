@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/resource")
-@CrossOrigin(origins = "http://35.184.60.72:4200")
+@CrossOrigin(origins = "http://35.184.60.72")
 public class ResourceController {
 
     private final ResourceService resourceService;

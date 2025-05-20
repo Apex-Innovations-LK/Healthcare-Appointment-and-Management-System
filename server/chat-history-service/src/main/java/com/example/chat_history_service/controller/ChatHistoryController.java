@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins ="http://35.184.60.72:4200")
+@CrossOrigin(origins ="http://35.184.60.72")
 @RestController
 @RequestMapping("/api/chat-history")
 public class ChatHistoryController {

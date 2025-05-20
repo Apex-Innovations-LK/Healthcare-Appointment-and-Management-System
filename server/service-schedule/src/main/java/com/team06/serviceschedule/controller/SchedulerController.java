@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@CrossOrigin(origins = "http://35.184.60.72:4200")
+@CrossOrigin(origins = "http://35.184.60.72")
 @RestController
 @RequestMapping("/api/schedule")
 public class SchedulerController {
