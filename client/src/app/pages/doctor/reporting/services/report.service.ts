@@ -8,7 +8,7 @@ import { ReportRequest, ReportData, VisualizationData, ExportRecord } from '../m
     providedIn: 'root'
 })
 export class ReportService {
-    private apiUrl = 'http://localhost:8080/api/reports';
+    private apiUrl = 'http://localhost:8080/api/analytics/reports';
     private exportHistory: ExportRecord[] = this.loadExportHistory();
 
     constructor(private http: HttpClient) {}

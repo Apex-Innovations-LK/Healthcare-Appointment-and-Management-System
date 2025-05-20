@@ -53,8 +53,8 @@ export class DoctorService {
     return this.httpClient.post<Slot[]>(apiUrl, { sessionId: session_id });
   }
 
-  uploadHr(hr: HealthRecord) {
-    const apiUrl = "http://127.0.0.1:8086/upload";
+  uploadHr(hr: HealthRecord){
+    const apiUrl = "http://127.0.0.1:8080/api/ipfs/upload";
     return this.httpClient.post(apiUrl, hr, { responseType: 'text' });
   }
 

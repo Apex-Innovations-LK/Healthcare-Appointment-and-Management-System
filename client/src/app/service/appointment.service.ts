@@ -29,8 +29,7 @@ export class AppointmentsService {
 
     getAppointments(): Observable<DoctorSessions[]> {
         return this.httpClient.get<any[]>(`${this.backendUrl}/get-slots`).pipe(
-            map((data: any[]) => {
-                
+            map((data: any[]) => {                
                 return data.map((item) => {
                     return new DoctorSessions(
                     item[0],

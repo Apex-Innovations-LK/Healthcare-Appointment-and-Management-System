@@ -44,7 +44,7 @@ import { MessageService } from 'primeng/api';
                 
                 <div class="flex flex-column align-items-center">
                     <div *ngIf="isRefreshing" class="flex justify-content-center align-items-center w-full" style="height: 300px">
-                        <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+                        <div class="spinner"></div>
                     </div>
                     <p-chart *ngIf="!isRefreshing" type="pie" [data]="distributionData" [options]="chartOptions" height="300px" width="300px"></p-chart>
                     <div class="text-center mt-3">
@@ -75,7 +75,7 @@ import { MessageService } from 'primeng/api';
                 </ng-template>
                 
                 <div *ngIf="isRefreshing" class="flex justify-content-center align-items-center" style="height: 200px">
-                    <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+                    <div class="spinner"></div>
                 </div>
                 
                 <p-table *ngIf="!isRefreshing" [value]="riskTable" styleClass="p-datatable-sm" responsiveLayout="scroll">
@@ -148,6 +148,19 @@ import { MessageService } from 'primeng/api';
         .risk-high { background: linear-gradient(90deg, #ffcdd2 0%, #e53935 100%); }
         .risk-moderate { background: linear-gradient(90deg, #fff9c4 0%, #fbc02d 100%); }
         .risk-low { background: linear-gradient(90deg, #c8e6c9 0%, #43a047 100%); }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1976d2;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     `]
 })
 export class RiskDistributionComponent implements OnInit {

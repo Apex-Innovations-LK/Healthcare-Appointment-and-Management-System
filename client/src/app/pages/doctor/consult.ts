@@ -115,6 +115,9 @@ export class Consult {
     slotIsRejected = false;
     slotIsNotBooked = false;
 
+    slotIsRejected = false;
+    slotIsNotBooked = false;
+
     sessionsList: any[] = [];
 
     currentPatientIndex = 0;
@@ -214,7 +217,7 @@ export class Consult {
             next: (response) => {
                 this.slots = response;
                 this.currentPatientIndex = 0;
-                console.log('Session slots for session ' + this.selectedSession.session_id + ': ', this.slots);
+                //console.log('Session slots for session ' + this.selectedSession.session_id + ': ', this.slots);
                 this.loadPatient();
             },
             error: (error) => {
@@ -246,11 +249,10 @@ export class Consult {
         } else {
             this.slotIsRejected = false;
             this.slotIsNotBooked = false;
-            console.log('selected slot id'+selectedSlot+ "index "+this.currentPatientIndex+this.slots);
+            //console.log('selected slot id'+selectedSlot+ "index "+this.currentPatientIndex+this.slots);
 
             this.doctorService.getSlotDataBySlotId(slot_id).subscribe({
                 next: (response) => {
-                    console.log("Slot extra info : ", response);
                     const patient_id = response.patient_id;
                     this.isVirtual = this.isNowBetweenTimes(this.selectedSession.from, this.selectedSession.to) && response.appoinment_type == 'VIRTUAL';
                     // console.log(' for session ' + this.session.session_id + ': ', this.slots);

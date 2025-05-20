@@ -11,6 +11,7 @@ import { MakeAppointment } from '../../../models/makeAppointment';
 import { NotificationService } from '../../../service/notification.service';
 import { RefreshButtonComponent } from './refreshButtonComponent';
 import { Notification } from '../../../models/Notification';
+import { DoctorSession } from '../../../models/doctor';
 
 interface Doctor {
     doctor_id: string;
@@ -108,13 +109,17 @@ interface AppointmentSlot {
                     </div>
                     <div class="flex justify-end space-x-4 mt-6">
                         <!-- Booking action buttons --><label for="diagnosisType" class="border p-2 ">Diagnosis Type</label>
-                        <select id="diagnosisType" [(ngModel)]="selectedDiagnosisType" name="diagnosisType" class="form-control border p-2 bg-primary-100 text-black" >
+                        <select id="diagnosisType" [(ngModel)]="selectedDiagnosisType" name="diagnosisType" class="form-control border p-2 bg-primary-100 text-black">
                             <option *ngFor="let type of diagnosisTypes" [value]="type">{{ type }}</option>
                         </select>
                     </div>
                     <div class="flex justify-end space-x-4 mt-6">
                         <button (click)="onCancel()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
                         <button (click)="bookAppointment()" [disabled]="!selectedSlot" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">Book Appointment</button>
+                    </div>
+                    <div *ngIf="isLoading" class="flex justify-center items-center mt-6">
+                        <i class="pi pi-spin pi-spinner text-3xl text-primary"></i>
+                        <span class="ml-3 text-lg text-primary">Booking confirmed! Refreshing...</span>
                     </div>
                 </div>
 
@@ -170,7 +175,7 @@ export class AddAppointmentComponent implements OnInit {
         this.isLoading = true;
         console.log('Loading doctors...');
         this.authService.getDoctors().subscribe({
-            next: (data: any) => {
+            next: (data: any[]) => {
                 console.log('Doctors data received:', data);
                 // Parse the doctor data from the backend format
                 this.allDoctors = this.parseDoctorData(data);
@@ -187,7 +192,7 @@ export class AddAppointmentComponent implements OnInit {
     loadAppointments() {
         this.isLoading = true;
         this.appointmentService.getAppointments().subscribe({
-            next: (data: any) => {
+            next: (data: any[]) => {
                 console.log('slots', data);
                 // Parse the appointment data from the backend format
                 this.allAppointments = this.parseAppointmentData(data);
@@ -220,7 +225,6 @@ export class AddAppointmentComponent implements OnInit {
     }
 
     parseAppointmentData(data: any): AppointmentSlot[] {
-        // Based on the console output format
         const appointments: AppointmentSlot[] = [];
 
         if (Array.isArray(data) && data.length > 0) {
@@ -242,6 +246,7 @@ export class AddAppointmentComponent implements OnInit {
                 }
             });
         }
+        console.log('Parsed appointments:', appointments);
         return appointments;
     }
 
@@ -328,13 +333,12 @@ export class AddAppointmentComponent implements OnInit {
         this.isBooking = true;
         this.appointmentService.bookAppointment(makeAppointment).subscribe({
             next: (response: string) => {
+                this.isLoading = true;
                 this.isBooking = false;
                 this.notificationService.showSuccess('Appointment booked successfully!');
-                const currentUrl = this.router.url;
-                this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-                    this.router.navigate([currentUrl]);
-                });
-                this.router.navigate(['/patient/appointments']);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             },
             error: (err) => {
                 this.isBooking = false;
@@ -366,3 +370,5 @@ export class AddAppointmentComponent implements OnInit {
         window.history.back();
     }
 }
+
+

@@ -21,7 +21,7 @@
    @Injectable({ providedIn: 'root' })
    export class AnalyticsService {
    
-     private readonly apiUrl = 'http://localhost:8080/api/analytics';
+     private readonly apiUrl = 'http://localhost:8080/api/analytics/data';
    
      constructor(private http: HttpClient) {}
    

@@ -60,7 +60,7 @@ export class CalendarViewComponent {
         if (this.type === 'schedule') {
             this.generateCurrentWeek();
         } else if (this.type === 'plan') {
-            this.generateNextWeek();
+            this.generateCurrentWeek();
         }
     }
 

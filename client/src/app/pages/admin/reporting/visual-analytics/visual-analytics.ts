@@ -21,14 +21,13 @@ import { ChartModule } from 'primeng/chart';
                 <h2 class="text-2xl font-bold mb-6">Visual Analytics</h2>
                 <form [formGroup]="filterForm" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
                         <div>
                             <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date</label>
-                            <p-calendar id="startDate" formControlName="startDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" class="w-full"></p-calendar>
+                            <p-calendar id="startDate" formControlName="startDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" [maxDate]="today" class="w-full"></p-calendar>
                         </div>
                         <div>
                             <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
-                            <p-calendar id="endDate" formControlName="endDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" class="w-full"></p-calendar>
+                            <p-calendar id="endDate" formControlName="endDate" dateFormat="yy-mm-dd" placeholder="YYYY-MM-DD" [maxDate]="today" class="w-full"></p-calendar>
                         </div>
                     </div>
                     <div class="mt-6">
@@ -37,7 +36,12 @@ import { ChartModule } from 'primeng/chart';
                 </form>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6" *ngIf="chartData">
+            <div *ngIf="isLoading" class="flex justify-center items-center mt-8">
+                <span class="pi pi-spin pi-spinner text-4xl text-blue-500"></span>
+                <span class="ml-3 text-lg text-blue-600">Loading data...</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6" *ngIf="chartData && !isLoading">
                 <div class="bg-white shadow-md rounded-lg p-6">
                     <h3 class="text-xl font-semibold mb-4">Visits by Month</h3>
                     <p-chart type="bar" [data]="chartData.visitsByMonth" [options]="chartOptions" class="h-64"></p-chart>
@@ -47,12 +51,12 @@ import { ChartModule } from 'primeng/chart';
                     <p-chart type="bar" [data]="chartData.diagnosis" [options]="chartOptions" class="h-64"></p-chart>
                 </div>
                 <div class="bg-white shadow-md rounded-lg p-6">
-                <h3 class="text-xl font-semibold mb-4">Age Distribution</h3>
-                <p-chart type="bar" [data]="chartData.age" [options]="chartOptions" class="h-64"></p-chart>
+                    <h3 class="text-xl font-semibold mb-4">Age Distribution</h3>
+                    <p-chart type="bar" [data]="chartData.age" [options]="chartOptions" class="h-64"></p-chart>
                 </div>
                 <div class="bg-white shadow-md rounded-lg p-6">
-                <h3 class="text-xl font-semibold mb-4">City Distribution</h3>
-                <p-chart type="bar" [data]="chartData.city" [options]="chartOptions" class="h-64"></p-chart>
+                    <h3 class="text-xl font-semibold mb-4">City Distribution</h3>
+                    <p-chart type="bar" [data]="chartData.city" [options]="chartOptions" class="h-64"></p-chart>
                 </div>
                 <div class="bg-white shadow-md rounded-lg p-6">
                     <h3 class="text-xl font-semibold mb-4">Sex Distribution</h3>
@@ -75,6 +79,9 @@ export class VisualAnalyticsComponent implements OnInit {
     filterForm: FormGroup;
     chartData: any = null;
     chartOptions: any;
+    isLoading: boolean = false;
+    today: Date = new Date(); // Current date to restrict future date selection
+
     // Array of colors for charts
     chartColors = {
         primary: ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD'],
@@ -103,7 +110,20 @@ export class VisualAnalyticsComponent implements OnInit {
         };
     }
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        // Add date validation
+        this.filterForm.get('endDate')?.valueChanges.subscribe((endDate) => {
+            const startDate = this.filterForm.get('startDate')?.value;
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                this.messageService.add({
+                    severity: 'warn',
+                    summary: 'Invalid Date Range',
+                    detail: 'End date cannot be before start date'
+                });
+                this.filterForm.get('endDate')?.setValue(null);
+            }
+        });
+    }
 
     private formatDate(date: any): string | null {
         if (!date) return null;
@@ -139,7 +159,7 @@ export class VisualAnalyticsComponent implements OnInit {
             this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Please select a report type' });
             return;
         }
-
+        this.isLoading = true;
         const request: ReportRequest = this.formatRequest(this.filterForm.value);
         this.reportService.getVisualizationData(request).subscribe({
             next: (data: VisualizationData) => {
@@ -165,11 +185,13 @@ export class VisualAnalyticsComponent implements OnInit {
                         datasets: [{ label: 'City Distribution', data: data.city_values, backgroundColor: '#8B5CF6' }]
                     }
                 };
+                this.isLoading = false;
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Visualization data loaded' });
             },
             error: (error: Error) => {
+                this.isLoading = false;
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message });
             }
-        });
-    }
+        });
+    }
 }
