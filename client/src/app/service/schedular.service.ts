@@ -10,7 +10,7 @@ import { map } from 'rxjs/operators';
     providedIn: 'root'
 })
 export class SchedularService {
-    private baseURL = 'http://localhost:8080/api/schedule';
+    private baseURL = 'http://35.184.60.72:8080/api/schedule';
 
     constructor(private httpClient: HttpClient) {}
 

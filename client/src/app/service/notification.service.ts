@@ -9,7 +9,7 @@ import { Notification } from '../models/Notification';
     providedIn: 'root'
 })
 export class NotificationService {
-    private baseURL = 'http://localhost:8080/api/notify';
+    private baseURL = 'http://35.184.60.72:8080/api/notify';
     constructor(private messageService: MessageService, private httpClient : HttpClient) {}
 
     showSuccess(message: string, title: string = 'Success') {

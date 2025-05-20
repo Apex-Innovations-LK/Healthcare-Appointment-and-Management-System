@@ -2,4 +2,4 @@
 
 bin/windows/zookeeper-server-start.bat config/zookeeper.properties
 
-bin/windows/kafka-console-consumer.bat --topic doctor_session --from-beginning --bootstrap-server localhost:9092
+bin/windows/kafka-console-consumer.bat --topic doctor_session --from-beginning --bootstrap-server 35.184.60.72:9092

@@ -20,7 +20,7 @@ interface Appointments {
     providedIn: 'root'
 })
 export class AppointmentsService {
-    private backendUrl = 'http://localhost:8080/api/appointment';
+    private backendUrl = 'http://35.184.60.72:8080/api/appointment';
 
     constructor(
         private httpClient: HttpClient,

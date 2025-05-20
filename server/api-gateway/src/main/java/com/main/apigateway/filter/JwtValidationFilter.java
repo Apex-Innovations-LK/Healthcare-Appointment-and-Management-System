@@ -22,7 +22,7 @@ public class JwtValidationFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
 
         String path = req.getRequestURI();
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+        res.setHeader("Access-Control-Allow-Origin", "http://35.184.60.72:4200");
         res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
         res.setHeader("Access-Control-Allow-Credentials", "true");

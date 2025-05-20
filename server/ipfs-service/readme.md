@@ -52,7 +52,7 @@ Configuration is handled automatically within the Docker container.
 ## API Endpoints
 
 ### IPFS Core API
-- Base URL: http://localhost:5001/api/v0
+- Base URL: http://35.184.60.72:5001/api/v0
 - Check IPFS version: 
   ```bash
   curl -X POST http://127.0.0.1:5001/api/v0/version

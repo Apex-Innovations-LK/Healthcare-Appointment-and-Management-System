@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")   // single place for CORS
+@CrossOrigin(origins = "http://35.184.60.72:4200")   // single place for CORS
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;

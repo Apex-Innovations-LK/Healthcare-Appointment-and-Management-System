@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DoctorService {
-  private baseURL = 'http://localhost:8080/api/doctors';
+  private baseURL = 'http://35.184.60.72:8080/api/doctors';
   constructor(private httpClient: HttpClient) { }
 
   getSessionsForDate(doctor_id:string, date: string) {
@@ -64,12 +64,12 @@ export class DoctorService {
   }
 
   getSlotDataBySlotId(slot_id: string){
-    const apiUrl = "http://localhost:8080/api/appointment/get-patient";
+    const apiUrl = "http://35.184.60.72:8080/api/appointment/get-patient";
     return this.httpClient.post<ExtraSlotInfo>(apiUrl, slot_id);
   }
 
   getPatientGeneralInfo(patient_id: string) {
-    const apiUrl = "http://localhost:8080/api/auth/fetch-userinfo";
+    const apiUrl = "http://35.184.60.72:8080/api/auth/fetch-userinfo";
     return this.httpClient.post<PatientGeneralInfo>(apiUrl, patient_id);
   }
 }

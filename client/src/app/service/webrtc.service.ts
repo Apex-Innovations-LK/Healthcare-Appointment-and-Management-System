@@ -15,7 +15,7 @@ export interface WebRTCCallSession {
   providedIn: 'root'
 })
 export class WebRTCService {
-  private apiUrl = 'http://localhost:8080/api/webrtc/calls';
+  private apiUrl = 'http://35.184.60.72:8080/api/webrtc/calls';
 
   constructor(private http: HttpClient) {}
 

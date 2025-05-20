@@ -10,7 +10,7 @@ import { Observable } from "rxjs";
 })
 
 export class ResourceService {
-    private apiServerUrl = "http://localhost:8080/api/resource"; // Replace with your API server URL
+    private apiServerUrl = "http://35.184.60.72:8080/api/resource"; // Replace with your API server URL
 
     constructor(private http: HttpClient) {}
 

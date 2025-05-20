@@ -31,8 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource(properties = {
-        "spring.kafka.bootstrap-servers=localhost:9092",
-        "ipfs.node.host=localhost"
+        "spring.kafka.bootstrap-servers=35.184.60.72:9092",
+        "ipfs.node.host=35.184.60.72"
 })
 public class IPFSServiceIntegrationTest {
 

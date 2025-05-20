@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/resource/staff-utilization")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://35.184.60.72:4200")
 public class StaffAllocationController {
     private final StaffAllocationService staffAllocationService;
 

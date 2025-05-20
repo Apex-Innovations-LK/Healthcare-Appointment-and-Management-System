@@ -50,7 +50,7 @@ public class AppConfig implements WebMvcConfigurer {
                 .appName("HealthcareAnalytics")
                 .master("local[*]")
                 .config("spark.driver.memory", "2g")
-                .config("spark.driver.host", "localhost")
+                .config("spark.driver.host", "35.184.60.72")
                 .config("spark.sql.session.timeZone", "UTC")
                 .config("spark.ui.enabled", "false") 
                 .config("spark.ui.showConsoleProgress", "false")
@@ -71,7 +71,7 @@ public class AppConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")  // Allow CORS for all endpoints
-                .allowedOrigins("http://localhost:4200")  // Allow requests from localhost:4200
+                .allowedOrigins("http://35.184.60.72:4200")  // Allow requests from 35.184.60.72:4200
                 .allowedMethods("GET", "POST", "PUT", "DELETE")  // Allow specific HTTP methods
                 .allowedHeaders("*")  // Allow all headers
                 .allowCredentials(true);  // Allow credentials if necessary (e.g., cookies)

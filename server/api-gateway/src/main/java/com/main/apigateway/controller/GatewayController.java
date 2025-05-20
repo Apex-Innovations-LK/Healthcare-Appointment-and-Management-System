@@ -69,17 +69,17 @@ public class GatewayController {
 
     private String getPort(String service) {
         return switch (service.toLowerCase()) {
-            case "appointment" -> "81"; // http://localhost:8081
-            case "blockchain" -> "82";   // http://localhost:8082
-            case "chat" -> "83";   // http://localhost:8083
-            case "analytics" -> "84";   // http://localhost:8084
-            case "ipfs" -> "85";   // http://localhost:8085
-            case "doctors" -> "86"; // http://localhost:8086
-            case "resource" -> "87";   // http://localhost:8087
-            case "auth" -> "88";   // http://localhost:8088
-            case "schedule" -> "89";   // http://localhost:8089
-            case "webrtc" -> "90";   // http://localhost:8090
-            case "chat-history" -> "91";   // http://localhost:8091
+            case "appointment" -> "81"; // http://35.184.60.72:8081
+            case "blockchain" -> "82";   // http://35.184.60.72:8082
+            case "chat" -> "83";   // http://35.184.60.72:8083
+            case "analytics" -> "84";   // http://35.184.60.72:8084
+            case "ipfs" -> "85";   // http://35.184.60.72:8085
+            case "doctors" -> "86"; // http://35.184.60.72:8086
+            case "resource" -> "87";   // http://35.184.60.72:8087
+            case "auth" -> "88";   // http://35.184.60.72:8088
+            case "schedule" -> "89";   // http://35.184.60.72:8089
+            case "webrtc" -> "90";   // http://35.184.60.72:8090
+            case "chat-history" -> "91";   // http://35.184.60.72:8091
 
             default -> throw new IllegalArgumentException("Unknown service: " + service);
         };
