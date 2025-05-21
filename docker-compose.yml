@@ -142,7 +142,9 @@ services:
       - healthcare-network
 
   appointment-service:
-    image: appointment-microservice
+    build:
+      context: ./server/appointment_service
+      dockerfile: Dockerfile
     container_name: appointment-service
     ports:
       - "8081:8081"
@@ -186,7 +188,9 @@ services:
       - healthcare-network
 
   schedule-service:
-    image: scheduler-microservice
+    build:
+      context: ./server/service-schedule
+      dockerfile: Dockerfile
     container_name: schedule-service
     ports:
       - "8089:8089"
@@ -202,7 +206,9 @@ services:
       - healthcare-network
 
   doctor-service:
-    image: doctor-microservice
+    build:
+      context: ./server/Microservice-Doctor/springboot-kafka-project
+      dockerfile: Dockerfile
     container_name: doctors-service
     ports:
       - "8086:8086"
