@@ -56,7 +56,7 @@ import { NotificationService } from '../../service/notification.service';
     <div *ngIf="(!selectedDate) || (!selectedSessionID) || slotIsRejected || slotIsNotBooked" class="overlay">
         <div class="overlay-content">
             <p *ngIf="slotIsRejected">This slot has been rejected by you.</p>
-            <p *ngIf="slotIsNotBooked">This slot is not booked by any patient.</p>
+            <p *ngIf="slotIsNotBooked && !slotIsRejected">This slot is not booked by any patient.</p>
             <p *ngIf="!selectedDate || !selectedSessionID">Please select respectively a date and a session to view deatils. Then you can move among slots of the selected session using next and previous buttons.</p>
 
         </div>
@@ -111,9 +111,6 @@ export class Consult {
     isVirtual = false;
     sessions: DoctorSession[] = [];
     slots: Slot[] = [];
-
-    slotIsRejected = false;
-    slotIsNotBooked = false;
 
     slotIsRejected = false;
     slotIsNotBooked = false;
