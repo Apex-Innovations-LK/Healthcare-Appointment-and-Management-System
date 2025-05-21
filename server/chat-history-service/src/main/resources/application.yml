@@ -3,7 +3,7 @@ spring:
     url: jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
     username: postgres.teiepvrwtcrpjljcycyr
     password: DAnuja2020123
-    driver-class-name: org.postgresql.Driver
+    # driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
