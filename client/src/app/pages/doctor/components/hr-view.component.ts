@@ -76,15 +76,23 @@ export class HRViewComponent {
     }
 
     loadHrs() {
-        this.doctorService.getHrsByPatientId(this.patientInfo.id).subscribe({
-            next: (response) => {
-                this.hrs = response;
-                console.log('HRs fetched successfully');
-            },
-            error: (error) => {
-                console.error('Error fetching hrs:', error);
-            }
-        });
+        setTimeout(() => {
+            if (this.patientInfo && this.patientInfo.id) {
+            console.log('Loading HRs for patient ID:', this.patientInfo.id);
+            this.doctorService.getHrsByPatientId(this.patientInfo.id).subscribe({
+                next: (response) => {
+                    this.hrs = response;
+                    console.log('HRs fetched successfully'+response);
+                },
+                error: (error) => {
+                    console.error('Error fetching hrs:', error);
+                }
+            });
+        }else{
+            console.log('No patient ID provided');
+        }
+    }, 5000);
+        
     }
 
     ngOnInit() {
@@ -93,6 +101,7 @@ export class HRViewComponent {
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['refreshView'] && this.refreshView) {
+            console.log('Refresh view triggered');
             this.loadHrs();
         }
     }

@@ -70,7 +70,7 @@ import { NotificationService } from '../../service/notification.service';
                     <app-add-new-hr [refreshHrView]="triggerHrViewRefresh" [patientInfo]="patientGeneralInfo" class="w-full" />
                 </ng-template>
                 <ng-template #panel>
-                    <app-health-records [patientInfo]="patientGeneralInfo" class="w-full" />
+                    <app-health-records [patientInfo]="patientGeneralInfo" [refreshView]="hrViewRefresh" class="w-full" />
                 </ng-template>
             </p-splitter>
         </div>
@@ -285,6 +285,7 @@ export class Consult {
         if (this.currentPatientIndex < this.slots.length - 1) {
             this.currentPatientIndex++;
             this.loadPatient();
+            this.triggerHrViewRefresh();
             // console.log('selected slot '+this.selected)
         }
     }
@@ -293,6 +294,7 @@ export class Consult {
         if (this.currentPatientIndex > 0) {
             this.currentPatientIndex--;
             this.loadPatient();
+            this.triggerHrViewRefresh();
         }
     }
 }

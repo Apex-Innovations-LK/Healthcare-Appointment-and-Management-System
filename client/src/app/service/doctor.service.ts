@@ -59,8 +59,8 @@ export class DoctorService {
   }
 
   getHrsByPatientId(patient_id: string): Observable<HealthRecord[]> {
-    const apiUrl = this.baseURL + '/getHealthRecordsByPatientId';
-    return this.httpClient.post<HealthRecord[]>(apiUrl, { patientId: patient_id });
+    const apiUrl = "http://127.0.0.1:8080/api/blockchain/records/patient/" + patient_id;
+    return this.httpClient.get<HealthRecord[]>(apiUrl);
   }
 
   getSlotDataBySlotId(slot_id: string) {

@@ -129,6 +129,7 @@ export class AddNewHRComponent {
                 lbf_data: newRecord.lbf_data,
                 his_data: newRecord.his_data
             };
+            console.log('Health Record:', hr);
 
             this.doctorService.uploadHr(hr).subscribe({
                 next: (response) => {
