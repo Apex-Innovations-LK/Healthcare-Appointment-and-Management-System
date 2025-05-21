@@ -115,9 +115,6 @@ export class Consult {
     slotIsRejected = false;
     slotIsNotBooked = false;
 
-    slotIsRejected = false;
-    slotIsNotBooked = false;
-
     sessionsList: any[] = [];
 
     currentPatientIndex = 0;
