@@ -76,7 +76,7 @@ public class GatewayController {
             case "ipfs" -> "85";   // http://localhost:8085
             case "doctors" -> "86"; // http://localhost:8086
             case "resource" -> "87";   // http://localhost:8087
-            // case "auth" -> "88";   // http://localhost:8088
+            case "auth" -> "88";   // http://localhost:8088
             case "schedule" -> "89";   // http://localhost:8089
             case "webrtc" -> "90";   // http://localhost:8090
             case "chat-history" -> "91";   // http://localhost:8091
