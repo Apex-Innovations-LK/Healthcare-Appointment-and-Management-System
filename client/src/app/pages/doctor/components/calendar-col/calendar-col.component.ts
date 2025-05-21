@@ -84,9 +84,11 @@ export class CalendarColComponent {
 
     loadSessions(): void {
         const userDetails = this.authStateService.getUserDetails();
-        const doctor_id = userDetails ? userDetails.id : '';
-        //const doctor_id = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
-        this.doctorService.getSessionsForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
+
+        if (userDetails && userDetails.id) {
+            // ✅ User details fetched successfully — run your code here
+            const doctor_id = userDetails.id;
+            this.doctorService.getSessionsForDate(doctor_id, this.toLocalISOString(this.date)).subscribe({
             next: (response) => {
                 this.sessions = response;
                 console.log(this.toLocalISOString(this.date), this.sessions);
@@ -95,6 +97,15 @@ export class CalendarColComponent {
                 console.error('Error fetching sessions for date' + this.date + ': ', error);
             }
         });
+            // ...your logic using doctor_id
+        } else {
+            // ❌ Couldn't fetch user details
+            console.error('Cannot fetch user details.');
+            // Or show a user-friendly message
+            // this.toastService.error('Failed to fetch user details. Please log in again.');
+        }
+        //const doctor_id = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
+        
     }
 
     loadAvailabilities() {

@@ -3,7 +3,7 @@ import { Component, ElementRef, Input, SimpleChanges, ViewChild } from '@angular
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
-import { DoctorSession, SessionSlot } from '../../../../models/doctor';
+import { DoctorSession, SessionSlot, Slot } from '../../../../models/doctor';
 import { DoctorService } from '../../../../service/doctor.service';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
 import { Router } from '@angular/router';
@@ -27,7 +27,7 @@ export class CalendarSessionComponent {
 
     @ViewChild('componentRef2') componentRef!: ElementRef;
 
-    slots!: SessionSlot[];
+    slots: Slot[] = [];
 
     fromTime!: Date;
     toTime!: Date;

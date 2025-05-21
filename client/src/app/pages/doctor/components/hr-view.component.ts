@@ -76,7 +76,7 @@ export class HRViewComponent {
     }
 
     loadHrs() {
-        this.doctorService.getHrsByPatientId(this.patientInfo.patient_id).subscribe({
+        this.doctorService.getHrsByPatientId(this.patientInfo.id).subscribe({
             next: (response) => {
                 this.hrs = response;
                 console.log('HRs fetched successfully');

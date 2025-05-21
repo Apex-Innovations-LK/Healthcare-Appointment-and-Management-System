@@ -29,14 +29,15 @@ export class AppointmentsService {
 
     getAppointments(): Observable<DoctorSessions[]> {
         return this.httpClient.get<any[]>(`${this.backendUrl}/get-slots`).pipe(
-            map((data: any[]) => {
-                console.log(data)
-                return data.map((item) => new DoctorSessions(
+            map((data: any[]) => {                
+                return data.map((item) => {
+                    return new DoctorSessions(
                     item[0],
                     item[1],
                     new Date(item[2]),
-                    new Date(item[3])
-                ));
+                    new Date(item[3]));
+                }
+            );
             })
         );
     }

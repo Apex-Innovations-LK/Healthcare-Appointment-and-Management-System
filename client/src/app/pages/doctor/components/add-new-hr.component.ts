@@ -4,7 +4,7 @@ import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } fr
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { FieldsetModule } from 'primeng/fieldset';
-import { HealthRecord } from '../../../models/doctor';
+import { HealthRecord, PatientGeneralInfo } from '../../../models/doctor';
 import { v4 as uuid } from 'uuid';
 import { AuthStateService } from '../../../service/auth-state.service';
 import { DoctorService } from '../../../service/doctor.service';
@@ -64,13 +64,7 @@ import { DoctorService } from '../../../service/doctor.service';
 export class AddNewHRComponent {
     recordForm: FormGroup;
 
-    @Input() patientInfo!: {
-        patient_id: string;
-        name: string;
-        dob: string;
-        sex: string;
-        phone: string;
-    };
+    @Input() patientInfo!: PatientGeneralInfo;
 
     @Input() refreshHrView!:() => void;
 
@@ -113,24 +107,25 @@ export class AddNewHRComponent {
             //const doctorId = '54b38592-bdfe-4d2f-b490-50fcb587e2fc';
             const date = new Date().toISOString();
             const record_id = uuid();
+            const fullName = this.patientInfo.first_name+" "+this.patientInfo.last_name;
 
             const hr: HealthRecord = {
                 record_id: record_id,
-                patient_id: this.patientInfo.patient_id,
-                patient_name: this.patientInfo.name,
-                patient_dob: this.patientInfo.dob,
+                patient_id: this.patientInfo.id,
+                patient_name: fullName,
+                patient_dob: this.patientInfo.date_of_birth,
                 date_of_service: date,
                 referring_doctor: doctor_id,
                 chief_complaint: newRecord.chief_complaint,
                 allergies: newRecord.allergies,
                 medications: newRecord.medications,
                 problem_list: newRecord.problem_list,
-                patient_sex: this.patientInfo.sex,
+                patient_sex: this.patientInfo.gender,
                 address: newRecord.address,
                 city: newRecord.city,
                 state: newRecord.state,
                 zip: newRecord.zip,
-                patient_phone: this.patientInfo.phone,
+                patient_phone: this.patientInfo.phone_number,
                 lbf_data: newRecord.lbf_data,
                 his_data: newRecord.his_data
             };
