@@ -127,14 +127,14 @@ import { MessageService } from 'primeng/api';
                 
                 <div class="mt-3 pl-2">
                     <h4>Risk Classification Criteria</h4>
-                    <ul class="pl-6 line-height-3">
+                    <ul class="pl-6 line-height-3 text-lg">
                         <li><span class="text-red-500 font-bold">High Risk</span>: Patients with Z-scores > 2.5 for blood glucose, > 2.0 for blood pressure, or < -2.0 for hemoglobin.</li>
                         <li><span class="text-yellow-500 font-bold">Moderate Risk</span>: Patients with Z-scores between 1.5-2.5 for key metrics or multiple moderate deviations.</li>
                         <li><span class="text-green-500 font-bold">Low Risk</span>: Patients with normal metrics within 1.5 standard deviations of population means.</li>
                     </ul>
                     
                     <h4 class="mt-4">Clinical Implications</h4>
-                    <p class="line-height-3">
+                    <p class="line-height-3 text-lg">
                         This analysis allows healthcare providers to efficiently allocate resources by focusing on high-risk patients, 
                         implementing preventive measures for moderate-risk patients, and maintaining routine care for low-risk patients.
                         Early interventions based on this risk stratification can significantly improve health outcomes and reduce healthcare costs.
