@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import com.team07.ipfs_service.dto.HealthRecord;
 import com.team07.ipfs_service.services.ipfs.IPFSService;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/ipfs")
 public class IPFSController {
