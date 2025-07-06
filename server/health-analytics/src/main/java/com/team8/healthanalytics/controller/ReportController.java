@@ -117,8 +117,15 @@ public class ReportController {
             // City Distribution
             Map<String, Long> cityDist = reportData.getData().stream()
                     .collect(Collectors.groupingBy(r -> (String) r.get("city"), Collectors.counting()));
-            vizData.put("city_labels", cityDist.keySet().stream().sorted().collect(Collectors.toList()));
-            vizData.put("city_values", cityDist.values().stream().collect(Collectors.toList()));
+            List<String> sortedCityLabels = cityDist.entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+            List<Long> sortedCityValues = sortedCityLabels.stream()
+                    .map(cityDist::get)
+                    .collect(Collectors.toList());
+            vizData.put("city_labels", sortedCityLabels);
+            vizData.put("city_values", sortedCityValues);
 
             vizData.put("summary", reportData.getSummary());
             return ResponseEntity.ok(vizData);

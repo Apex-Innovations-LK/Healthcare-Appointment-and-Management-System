@@ -192,6 +192,6 @@ export class VisualAnalyticsComponent implements OnInit {
                 this.isLoading = false;
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message });
             }
-        });
-    }
+        });
+    }
 }

@@ -8,6 +8,7 @@ import { HealthRecord, PatientGeneralInfo } from '../../../models/doctor';
 import { v4 as uuid } from 'uuid';
 import { AuthStateService } from '../../../service/auth-state.service';
 import { DoctorService } from '../../../service/doctor.service';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
     selector: 'app-add-new-hr',
@@ -71,7 +72,8 @@ export class AddNewHRComponent {
     constructor(
         private fb: FormBuilder,
         private doctorService: DoctorService,
-        private authStateService: AuthStateService
+        private authStateService: AuthStateService,
+        private notificationService: NotificationService
     ) {
         this.recordForm = this.fb.group({
             address: ['', Validators.required],
@@ -138,6 +140,7 @@ export class AddNewHRComponent {
                     for (let key of Object.keys(this.recordForm.controls)) {
                         this.recordForm.setControl(key, this.fb.array([]));
                     }
+                    this.notificationService.showSuccess('Health Record uploaded successfully');
                     this.refreshHrView();
                 },
                 error: (error) => {
